@@ -15,6 +15,7 @@
 #include <linux/module.h>
 #include <linux/platform_device.h>
 #include <linux/miscdevice.h>
+#include <linux/of.h>
 #include <linux/init.h>
 
 #define DRV_NAME "extsys_ctrl"
