@@ -40,6 +40,9 @@
 
 /* IOCTL commands */
 #define EXTSYS_CPU_WAIT_DISABLE 0x0
+#define EXTSYS_RST_REQ_ENABLE   0x1
+#define EXTSYS_RST_REQ_DISABLE  0x3
+#define EXTSYS_RST_ST           0x4
 
 struct extsys_ctrl {
 	struct miscdevice miscdev;
@@ -48,6 +51,7 @@ struct extsys_ctrl {
 };
 
 #define CLEAR_BIT(addr, index) writel(readl(addr) & ~(1UL << index), addr)
+#define SET_BIT(addr, index) writel(readl(addr) | (1UL << index), addr)
 
 static long extsys_ctrl_ioctl(struct file *f,
 		unsigned int cmd, unsigned long arg)
@@ -58,6 +62,14 @@ static long extsys_ctrl_ioctl(struct file *f,
 	case EXTSYS_CPU_WAIT_DISABLE:
 		CLEAR_BIT(drvdata->rstreg, EXTSYS_CPU_WAIT);
 		break;
+	case EXTSYS_RST_REQ_ENABLE:
+		SET_BIT(drvdata->rstreg, EXTSYS_RST_REQ);
+		break;
+	case EXTSYS_RST_REQ_DISABLE:
+		CLEAR_BIT(drvdata->rstreg,EXTSYS_RST_REQ);
+		break;
+	case EXTSYS_RST_ST:
+		return readl(drvdata->streg);
 	default:
 		break;
 	}
