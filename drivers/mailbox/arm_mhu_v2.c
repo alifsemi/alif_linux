@@ -51,15 +51,25 @@ static irqreturn_t mhuv2_rx_interrupt(int irq, void *p)
 {
 	struct mbox_chan *chan = p;
 	struct mhuv2_link *mlink = chan->con_priv;
+	unsigned int i, pchans;
 	u32 val;
 
-	val = readl_relaxed(mlink->rx_reg + MHU_V2_REG_STAT_OFS);
-	if (!val)
-		return IRQ_NONE;
+	pchans = readl_relaxed(mlink->rx_reg + MHU_V2_REG_MSG_NO_CAP_OFS);
+	if (pchans == 0 || pchans % 2) {
+		dev_err(mlink->rx_reg, "invalid number of channels %d\n", pchans);
+		return -EINVAL;
+	}
 
-	mbox_chan_received_data(chan, (void *)&val);
+	for(i = 0; i < pchans ; ++i) {
+		val = readl_relaxed(mlink->rx_reg + ((i * MHU_V2_EACH_CHANNEL_SIZE) + MHU_V2_REG_STAT_OFS));
+		if (!val) {
+			continue;
+		}
 
-	writel_relaxed(val, mlink->rx_reg + MHU_V2_REG_CLR_OFS);
+		mbox_chan_received_data(chan, (void *)&val);
+
+		writel_relaxed(val, (mlink->rx_reg + ((i * MHU_V2_EACH_CHANNEL_SIZE) + MHU_V2_REG_CLR_OFS)));
+	}
 
 	return IRQ_HANDLED;
 }
@@ -76,9 +86,19 @@ static int mhuv2_send_data(struct mbox_chan *chan, void *data)
 {
 	struct mhuv2_link *mlink = chan->con_priv;
 	u32 *arg = data;
+	struct arm_mhuv2 *mhuv2 = mbox_to_arm_mhuv2(chan->mbox);
+	unsigned int i, pchans;
 
-	writel_relaxed(*arg, mlink->tx_reg + MHU_V2_REG_SET_OFS);
+	pchans = readl_relaxed(mhuv2->base + MHU_V2_REG_MSG_NO_CAP_OFS);
+	if (pchans == 0 || pchans % 2) {
+		dev_err(mhuv2->base, "invalid number of channels %d\n", pchans);
+		return -EINVAL;
+	}
 
+	for(i = 0; i < pchans ; ++i) {
+		writel_relaxed(*arg, mhuv2->base + ((i * MHU_V2_EACH_CHANNEL_SIZE) + MHU_V2_REG_SET_OFS));
+		arg++;
+	}
 	return 0;
 }
 
