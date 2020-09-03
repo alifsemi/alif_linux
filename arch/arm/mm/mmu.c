@@ -575,7 +575,7 @@ static void __init build_mem_type_table(void)
 	 * Check is it with support for the PXN bit
 	 * in the Short-descriptor translation table format descriptors.
 	 */
-	if (cpu_arch == CPU_ARCH_ARMv7 &&
+	if (((cpu_arch == CPU_ARCH_ARMv7) || (cpu_arch == CPU_ARCH_ARMv8)) &&
 		(read_cpuid_ext(CPUID_EXT_MMFR0) & 0xF) >= 4) {
 		user_pmd_table |= PMD_PXNTABLE;
 	}

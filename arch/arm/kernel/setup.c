@@ -227,7 +227,7 @@ static const char *proc_arch[] = {
 	"6TEJ",
 	"7",
 	"7M",
-	"?(12)",
+	"8",
 	"?(13)",
 	"?(14)",
 	"?(15)",
@@ -258,8 +258,13 @@ static int __get_cpu_architecture(void)
 		 * Register 0 and check for VMSAv7 or PMSAv7 */
 		unsigned int mmfr0 = read_cpuid_ext(CPUID_EXT_MMFR0);
 		if ((mmfr0 & 0x0000000f) >= 0x00000003 ||
-		    (mmfr0 & 0x000000f0) >= 0x00000030)
+		    (mmfr0 & 0x000000f0) >= 0x00000030) {
 			cpu_arch = CPU_ARCH_ARMv7;
+			if ((read_cpuid_part() == ARM_CPU_PART_CORTEX_A32) ||
+			    (read_cpuid_part() == ARM_CPU_PART_CORTEX_A73) ||
+			    (read_cpuid_part() == ARM_CPU_PART_CORTEX_A75))
+				cpu_arch = CPU_ARCH_ARMv8;
+		}
 		else if ((mmfr0 & 0x0000000f) == 0x00000002 ||
 			 (mmfr0 & 0x000000f0) == 0x00000020)
 			cpu_arch = CPU_ARCH_ARMv6;
@@ -291,6 +296,7 @@ static int cpu_has_aliasing_icache(unsigned int arch)
 	/* arch specifies the register format */
 	switch (arch) {
 	case CPU_ARCH_ARMv7:
+	case CPU_ARCH_ARMv8:
 		set_csselr(CSSELR_ICACHE | CSSELR_L1);
 		isb();
 		id_reg = read_ccsidr();
@@ -1274,7 +1280,7 @@ static int c_show(struct seq_file *m, void *v)
 
 		seq_printf(m, "\nCPU implementer\t: 0x%02x\n", cpuid >> 24);
 		seq_printf(m, "CPU architecture: %s\n",
-			   proc_arch[cpu_architecture()]);
+			proc_arch[cpu_architecture()]);
 
 		if ((cpuid & 0x0008f000) == 0x00000000) {
 			/* pre-ARM7 */

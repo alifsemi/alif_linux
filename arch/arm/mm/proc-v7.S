@@ -122,7 +122,10 @@ ENTRY(cpu_v7_bpiall_switch_mm)
 	b	cpu_v7_switch_mm
 ENDPROC(cpu_v7_bpiall_switch_mm)
 
-	string	cpu_v7_name, "ARMv7 Processor"
+	string  cpu_v7_name, "ARMv7 Processor"
+	.align
+
+	string	cpu_v8_name, "ARMv8-a aarch32 Processor"
 	.align
 
 /* Suspend/resume support: derived from arch/arm/mach-s5pv210/sleep.S */
@@ -649,7 +652,7 @@ __v7_setup_stack:
 	/*
 	 * Standard v7 proc info content
 	 */
-.macro __v7_proc name, initfunc, mm_mmuflags = 0, io_mmuflags = 0, hwcaps = 0, proc_fns = v7_processor_functions, cache_fns = v7_cache_fns
+.macro __v7_proc name, initfunc, mm_mmuflags = 0, io_mmuflags = 0, hwcaps = 0, proc_fns = v7_processor_functions, cache_fns = v7_cache_fns, cpu_name = cpu_v7_name
 	ALT_SMP(.long	PMD_TYPE_SECT | PMD_SECT_AP_WRITE | PMD_SECT_AP_READ | \
 			PMD_SECT_AF | PMD_FLAGS_SMP | \mm_mmuflags)
 	ALT_UP(.long	PMD_TYPE_SECT | PMD_SECT_AP_WRITE | PMD_SECT_AP_READ | \
@@ -661,7 +664,7 @@ __v7_setup_stack:
 	.long	cpu_elf_name
 	.long	HWCAP_SWP | HWCAP_HALF | HWCAP_THUMB | HWCAP_FAST_MULT | \
 		HWCAP_EDSP | HWCAP_TLS | \hwcaps
-	.long	cpu_v7_name
+	.long	\cpu_name
 	.long	\proc_fns
 	.long	v7wbi_tlb_fns
 	.long	v6_user_fns
@@ -783,12 +786,22 @@ __v7_ca17mp_proc_info:
 	__v7_proc __v7_ca17mp_proc_info, __v7_ca17mp_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
 	.size	__v7_ca17mp_proc_info, . - __v7_ca17mp_proc_info
 
+	/*
+	 * ARM Ltd. Cortex A32 processor.
+	 */
+	.type	__v7_ca32__proc_info, #object
+__v7_ca32_proc_info:
+	.long	0x410fd010
+	.long	0xff0ffff0
+	__v7_proc __v7_ca32_proc_info, __v7_setup , cpu_name = cpu_v8_name
+	.size	__v7_ca32_proc_info, . - __v7_ca32_proc_info
+
 	/* ARM Ltd. Cortex A73 processor */
 	.type	__v7_ca73_proc_info, #object
 __v7_ca73_proc_info:
 	.long	0x410fd090
 	.long	0xff0ffff0
-	__v7_proc __v7_ca73_proc_info, __v7_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
+	__v7_proc __v7_ca73_proc_info, __v7_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS, cpu_name = cpu_v8_name
 	.size	__v7_ca73_proc_info, . - __v7_ca73_proc_info
 
 	/* ARM Ltd. Cortex A75 processor */
@@ -796,7 +809,7 @@ __v7_ca73_proc_info:
 __v7_ca75_proc_info:
 	.long	0x410fd0a0
 	.long	0xff0ffff0
-	__v7_proc __v7_ca75_proc_info, __v7_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS
+	__v7_proc __v7_ca75_proc_info, __v7_setup, proc_fns = HARDENED_BPIALL_PROCESSOR_FUNCTIONS, cpu_name = cpu_v8_name
 	.size	__v7_ca75_proc_info, . - __v7_ca75_proc_info
 
 	/*
