@@ -3,3 +3,8 @@ config EXTSYS_CTRL
 	help
 	  Say y here to enable support for external system control
 	  driver for the Arm Corstone-700 platform
+config HWSEM
+	tristate "Alif hardware semaphore"
+	help
+	  Say y here to enable support for hardware semaphore
+	  driver for the Bolt platform
