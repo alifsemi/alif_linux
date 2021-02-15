@@ -58,6 +58,19 @@
 #define SPI_SRL_OFFSET			11
 #define SPI_CFS_OFFSET			12
 
+/* Bit fields in CTRLR0 based on DWC_ssi_databook.pdf v1.03a */
+#define DWC_SSI_CTRLR0_MASTER		31
+#define DWC_SSI_CTRLR0_CFS_OFFSET	19
+#define DWC_SSI_CTRLR0_SSTE_ON		14
+#define DWC_SSI_CTRLR0_SRL_OFFSET	13
+#define DWC_SSI_CTRLR0_SLVOE_OFFSET	12
+#define DWC_SSI_CTRLR0_TMOD_OFFSET	10
+#define DWC_SSI_CTRLR0_TMOD_MASK	GENMASK(11, 10)
+#define DWC_SSI_CTRLR0_SCPOL_OFFSET	9
+#define DWC_SSI_CTRLR0_SCPH_OFFSET	8
+#define DWC_SSI_CTRLR0_FRF_OFFSET	6
+#define DWC_SSI_CTRLR0_DFS_OFFSET	0
+
 /* Bit fields in SR, 7 bits */
 #define SR_MASK				0x7f		/* cover 7 bits */
 #define SR_BUSY				(1 << 0)
@@ -82,6 +95,9 @@
 
 /* TX RX interrupt level threshold, max can be 256 */
 #define SPI_INT_THRESHOLD		32
+
+/* EXPMST0 APB Register */
+#define EXPMST0_ADDR			0x4902f028
 
 enum dw_ssi_type {
 	SSI_MOTO_SPI = 0,
@@ -115,6 +131,8 @@ struct dw_spi {
 	u16			bus_num;
 	u16			num_cs;		/* supported slave numbers */
 	void (*set_cs)(struct spi_device *spi, bool enable);
+	u32 (*update_cr0)(struct spi_controller *master, struct spi_device *spi,
+			struct spi_transfer *transfer);
 
 	/* Current message transfer state info */
 	size_t			len;
@@ -253,6 +271,10 @@ extern int dw_spi_add_host(struct device *dev, struct dw_spi *dws);
 extern void dw_spi_remove_host(struct dw_spi *dws);
 extern int dw_spi_suspend_host(struct dw_spi *dws);
 extern int dw_spi_resume_host(struct dw_spi *dws);
+
+extern u32 dw_spi_update_cr0_v1_03a(struct spi_controller *master,
+					struct spi_device *spi,
+					struct spi_transfer *transfer);
 
 /* platform related setup */
 extern int dw_spi_mid_init(struct dw_spi *dws); /* Intel MID platforms */
