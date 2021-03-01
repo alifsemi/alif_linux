@@ -109,6 +109,20 @@ config PINCTRL_AMD
 	  Requires ACPI/FDT device enumeration code to set up a platform
 	  device.
 
+config PINCTRL_BOLT
+	bool "Alif Bolt pin controller driver"
+	#depends on ARCH_BOLT
+	depends on SOC_BOLT
+	depends on OF
+	select PINMUX
+	select PINCONF
+	select GENERIC_PINCONF
+	select GENERIC_PINCTRL_GROUPS
+	select GENERIC_PINMUX_FUNCTIONS
+	#select GPIOLIB_IRQCHIP
+	help
+	  Pinctrl driver for Alif Bolt pinconf.
+
 config PINCTRL_BM1880
 	bool "Bitmain BM1880 Pinctrl driver"
 	depends on OF && (ARCH_BITMAIN || COMPILE_TEST)
