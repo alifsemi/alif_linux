@@ -30,9 +30,9 @@
 #define MAX_NB_GPIO_PER_BANK	32
 
 /* Number of io pads that can be configured */
-#define BOLT_NUM_IOS	116
+#define BOLT_NUM_IOS		116
 /* Port 0 is Analog, Digital starts from Port 1 */
-#define BOLT_DIGITAL_IO 20
+#define BOLT_DIGITAL_IO		20
 
 static const struct pinctrl_pin_desc bolt_pins[] = {
 	/* Port 0 */
@@ -171,6 +171,7 @@ struct bolt_pinctrl {
 	struct pinctrl_dev 	*pctl;
 	void __iomem 		*pinmux_base;
 	void __iomem 		*padctrl_base;
+	void __iomem 		*expmst0_base;
 	unsigned int group_index;
 	struct mutex mutex;
 };
@@ -212,7 +213,7 @@ struct bolt_pinctrl {
 
 /* DRV [1 = Push Pull, 0 = Open Drain] */
 #define BOLT_PINCONF_DRV		BIT(7)
-#define BOLT_NO_PAD_CTL  0x80000000
+#define BOLT_NO_PAD_CTL  		0x80000000
 
 static inline const struct group_desc *bolt_pinctrl_find_group_by_name(
 				struct pinctrl_dev *pctldev,
@@ -329,7 +330,7 @@ static const struct pinctrl_ops bolt_pctl_ops = {
 static int get_mux_offset(int pin_id, u32 *offset, u32 *bitshift)
 {
 	u32 portpin;
-	u32 off, bs;
+	u32 off;
 
 	/* GPIO port 0 is in analog domain, and port 4 is VBAT domain */
 	if(pin_id < 20){
@@ -353,12 +354,8 @@ static int get_mux_offset(int pin_id, u32 *offset, u32 *bitshift)
 		return -EINVAL;
 	}
 	off += (portpin / 8) * 4;
-	bs = (portpin % 8) * 4;
-
-//printk("###HGG: muxoffset %d offset 0x%x, bitshift %d\n", pin_id, off, bs);
 	*offset = off;
-	*bitshift = bs;
-
+	*bitshift = (portpin % 8) * 4;
 	return 0;
 }
 
@@ -367,7 +364,7 @@ static int bolt_pmx_set_one_pin(struct bolt_pinctrl *ipctl,
 {
 	unsigned int pin_id;
 	int ret;
-	u32 offset, bitshift;
+	u32 offset, bitshift, val;
 
 	pin_id = pin->pin_no;
 	ret = get_mux_offset(pin_id, &offset, &bitshift);
@@ -376,10 +373,9 @@ static int bolt_pmx_set_one_pin(struct bolt_pinctrl *ipctl,
 		return -EINVAL;
 	}
 
-//printk("###HGG: bolt_pmx_set_one_pin %d, pinmux_base 0x%px, offset 0x%x, bitshift %d mux %ld\n", pin_id, ipctl->pinmux_base, offset, bitshift, pin->mux);
-//	val = readl(ipctl->pinmux_base + offset);
-//	val |= (pin->mux) << bitshift;
-//	writel(pin->mux, ipctl->pinmux_base + offset);
+	val = readl(ipctl->pinmux_base + offset);
+	val |= (pin->mux) << bitshift;
+	writel(val, ipctl->pinmux_base + offset);
 
 	dev_dbg(ipctl->dev, "write: offset 0x%x val 0x%lx\n",
 		offset, pin->mux);
@@ -432,25 +428,24 @@ struct pinmux_ops bolt_pmx_ops = {
 
 static int bolt_pinconf_get_config(struct pinctrl_dev *pctldev, unsigned pin, u32 *val)
 {
-	//struct bolt_pinctrl *info = pinctrl_dev_get_drvdata(pctldev);
+	struct bolt_pinctrl *info = pinctrl_dev_get_drvdata(pctldev);
 	u32 offset;
 
 	offset = (pin - BOLT_DIGITAL_IO) * 4;
-//	*val = readl_relaxed(info->padctrl_base + offset);
-//printk("###########HGG pinconf_get addr 0x%px \n", info->padctrl_base + offset);
-	*val = 0;
+	*val = readl_relaxed(info->padctrl_base + offset);
+printk("###HGG padconf get addr 0x%px val 0x%x\n", info->padctrl_base + offset, *val);
 
 	return 0;
 }
 
 static void bolt_pinconf_set_config(struct pinctrl_dev *pctldev, unsigned pin, u32 val)
 {
-	//struct bolt_pinctrl *info = pinctrl_dev_get_drvdata(pctldev);
+	struct bolt_pinctrl *info = pinctrl_dev_get_drvdata(pctldev);
 	u32 offset;
 
 	offset = (pin - BOLT_DIGITAL_IO) * 4;
 //	writel_relaxed(val, info->padctrl_base + offset);
-//printk("###########HGG pinconf_set addr 0x%px val 0x%x\n", info->padctrl_base + offset, val);
+printk("###HGG padconf set pin %d addr 0x%px val 0x%x\n", pin, info->padctrl_base + offset, val);
 }
 
 static int bolt_pinconf_set(struct pinctrl_dev *pctldev, unsigned pin_id,
@@ -840,6 +835,16 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 		return PTR_ERR(info->syscon);
 	}
 #endif
+	printk("##HGG setting expmst0\n");
+	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
+	info->expmst0_base = devm_ioremap_resource(&pdev->dev, res);
+//	writel((1 << 0) | (1 << 4), info->expmst0_base);
+	writel(0x11, info->expmst0_base);
+	/* UART4*/
+	writel((1 << 12) | (1 << 4), info->expmst0_base + 0x8);
+	/* I3C */
+	writel(0x01000001, info->expmst0_base + 0x24);
+
 	platform_set_drvdata(pdev, info);
 
 	pctl_desc->name		= dev_name(&pdev->dev);

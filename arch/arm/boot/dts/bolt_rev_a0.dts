@@ -138,12 +138,18 @@
 			clock-output-names = "i2s_sclk";
 		};
 		uartclk: uartclk {
-			/* uart clock - 100MHz */
+			/* uart clock - 10MHz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-//Is 10Mhz in FPGA	clock-frequency = <100000000>;
 			clock-frequency = <10000000>;
 			clock-output-names = "uartclk";
+		};
+		dwuartclk: dwuartclk {
+			/* clock - 100MHz */
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <100000000>;
+			clock-output-names = "baudclk";
 		};
 	};
 
@@ -403,7 +409,7 @@
 			pinctrl-names = "default";
 		/*	pinctrl-0 = <&pinctrl_uart0>;
 			reg = <0x49008000 0x1000>;*/
-			clocks = <&uartclk>, <&syst_pclk>;
+			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
@@ -414,7 +420,7 @@
 		uart1@49009000 {
 			compatible = "snps,dw-apb-uart";
 			reg = <0x49009000 0x1000>;
-			clocks = <&uartclk>, <&syst_pclk>;
+			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
@@ -427,7 +433,7 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_uart2>;
 			reg = <0x4900A000 0x1000>;
-			clocks = <&uartclk>, <&syst_pclk>;
+			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>;
@@ -438,7 +444,7 @@
 		uart3@4900B000 {
 			compatible = "snps,dw-apb-uart";
 			reg = <0x4900B000 0x1000>;
-			clocks = <&uartclk>, <&syst_pclk>;
+			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>;
@@ -451,7 +457,7 @@
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_uart4>;
 			reg = <0x4900C000 0x1000>;
-			clocks = <&uartclk>, <&syst_pclk>;
+			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
@@ -462,7 +468,7 @@
 		uart5@4900D000 {
 			compatible = "snps,dw-apb-uart";
 			reg = <0x4900D000 0x1000>;
-			clocks = <&uartclk>, <&syst_pclk>;
+			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>;
@@ -473,7 +479,7 @@
 		uart6@4900E000 {
 			compatible = "snps,dw-apb-uart";
 			reg = <0x4900E000 0x1000>;
-			clocks = <&uartclk>, <&syst_pclk>;
+			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>;
@@ -484,7 +490,7 @@
 		uart7@4900F000 {
 			compatible = "snps,dw-apb-uart";
 			reg = <0x4900F000 0x1000>;
-			clocks = <&uartclk>, <&syst_pclk>;
+			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>;
@@ -562,15 +568,23 @@
 		};
 
 		/* ====== DW I3C ====== */
-		i3c@49018000 {
+		i3c0: i3c@49018000 {
 			compatible = "snps,dw-i3c-master-1.00a";
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_i3c0>;
-			#address-cells = <3>;
-			#size-cells = <0>;
 			reg = <0x49018000 0x1000>;
 			interrupts = <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&syst_pclk>;
+			#address-cells = <3>;
+			#size-cells = <0>;
+			i2c-scl-hz = <100000>;
+
+			//clock-frequency = <100000>;
+			/* I2C device.*/
+			eeprom@50 {
+				compatible = "atmel,24c02";
+				reg = <0x50 0x0 0x50>;
+			}; 
 		}; /* I3C End*/
 
 		/*====== DW I2S ====== */
@@ -639,8 +653,103 @@
 		compatible = "Corstone-700,apb-bus","simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
-		reg = <0x49040000 0x00010000>;
+		reg = <0x49040000 0x000c0000>;
 		ranges = <>;
+
+		dmac_bus_s: dma-controller@49080000 {
+			reg = <0x49080000 0x1000>;
+			arm,primecell-periphid = <0x00041330>;
+		//	compatible = "arm,pl330", "arm,primecell";
+			interrupt-parent = <&gic>;
+			interrupts = 	<0 279 IRQ_TYPE_LEVEL_HIGH>,
+					<0 280 IRQ_TYPE_LEVEL_HIGH>,
+					<0 281 IRQ_TYPE_LEVEL_HIGH>,
+					<0 282 IRQ_TYPE_LEVEL_HIGH>,
+					<0 283 IRQ_TYPE_LEVEL_HIGH>,
+					<0 284 IRQ_TYPE_LEVEL_HIGH>,
+					<0 285 IRQ_TYPE_LEVEL_HIGH>,
+					<0 286 IRQ_TYPE_LEVEL_HIGH>,
+					<0 287 IRQ_TYPE_LEVEL_HIGH>,
+					<0 288 IRQ_TYPE_LEVEL_HIGH>,
+					<0 289 IRQ_TYPE_LEVEL_HIGH>,
+					<0 290 IRQ_TYPE_LEVEL_HIGH>,
+					<0 291 IRQ_TYPE_LEVEL_HIGH>,
+					<0 292 IRQ_TYPE_LEVEL_HIGH>,
+					<0 293 IRQ_TYPE_LEVEL_HIGH>,
+					<0 294 IRQ_TYPE_LEVEL_HIGH>,
+					<0 295 IRQ_TYPE_LEVEL_HIGH>,
+					<0 296 IRQ_TYPE_LEVEL_HIGH>,
+					<0 297 IRQ_TYPE_LEVEL_HIGH>,
+					<0 298 IRQ_TYPE_LEVEL_HIGH>,
+					<0 299 IRQ_TYPE_LEVEL_HIGH>,
+					<0 300 IRQ_TYPE_LEVEL_HIGH>,
+					<0 301 IRQ_TYPE_LEVEL_HIGH>,
+					<0 302 IRQ_TYPE_LEVEL_HIGH>,
+					<0 303 IRQ_TYPE_LEVEL_HIGH>,
+					<0 304 IRQ_TYPE_LEVEL_HIGH>,
+					<0 305 IRQ_TYPE_LEVEL_HIGH>,
+					<0 306 IRQ_TYPE_LEVEL_HIGH>,
+					<0 307 IRQ_TYPE_LEVEL_HIGH>,
+					<0 308 IRQ_TYPE_LEVEL_HIGH>,
+					<0 309 IRQ_TYPE_LEVEL_HIGH>,
+					<0 310 IRQ_TYPE_LEVEL_HIGH>,
+					<0 311 IRQ_TYPE_LEVEL_HIGH>;
+			#dma-cells = <1>;
+			#dma-channels = <8>;
+			#dma-requests = <32>;
+			clocks = <&syst_pclk>;
+			clock-names = "apb_pclk";
+			//resets = <&rst DMA_RESET>, <&rst DMA_OCP_RESET>;
+			//reset-names = "dma", "dma-ocp";
+		}; 
+
+		dmac_bus_ns: dma-controller@490A0000 {
+			reg = <0x490A0000 0x1000>;
+			arm,primecell-periphid = <0x00041330>;
+		//	compatible = "arm,pl330", "arm,primecell";
+			interrupt-parent = <&gic>;
+			interrupts = 	<0 279 IRQ_TYPE_LEVEL_HIGH>,
+					<0 280 IRQ_TYPE_LEVEL_HIGH>,
+					<0 281 IRQ_TYPE_LEVEL_HIGH>,
+					<0 282 IRQ_TYPE_LEVEL_HIGH>,
+					<0 283 IRQ_TYPE_LEVEL_HIGH>,
+					<0 284 IRQ_TYPE_LEVEL_HIGH>,
+					<0 285 IRQ_TYPE_LEVEL_HIGH>,
+					<0 286 IRQ_TYPE_LEVEL_HIGH>,
+					<0 287 IRQ_TYPE_LEVEL_HIGH>,
+					<0 288 IRQ_TYPE_LEVEL_HIGH>,
+					<0 289 IRQ_TYPE_LEVEL_HIGH>,
+					<0 290 IRQ_TYPE_LEVEL_HIGH>,
+					<0 291 IRQ_TYPE_LEVEL_HIGH>,
+					<0 292 IRQ_TYPE_LEVEL_HIGH>,
+					<0 293 IRQ_TYPE_LEVEL_HIGH>,
+					<0 294 IRQ_TYPE_LEVEL_HIGH>,
+					<0 295 IRQ_TYPE_LEVEL_HIGH>,
+					<0 296 IRQ_TYPE_LEVEL_HIGH>,
+					<0 297 IRQ_TYPE_LEVEL_HIGH>,
+					<0 298 IRQ_TYPE_LEVEL_HIGH>,
+					<0 299 IRQ_TYPE_LEVEL_HIGH>,
+					<0 300 IRQ_TYPE_LEVEL_HIGH>,
+					<0 301 IRQ_TYPE_LEVEL_HIGH>,
+					<0 302 IRQ_TYPE_LEVEL_HIGH>,
+					<0 303 IRQ_TYPE_LEVEL_HIGH>,
+					<0 304 IRQ_TYPE_LEVEL_HIGH>,
+					<0 305 IRQ_TYPE_LEVEL_HIGH>,
+					<0 306 IRQ_TYPE_LEVEL_HIGH>,
+					<0 307 IRQ_TYPE_LEVEL_HIGH>,
+					<0 308 IRQ_TYPE_LEVEL_HIGH>,
+					<0 309 IRQ_TYPE_LEVEL_HIGH>,
+					<0 310 IRQ_TYPE_LEVEL_HIGH>,
+					<0 311 IRQ_TYPE_LEVEL_HIGH>;
+			#dma-cells = <1>;
+			#dma-channels = <8>;
+			#dma-requests = <32>;
+			dma-channel-mask = <0x000fffff>;
+			clocks = <&syst_pclk>;
+			clock-names = "apb_pclk";
+			//resets = <&rst DMA_RESET>, <&rst DMA_OCP_RESET>;
+			//reset-names = "dma", "dma-ocp";
+		};
 	};
 
 	lpaon: apb@71000000{
@@ -654,10 +763,12 @@
 			compatible = "alif,pinctrl-bolt";
 			/*padctrl: aon@71007000 */
 			reg = 	<0x71006000 0x00001000>,
-				<0x71007000 0x00001000>;
+				<0x71007000 0x00001000>,
+				<0x4902F000 0x00001000>;
 		};
 	};
 };
+
 
 &pinmux {
 	pinctrl_eth0: eth0grp {
