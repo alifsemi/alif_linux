@@ -404,18 +404,19 @@
 		};
 
 		/* ====== DW UART ====== */
+		/* uart0 not routed out on Thunder Carrier board
 		uart0@49008000 {
 			compatible = "snps,dw-apb-uart";
 			pinctrl-names = "default";
-		/*	pinctrl-0 = <&pinctrl_uart0>;
-			reg = <0x49008000 0x1000>;*/
+			pinctrl-0 = <&pinctrl_uart0>;
+			reg = <0x49008000 0x1000>;
 			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
-		};
+		};*/
 
 		uart1@49009000 {
 			compatible = "snps,dw-apb-uart";
@@ -431,7 +432,7 @@
 		uart2@4900A000 {
 			compatible = "snps,dw-apb-uart";
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_uart2>;
+			pinctrl-0 = <&pinctrl_uart2 &pinctrl_uart2_1>;
 			reg = <0x4900A000 0x1000>;
 			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
@@ -773,52 +774,59 @@
 &pinmux {
 	pinctrl_eth0: eth0grp {
 		pinmux = <
-			PIN_P1_0__ETH_RXD0_A	0x3
-			PIN_P1_1__ETH_RXD1_A	0x3
-			PIN_P1_2__ETH_CRS_DV_A	0x3
-			PIN_P1_3__ETH_RST_A	0x3
-			PIN_P1_4__ETH_TXD0_A	0x3
-			PIN_P1_5__ETH_TXD1_A	0x3
-			PIN_P1_6__ETH_TXEN_A	0x3
-			PIN_P1_7__ETH_IRQ_A	0x3
-			PIN_P1_8__ETH_REFCLK_A	0x3
-			PIN_P1_9__ETH_MDIO_A	0x3
-			PIN_P1_10__ETH_MDC_A	0x3
+			PIN_P1_0__ETH_RXD0_A	0x0
+			PIN_P1_1__ETH_RXD1_A	0x0
+			PIN_P1_2__ETH_CRS_DV_A	0x0
+			PIN_P1_3__ETH_RST_A	0x0
+			PIN_P1_4__ETH_TXD0_A	0x0
+			PIN_P1_5__ETH_TXD1_A	0x0
+			PIN_P1_6__ETH_TXEN_A	0x0
+			PIN_P1_7__ETH_IRQ_A	0x0
+			PIN_P1_8__ETH_REFCLK_A	0x0
+			PIN_P1_9__ETH_MDIO_A	0x0
+			PIN_P1_10__ETH_MDC_A	0x0
 		>;
 	};
-	/*pinctrl_uart0: uart0grp {
-		UART0 is not routed out on Thunder carrier board
+	/* UART0 is not routed out on Thunder carrier board
+	pinctrl_uart0: uart0grp {
 		pinmux = <
-			PIN_P2_28__UART0_RX_B	0x3
-			PIN_P2_29__UART0_TX_B	0x3
+			PIN_P2_28__UART0_RX_B	0x0
+			PIN_P2_29__UART0_TX_B	0x0
 		>;
-	};*/
+	}; */
 	pinctrl_i2s0: i2s0grp {
 		pinmux = <
-			PIN_P2_29__I2S0_SDO_B	0x3
-			PIN_P2_30__I2S0_SCLK_B	0x3
-			PIN_P2_31__I2S0_WS_B	0x3
+			PIN_P2_29__I2S0_SDO_B	0x0
+			PIN_P2_30__I2S0_SCLK_B	0x0
+			PIN_P2_31__I2S0_WS_B	0x0
 		>;
 	};
 	pinctrl_uart2: uart2grp {
 		pinmux = <
-			PIN_P3_16__UART2_RX_B	0x3
-			PIN_P3_17__UART2_TX_B	0x3
-			PIN_P3_18__UART2_CTS_B	0x3
-			PIN_P3_19__UART2_RTS_B	0x3
+			PIN_P3_16__UART2_RX_B	0x1
+			PIN_P3_17__UART2_TX_B	0x0
 		>;
+		drive-push-pull;
+		bias-pull-up;
+	};
+	pinctrl_uart2_1: uart2grp_1 {
+		pinmux = <
+			PIN_P3_18__UART2_CTS_B	0x0
+			PIN_P3_19__UART2_RTS_B	0x0
+		>;
+		slew-rate = <1>;
 	};
 	pinctrl_uart4: uart4grp {
 		pinmux = <
-			PIN_P3_1__UART4_RX_B	0x3
-			PIN_P3_2__UART4_TX_B	0x3
-			PIN_P3_3__UART4_DE_B	0x3
+			PIN_P3_1__UART4_RX_B	0x0
+			PIN_P3_2__UART4_TX_B	0x0
+			PIN_P3_3__UART4_DE_B	0x0
 		>;
 	};
 	pinctrl_i3c0: i3c0grp {
 		pinmux = <
-			PIN_P3_8__I3C_SDA_B	0x3
-			PIN_P3_9__I3C_SCL_B	0x3
+			PIN_P3_8__I3C_SDA_B	0x0
+			PIN_P3_9__I3C_SCL_B	0x0
 		>;
 	};
 };

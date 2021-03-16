@@ -22,8 +22,9 @@
 #include <linux/slab.h>
 #include <linux/regmap.h>
 
-#include "pinctrl-utils.h"
 #include "core.h"
+#include "pinconf.h"
+#include "pinctrl-utils.h"
 #include "pinmux.h"
 
 #define MAX_GPIO_BANKS		4
@@ -213,7 +214,7 @@ struct bolt_pinctrl {
 
 /* DRV [1 = Push Pull, 0 = Open Drain] */
 #define BOLT_PINCONF_DRV		BIT(7)
-#define BOLT_NO_PAD_CTL  		0x80000000
+#define BOLT_NO_PAD_CTL  		0x00000000
 
 static inline const struct group_desc *bolt_pinctrl_find_group_by_name(
 				struct pinctrl_dev *pctldev,
@@ -242,12 +243,14 @@ static int bolt_dt_node_to_map(struct pinctrl_dev *pctldev,
 			struct pinctrl_map **map, unsigned *num_maps)
 {
 	struct bolt_pinctrl *ipctl = pinctrl_dev_get_drvdata(pctldev);
+	unsigned long *configs;
+	unsigned int num_configs;
 	const struct group_desc *grp;
 	struct pinctrl_map *new_map;
 	struct device_node *parent;
 	struct bolt_pin *pin;
 	int map_num = 1;
-	int i, j;
+	int i, j, ret;
 
 	/*
 	 * first find the group of this node and check if we need create
@@ -259,17 +262,23 @@ static int bolt_dt_node_to_map(struct pinctrl_dev *pctldev,
 		return -EINVAL;
 	}
 
-	for (i = 0; i < grp->num_pins; i++) {
-		pin = &((struct bolt_pin *)(grp->data))[i];
-		if (!(pin->padctrl & BOLT_NO_PAD_CTL))
-			map_num++;
+	ret = pinconf_generic_parse_dt_config(np, pctldev, &configs,
+		 &num_configs);
+	if(ret) {
+		dev_err(ipctl->dev, "Unable to parse dt config for node %pOFn\n", np);
+		return -EINVAL;
+	}
+
+	if(num_configs){
+		 map_num += (grp->num_pins);
 	}
 
 	new_map = kmalloc_array(map_num, sizeof(struct pinctrl_map),
 				GFP_KERNEL);
-	if (!new_map)
-		return -ENOMEM;
-
+	if (!new_map){
+		ret = -ENOMEM;
+		goto out;
+	}
 	*map = new_map;
 	*num_maps = map_num;
 
@@ -277,45 +286,39 @@ static int bolt_dt_node_to_map(struct pinctrl_dev *pctldev,
 	parent = of_get_parent(np);
 	if (!parent) {
 		kfree(new_map);
-		return -EINVAL;
+		ret = -EINVAL;
+		goto out;
 	}
+
 	new_map[0].type = PIN_MAP_TYPE_MUX_GROUP;
 	new_map[0].data.mux.function = parent->name;
 	new_map[0].data.mux.group = np->name;
 	of_node_put(parent);
 
-	/* create config map */
-	new_map++;
-	for (i = j = 0; i < grp->num_pins; i++) {
-		pin = &((struct bolt_pin *)(grp->data))[i];
+	if (num_configs) {
 
-		/*
-		 * We only create config maps for SCU pads or MMIO pads that
-		 * are not using the default config(a.k.a IMX_NO_PAD_CTL)
-		 */
-		if (pin->padctrl & BOLT_NO_PAD_CTL)
-			continue;
+		/* j index starts with 1 as the first map is already taken */
+		/* create config map */
+		j = 1;
 
-		new_map[j].type = PIN_MAP_TYPE_CONFIGS_PIN;
-		new_map[j].data.configs.group_or_pin =
-					pin_get_name(pctldev, pin->pin_no);
+		for (i = 0; i < grp->num_pins; i++) {
+			pin = &((struct bolt_pin *)(grp->data))[i];
 
-		new_map[j].data.configs.configs = &pin->padctrl;
-		new_map[j].data.configs.num_configs = 1;
-
-		j++;
+			/* The counter 'j' is incremented by this function */
+			ret = pinctrl_utils_add_map_configs(pctldev, &new_map,
+					num_maps, &j,
+					pin_get_name(pctldev, pin->pin_no),
+					configs, num_configs,
+					PIN_MAP_TYPE_CONFIGS_PIN);
+		}
 	}
 
 	dev_dbg(pctldev->dev, "maps: function %s group %s num %d\n",
 		(*map)->data.mux.function, (*map)->data.mux.group, map_num);
-
-	return 0;
-}
-
-static void bolt_dt_free_map(struct pinctrl_dev *pctldev,
-				struct pinctrl_map *map, unsigned num_maps)
-{
-	kfree(map);
+out:
+	if (num_configs)
+		kfree(configs);
+	return ret;
 }
 
 static const struct pinctrl_ops bolt_pctl_ops = {
@@ -324,7 +327,7 @@ static const struct pinctrl_ops bolt_pctl_ops = {
 	.get_group_pins = pinctrl_generic_get_group_pins,
 	.pin_dbg_show = bolt_pin_dbg_show,
 	.dt_node_to_map = bolt_dt_node_to_map,
-	.dt_free_map = bolt_dt_free_map,
+	.dt_free_map = pinctrl_utils_free_map,
 };
 
 static int get_mux_offset(int pin_id, u32 *offset, u32 *bitshift)
@@ -424,28 +427,26 @@ struct pinmux_ops bolt_pmx_ops = {
 	.get_function_name = pinmux_generic_get_function_name,
 	.get_function_groups = pinmux_generic_get_function_groups,
 	.set_mux = bolt_pmx_set,
+//	.gpio_request_enable = bolt_request_gpio,
 };
 
-static int bolt_pinconf_get_config(struct pinctrl_dev *pctldev, unsigned pin, u32 *val)
+static int bolt_pinconf_get_config(struct bolt_pinctrl *info, unsigned pin, u32 *val)
 {
-	struct bolt_pinctrl *info = pinctrl_dev_get_drvdata(pctldev);
 	u32 offset;
 
 	offset = (pin - BOLT_DIGITAL_IO) * 4;
 	*val = readl_relaxed(info->padctrl_base + offset);
-printk("###HGG padconf get addr 0x%px val 0x%x\n", info->padctrl_base + offset, *val);
-
+	//printk("### padconf get addr 0x%px val 0x%x\n", info->padctrl_base + offset, *val);
 	return 0;
 }
 
-static void bolt_pinconf_set_config(struct pinctrl_dev *pctldev, unsigned pin, u32 val)
+static void bolt_pinconf_set_config(struct bolt_pinctrl *info, unsigned pin, u32 val)
 {
-	struct bolt_pinctrl *info = pinctrl_dev_get_drvdata(pctldev);
 	u32 offset;
 
 	offset = (pin - BOLT_DIGITAL_IO) * 4;
-//	writel_relaxed(val, info->padctrl_base + offset);
-printk("###HGG padconf set pin %d addr 0x%px val 0x%x\n", pin, info->padctrl_base + offset, val);
+	writel_relaxed(val, info->padctrl_base + offset);
+	//printk("### padconf set pin %d addr 0x%px val 0x%x\n", pin, info->padctrl_base + offset, val);
 }
 
 static int bolt_pinconf_set(struct pinctrl_dev *pctldev, unsigned pin_id,
@@ -469,33 +470,34 @@ static int bolt_pinconf_set(struct pinctrl_dev *pctldev, unsigned pin_id,
 		dev_dbg(info->dev,
 			"%s:%d, pin_id=%d, config=0x%lx",
 			__func__, __LINE__, pin_id, config);
+
 		switch(param) {
 		case PIN_CONFIG_BIAS_BUS_HOLD:
-			if(arg) val |= BOLT_PINCONF_DSC_REP;
+			val |= BOLT_PINCONF_DSC_REP;
 			break;
 		case PIN_CONFIG_BIAS_HIGH_IMPEDANCE:
-			if(arg) val |= BOLT_PINCONF_DSC_Z;
+			val |= BOLT_PINCONF_DSC_Z;
 			break;
 		case PIN_CONFIG_BIAS_PULL_UP:
-			if(arg) val |= BOLT_PINCONF_DSC_PU;
+			val |= BOLT_PINCONF_DSC_PU;
 			break;
 		case PIN_CONFIG_BIAS_PULL_DOWN:
-			if(arg) val |= BOLT_PINCONF_DSC_PD;
+			val |= BOLT_PINCONF_DSC_PD;
 			break;
 		case PIN_CONFIG_INPUT_SCHMITT:
-			if(arg) val |= BOLT_PINCONF_SCHMITT;
+			val |= BOLT_PINCONF_SCHMITT;
 			break;
 		case PIN_CONFIG_DRIVE_OPEN_DRAIN:
-			if(arg) val &= ~BOLT_PINCONF_DRV;
+			val &= ~BOLT_PINCONF_DRV;
 			break;
 		case PIN_CONFIG_DRIVE_PUSH_PULL:
-			if(arg) val |= BOLT_PINCONF_DRV;
+			val |= BOLT_PINCONF_DRV;
 			break;
 		case PIN_CONFIG_INPUT_ENABLE:
-			if(arg) val |= BOLT_PINCONF_REN;
+			val |= BOLT_PINCONF_REN;
 			break;
 		case PIN_CONFIG_SLEW_RATE:
-			if(arg) val |= BOLT_PINCONF_SR;
+			val |= BOLT_PINCONF_SR;
 			break;
 		case PIN_CONFIG_DRIVE_STRENGTH:
 			switch(arg){
@@ -517,7 +519,7 @@ static int bolt_pinconf_set(struct pinctrl_dev *pctldev, unsigned pin_id,
 		default:
 			return -ENOTSUPP;
 		}
-		bolt_pinconf_set_config(pctldev, pin_id, val);
+		bolt_pinconf_set_config(info, pin_id, val);
 	}
 	return 0;
 }
@@ -525,7 +527,7 @@ static int bolt_pinconf_set(struct pinctrl_dev *pctldev, unsigned pin_id,
 static int bolt_pinconf_get(struct pinctrl_dev *pctldev,
 			     unsigned pin_id, unsigned long *config)
 {
-	//struct bolt_pinctrl *info = pinctrl_dev_get_drvdata(pctldev);
+	struct bolt_pinctrl *info = pinctrl_dev_get_drvdata(pctldev);
 	unsigned int param = pinconf_to_config_param(*config);
 	unsigned int arg = 0;
 	u32 reg;
@@ -535,7 +537,7 @@ static int bolt_pinconf_get(struct pinctrl_dev *pctldev,
 	if (pin_id < BOLT_DIGITAL_IO || pin_id >= BOLT_NUM_IOS)
 		return -ENOTSUPP;
 
-	ret =  bolt_pinconf_get_config(pctldev, pin_id, &reg);
+	ret =  bolt_pinconf_get_config(info, pin_id, &reg);
 	if (ret)
 		return -EIO;
 
@@ -662,9 +664,9 @@ static const struct pinconf_ops bolt_conf_ops = {
 #define PIN_SIZE 8
 
 void bolt_pinctrl_parse_pin(struct bolt_pinctrl *info,
-				       unsigned int *pin_id, struct bolt_pin *pin,
-				       const __be32 **list_p,
-				       struct device_node *np)
+		       unsigned int *pin_id, struct bolt_pin *pin,
+		       const __be32 **list_p,
+		       struct device_node *np)
 {
 	const __be32 *list = *list_p;
 	u32 val;
@@ -675,8 +677,9 @@ void bolt_pinctrl_parse_pin(struct bolt_pinctrl *info,
 	pin->mux = (val >> 16) & 0xf;
 	pin->padctrl = be32_to_cpu(*list++);
 
-//printk("#####HGG: pinctrl_parse_pin pin %ld mux %ld padctrl 0x%lx\n",
-//		pin->pin_no, pin->mux, pin->padctrl);
+	/* Set initial default pad config */
+	if(pin->padctrl != BOLT_NO_PAD_CTL)
+		bolt_pinconf_set_config(info, pin->pin_no, pin->padctrl);
 
 	*list_p = list;
 
@@ -723,9 +726,6 @@ static int bolt_pinctrl_parse_groups(struct device_node *np,
 				sizeof(unsigned int), GFP_KERNEL);
 	if (!grp->pins || !grp->data)
 		return -ENOMEM;
-
-//printk("##HGG bolt_pinctrl_parse_groups: grp->num_pins %d, size 0x%x pin_size 0x%x\n",
-//	 grp->num_pins, size, pin_size);
 
 	for (i = 0; i < grp->num_pins; i++) {
 		pin = &((struct bolt_pin *)(grp->data))[i];
@@ -835,7 +835,7 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 		return PTR_ERR(info->syscon);
 	}
 #endif
-	printk("##HGG setting expmst0\n");
+	printk("##Setting expmst0\n");
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
 	info->expmst0_base = devm_ioremap_resource(&pdev->dev, res);
 //	writel((1 << 0) | (1 << 4), info->expmst0_base);
