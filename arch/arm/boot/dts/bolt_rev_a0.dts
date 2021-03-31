@@ -203,6 +203,31 @@
 		mbox-name = "arm-m55_hp-mhu1";
 	};
 
+	mbox_m55_he_mhu0: mhu@1b040000 {
+		compatible = "arm,mhuv2","arm,primecell";
+		reg = <0x1b040000 0x1000>,
+		      <0x1b050000 0x1000>;
+		clocks = <&syst_pclk>;
+		clock-names = "apb_pclk";
+		interrupts = <0 14 4>;
+		interrupt-names = "mhu_rx";
+		#mbox-cells = <1>;
+		mbox-name = "arm-m55_he-mhu0";
+	};
+
+	mbox_m55_he_mhu1: mhu@1b060000 {
+		compatible = "arm,mhuv2","arm,primecell";
+		reg = <0x1b060000 0x1000>,
+		      <0x1b070000 0x1000>;
+		clocks = <&syst_pclk>;
+		clock-names = "apb_pclk";
+		interrupts = <0 49 4>;
+		interrupt-names = "mhu_rx";
+		#mbox-cells = <1>;
+		mbox-name = "arm-m55_he-mhu1";
+	};
+
+
 	mbox_se_mhu0: mhu@1b800000 {
 		compatible = "arm,mhuv2","arm,primecell";
 		reg = <0x1b800000 0x1000>,
@@ -231,9 +256,11 @@
 		compatible = "arm,client";
 		mboxes = <&mbox_m55_hp_mhu0 0>,
 			 <&mbox_m55_hp_mhu1 0>,
+			 <&mbox_m55_he_mhu0 0>,
+			 <&mbox_m55_he_mhu1 0>,
 			 <&mbox_se_mhu0 0>,
 			 <&mbox_se_mhu1 0>;
-		mbox-names = "m55_hp_mhu0", "m55_hp_mhu1", "se_mhu0", "se_mhu1";
+		mbox-names = "m55_hp_mhu0", "m55_hp_mhu1", "m55_he_mhu0", "m55_he_mhu1", "se_mhu0", "se_mhu1";
 	};
 
 	m55_hp: m55_hp@1A010310 {
