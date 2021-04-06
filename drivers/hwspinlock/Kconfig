@@ -68,3 +68,11 @@ config HSEM_U8500
 	  SoC.
 
 	  If unsure, say N.
+
+config HWSEM_ALIF
+	tristate "Alif hardware semaphore"
+	help
+	  Say y here to support the Alif hardware semaphore functionality on
+	  the SoC.
+
+	  If unsure, say N.
