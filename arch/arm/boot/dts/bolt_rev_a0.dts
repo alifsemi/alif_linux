@@ -525,6 +525,150 @@
 			reg-shift = <2>;
 			reg-io-width = <4>;
 		};
+		hwsem0: hwsem0@4901b000 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b000 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 96 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem1: hwsem1@4901b010 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b010 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 97 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem2: hwsem2@4901b020 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b020 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 98 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem3: hwsem3@4901b030 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b030 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 99 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem4: hwsem4@4901b040 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b040 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 100 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem5: hwsem5@4901b050 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b050 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 101 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem6: hwsem6@4901b060 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b060 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 102 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem7: hwsem7@4901b070 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b070 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 103 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem8: hwsem8@4901b080 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b080 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 104 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem9: hwsem9@4901b090 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b090 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 105 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem10: hwsem10@4901b0A0 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b0A0 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 106 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem11: hwsem11@4901b0B0 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b0B0 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 107 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem12: hwsem12@4901b0C0 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b0C0 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 108 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem13: hwsem13@4901b0D0 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b0D0 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 109 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem14: hwsem14@4901b0E0 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b0E0 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 110 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		hwsem15: hwsem15@4901b0F0 {
+			compatible = "alif,hwsem";
+			reg = <0x4901b0F0 0x4>;
+			reg-names = "hwsem_base";
+			interrupt-parent = <&gic>;
+			interrupts = <0 111 4>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
 	};
 	apb_b: apb@49010000{
 		compatible = "Corstone-700,apb-bus","simple-bus";
