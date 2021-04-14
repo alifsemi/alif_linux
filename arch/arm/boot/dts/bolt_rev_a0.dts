@@ -17,7 +17,7 @@
 	#size-cells = <1>;
 
 	chosen {
-		bootargs = "console=ttyS3,115200 \
+		bootargs = "console=ttyS3,115200n8 \
 		root=mtd:physmap-flash.0 \
 		ro \
 		loglevel=9";
@@ -944,7 +944,7 @@
 
 &pinmux {
 	pinctrl_eth0: eth0grp {
-		pinmux = <
+	/*	pinmux = <
 			PIN_P1_0__ETH_RXD0_A	0x0
 			PIN_P1_1__ETH_RXD1_A	0x0
 			PIN_P1_2__ETH_CRS_DV_A	0x0
@@ -957,6 +957,7 @@
 			PIN_P1_9__ETH_MDIO_A	0x0
 			PIN_P1_10__ETH_MDC_A	0x0
 		>;
+	*/
 	};
 	/* UART0 is not routed out on Thunder carrier board
 	pinctrl_uart0: uart0grp {
@@ -964,7 +965,8 @@
 			PIN_P2_28__UART0_RX_B	0x0
 			PIN_P2_29__UART0_TX_B	0x0
 		>;
-	}; */
+	};
+	*/
 	pinctrl_i2s0: i2s0grp {
 		pinmux = <
 			PIN_P2_29__I2S0_SDO_B	0x0
@@ -977,21 +979,21 @@
 			PIN_P3_16__UART2_RX_B	0x1
 			PIN_P3_17__UART2_TX_B	0x0
 		>;
-		drive-push-pull;
-		bias-pull-up;
 	};
 	pinctrl_uart2_1: uart2grp_1 {
 		pinmux = <
 			PIN_P3_18__UART2_CTS_B	0x0
 			PIN_P3_19__UART2_RTS_B	0x0
 		>;
-		slew-rate = <1>;
 	};
 	pinctrl_uart4: uart4grp {
 		pinmux = <
-			PIN_P3_1__UART4_RX_B	0x0
+		/*	PIN_P3_1__UART4_RX_B	0x0
 			PIN_P3_2__UART4_TX_B	0x0
 			PIN_P3_3__UART4_DE_B	0x0
+		*/
+			PIN_P1_2__UART4_RX_A	0x0
+			PIN_P1_3__UART4_TX_A	0x0
 		>;
 	};
 	pinctrl_i3c0: i3c0grp {
