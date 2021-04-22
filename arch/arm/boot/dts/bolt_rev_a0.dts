@@ -325,6 +325,36 @@
 			clocks-names = "core";
 			bus-width = <8>;
 		};
+
+		hsusb: dwc3-drd {
+			compatible = "alif,bolt-usb3";
+			#address-cells = <1>;
+			#size-cells = <1>;
+			//clocks = <&syst_hclk>;
+			//clock-names = "ahb_clk";
+			vdd18-supply = <&reg_1p8v>;
+			vdd33-supply = <&reg_3p3v>;
+			//vbus-supply = <&reg_5p0v>;
+			ranges;
+			status = "okay";
+			usbdual_hs: usb-dual@48200000 {
+			compatible = "snps","snps,dwc3";
+			reg = <0x48200000 0x100000>;
+			interrupts = <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>;
+			phy = <&usbclk>;
+			phy-names = "usb2_phy";
+			dr_mode = "peripheral";
+			snps,hsphy_interface = "utmi";
+			phy_type = "utmi_wide";
+			maximum-speed = "high-speed";
+			snps,dis_u3_susphy_quirk;
+			snps,dis_u2_susphy_quirk;
+			snps,incr-burst-type-adjustment = <1>, <4>, <8>, <16>;
+			snps,quirk-frame-length-adjustment = <0x20>;
+			snps,usb2-lpm-disable;
+			status = "okay";
+			};
+		};/* End of DWC3 layer */
 	};
 
 	/* ====== EXPMST0 APB ====== */
