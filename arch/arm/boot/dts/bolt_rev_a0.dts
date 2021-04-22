@@ -68,14 +68,14 @@
 			/* 400Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <100000000>;
+			clock-frequency = <400000000>;
 			clock-output-names = "axi_clk";
 		};
 		syst_hclk: ahb_clk {
 			/* 200Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <100000000>;
+			clock-frequency = <200000000>;
 			clock-output-names = "ahb_clk";
 		};
 		syst_pclk: apb_pclk {
@@ -177,6 +177,21 @@
 				<1 14 0xf08>,
 				<1 11 0xf08>,
 				<1 10 0xf08>;
+	};
+
+	refclk: refclk@1a220000 {
+		compatible = "arm,armv7-timer-mem";
+		reg = <0x1a220000  0x1000>;
+		clock-frequency = <100000000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		frame@1a230000 {
+			frame-number = <0>;
+			interrupts = <0 2 0xf04>;
+			reg = <0x1a230000 0x1000>;
+		};
 	};
 
 	mbox_m55_hp_mhu0: mhu@1b000000 {
