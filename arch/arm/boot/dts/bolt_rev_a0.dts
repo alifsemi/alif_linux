@@ -86,7 +86,7 @@
 			clock-output-names = "apb_pclk";
 		};
 
-		usbclk {
+		usbclk: usb_clk {
 			/* 20MHz clock */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
@@ -152,6 +152,38 @@
 			clock-output-names = "baudclk";
 		};
 	};
+
+	/* Regulators entry */
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg_3p3v: regulator@0 {
+		compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "fixed-3.3V";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+		reg_1p8v: reg18@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "fixed-1.8V";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			regulator-always-on;
+		};
+		reg_5p0v: reg5@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "fixed-5V";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			regulator-always-on;
+		};
+	};
+	/* Regulator enrty ends */
 
 	serial0: uart@1a510000 {
 		compatible = "arm,pl011", "arm,primecell";

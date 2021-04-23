@@ -212,7 +212,7 @@ static int dwc3_bolt_resume(struct device *dev)
 }
 
 static const struct dev_pm_ops bolt_dev_pm_ops = {
-	SET_SYSTEM_SLEEP_PM_OPS(bolt_suspend, bolt_resume)
+	SET_SYSTEM_SLEEP_PM_OPS(dwc3_bolt_suspend, dwc3_bolt_resume)
 };
 
 #define DEV_PM_OPS	(&bolt_dev_pm_ops)
