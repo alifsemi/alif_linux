@@ -1345,7 +1345,7 @@ config SGETMASK_SYSCALL
 
 config SYSFS_SYSCALL
 	bool "Sysfs syscall support" if EXPERT
-	default y
+	default n
 	---help---
 	  sys_sysfs is an obsolete system call no longer supported in libc.
 	  Note that disabling this option is more secure but might break
@@ -1559,7 +1559,7 @@ config MEMBARRIER
 
 config KALLSYMS
 	 bool "Load all symbols for debugging/ksymoops" if EXPERT
-	 default y
+	 default n
 	 help
 	   Say Y here to let the kernel print out symbolic crash information and
 	   symbolic stack backtraces. This increases the size of the kernel
