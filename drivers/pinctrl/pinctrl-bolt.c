@@ -436,7 +436,6 @@ static int bolt_pinconf_get_config(struct bolt_pinctrl *info, unsigned pin, u32 
 
 	offset = (pin - BOLT_DIGITAL_IO) * 4;
 	*val = readl_relaxed(info->padctrl_base + offset);
-	//printk("### padconf get addr 0x%px val 0x%x\n", info->padctrl_base + offset, *val);
 	return 0;
 }
 
@@ -446,7 +445,6 @@ static void bolt_pinconf_set_config(struct bolt_pinctrl *info, unsigned pin, u32
 
 	offset = (pin - BOLT_DIGITAL_IO) * 4;
 	writel_relaxed(val, info->padctrl_base + offset);
-	//printk("### padconf set pin %d addr 0x%px val 0x%x\n", pin, info->padctrl_base + offset, val);
 }
 
 static int bolt_pinconf_set(struct pinctrl_dev *pctldev, unsigned pin_id,
@@ -835,7 +833,6 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 		return PTR_ERR(info->syscon);
 	}
 #endif
-	printk("##Setting expmst0\n");
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
 	info->expmst0_base = devm_ioremap_resource(&pdev->dev, res);
 //	writel((1 << 0) | (1 << 4), info->expmst0_base);
