@@ -836,6 +836,18 @@
 			}; 
 		}; /* I3C End*/
 
+		/*====== SBSA WDT ==== */
+		watchdog@1a300000 {
+		compatible = "arm,sbsa-gwdt";
+		reg = <0x1a300000 0x1000>,
+			<0x1a310000 0x1000>;
+		clocks = <&syst_pclk>;
+		clock-names = "apb_pclk";
+		interrupt-parent = <&gic>;
+		interrupts = <0 32 4>;
+		timeout-sec = <100>;
+		};/* WDT END */
+
 		/*====== DW I2S ====== */
 		i2s0@49014000 {
 			compatible = "snps,designware-i2s";
