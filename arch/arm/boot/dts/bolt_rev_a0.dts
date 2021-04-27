@@ -17,7 +17,7 @@
 	#size-cells = <1>;
 
 	chosen {
-		bootargs = "console=ttyS3,115200n8 \
+		bootargs = "console=ttyS1,115200n8 \
 		root=mtd:physmap-flash.0 \
 		ro \
 		loglevel=9";
@@ -183,7 +183,34 @@
 			regulator-always-on;
 		};
 	};
-	/* Regulator enrty ends */
+	/* Regulator entry ends */
+
+	refclk: refclk@1a220000 {
+		compatible = "arm,armv7-timer-mem";
+		reg = <0x1a220000  0x1000>;
+		clock-frequency = <100000000>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		frame@1a230000 {
+			frame-number = <0>;
+			interrupts = <0 2 0xf04>;
+			reg = <0x1a230000 0x1000>;
+		};
+	};
+
+	/*====== SBSA WDT ==== */
+	watchdog@1a300000 {
+		compatible = "arm,sbsa-gwdt";
+		reg = <0x1a300000 0x1000>,
+			<0x1a310000 0x1000>;
+		clocks = <&syst_pclk>;
+		clock-names = "apb_pclk";
+		interrupt-parent = <&gic>;
+		interrupts = <0 32 4>;
+		timeout-sec = <100>;
+	};/* WDT END */
 
 	serial0: uart@1a510000 {
 		compatible = "arm,pl011", "arm,primecell";
@@ -209,21 +236,6 @@
 				<1 14 0xf08>,
 				<1 11 0xf08>,
 				<1 10 0xf08>;
-	};
-
-	refclk: refclk@1a220000 {
-		compatible = "arm,armv7-timer-mem";
-		reg = <0x1a220000  0x1000>;
-		clock-frequency = <100000000>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		ranges;
-
-		frame@1a230000 {
-			frame-number = <0>;
-			interrupts = <0 2 0xf04>;
-			reg = <0x1a230000 0x1000>;
-		};
 	};
 
 	mbox_m55_hp_mhu0: mhu@1b000000 {
@@ -602,6 +614,143 @@
 			reg-shift = <2>;
 			reg-io-width = <4>;
 		};
+	};
+	apb_b: apb@49010000{
+		compatible = "Corstone-700,apb-bus","simple-bus";
+		#address-cells = <1>;
+		#size-cells = <1>;
+		reg = <0x49010000 0x00010000>;
+		ranges = <>;
+
+		/* ====== DW I2C ====== */
+		i2c0@49010000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "snps,designware-i2c";
+			reg = <0x49010000 0x1000>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_pclk>;
+			//clock-names = "pclk" ;
+			//clock-frequency = <100000>;
+			i2c-sda-hold-time-ns = <300>;
+			i2c-sda-falling-time-ns = <300>;
+			i2c-scl-falling-time-ns = <300>;
+		};
+
+		i2c1@49011000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "snps,designware-i2c";
+			reg = <0x49011000 0x1000>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_pclk>;
+			//clock-names = "pclk" ;
+			//clock-frequency = <100000>;
+			i2c-sda-hold-time-ns = <300>;
+			i2c-sda-falling-time-ns = <300>;
+			i2c-scl-falling-time-ns = <300>;
+		};
+
+		i2c2@49012000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "snps,designware-i2c";
+			reg = <0x49012000 0x1000>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_pclk>;
+			//clock-names = "pclk" ;
+			//clock-frequency = <100000>;
+			i2c-sda-hold-time-ns = <300>;
+			i2c-sda-falling-time-ns = <300>;
+			i2c-scl-falling-time-ns = <300>;
+		};
+
+		i2c3@49013000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "snps,designware-i2c";
+			reg = <0x49013000 0x1000>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_pclk>;
+			//clock-names = "pclk" ;
+			//clock-frequency = <100000>;
+			i2c-sda-hold-time-ns = <300>;
+			i2c-sda-falling-time-ns = <300>;
+			i2c-scl-falling-time-ns = <300>;
+		};
+
+		/* ====== DW I3C ====== */
+		i3c0: i3c@49018000 {
+			compatible = "snps,dw-i3c-master-1.00a";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i3c0>;
+			reg = <0x49018000 0x1000>;
+			interrupts = <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_pclk>;
+			#address-cells = <3>;
+			#size-cells = <0>;
+			i2c-scl-hz = <100000>;
+
+			//clock-frequency = <100000>;
+			/* I2C device.*/
+		/*	eeprom@50 {
+				compatible = "atmel,24c02";
+				reg = <0x50 0x0 0x50>;
+			};
+		*/
+		};
+
+		/*====== DW I2S ====== */
+		i2s0@49014000 {
+			compatible = "snps,designware-i2s";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2s0>;
+			reg = <0x49014000 0x1000>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "i2sclk";
+			#sound-dai-cells = <0>;
+			interrupts = <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>;
+			//dmas = <&dma0 5>;
+			//dma-names = "tx";
+		};
+
+		i2s1@49015000 {
+			compatible = "snps,designware-i2s";
+			reg = <0x49015000 0x1000>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "i2sclk";
+			#sound-dai-cells = <0>;
+			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
+			//dmas = <&dma0 5>;
+			//dma-names = "tx";
+		};
+
+		i2s2@49016000 {
+			compatible = "snps,designware-i2s";
+			reg = <0x49016000 0x1000>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "i2sclk";
+			#sound-dai-cells = <0>;
+			interrupts = <GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>;
+			//dmas = <&dma0 5>;
+			//dma-names = "tx";
+		};
+
+		i2s3@49017000 {
+			compatible = "snps,designware-i2s";
+			reg = <0x49017000 0x1000>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "i2sclk";
+			#sound-dai-cells = <0>;
+			interrupts = <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>;
+			//dmas = <&dma0 5>;
+			//dma-names = "tx";
+		};
+
 		hwsem0: hwsem0@4901b000 {
 			compatible = "alif,hwsem";
 			reg = <0x4901b000 0x4>;
@@ -747,154 +896,6 @@
 			clock-names = "apb_pclk" ;
 		};
 	};
-	apb_b: apb@49010000{
-		compatible = "Corstone-700,apb-bus","simple-bus";
-		#address-cells = <1>;
-		#size-cells = <1>;
-		reg = <0x49010000 0x00010000>;
-		ranges = <>;
-
-
-		/* ====== DW I2C ====== */
-		i2c0@49010000 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			compatible = "snps,designware-i2c";
-			reg = <0x49010000 0x1000>;
-			interrupt-parent = <&gic>;
-			interrupts = <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&syst_pclk>;
-			//clock-names = "pclk" ;
-			//clock-frequency = <100000>;
-			i2c-sda-hold-time-ns = <300>;
-			i2c-sda-falling-time-ns = <300>;
-			i2c-scl-falling-time-ns = <300>;
-		};
-
-		i2c1@49011000 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			compatible = "snps,designware-i2c";
-			reg = <0x49011000 0x1000>;
-			interrupt-parent = <&gic>;
-			interrupts = <GIC_SPI 124 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&syst_pclk>;
-			//clock-names = "pclk" ;
-			//clock-frequency = <100000>;
-			i2c-sda-hold-time-ns = <300>;
-			i2c-sda-falling-time-ns = <300>;
-			i2c-scl-falling-time-ns = <300>;
-		};
-
-		i2c2@49012000 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			compatible = "snps,designware-i2c";
-			reg = <0x49012000 0x1000>;
-			interrupt-parent = <&gic>;
-			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&syst_pclk>;
-			//clock-names = "pclk" ;
-			//clock-frequency = <100000>;
-			i2c-sda-hold-time-ns = <300>;
-			i2c-sda-falling-time-ns = <300>;
-			i2c-scl-falling-time-ns = <300>;
-		};
-
-		i2c3@49013000 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			compatible = "snps,designware-i2c";
-			reg = <0x49013000 0x1000>;
-			interrupt-parent = <&gic>;
-			interrupts = <GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&syst_pclk>;
-			//clock-names = "pclk" ;
-			//clock-frequency = <100000>;
-			i2c-sda-hold-time-ns = <300>;
-			i2c-sda-falling-time-ns = <300>;
-			i2c-scl-falling-time-ns = <300>;
-		};
-
-		/* ====== DW I3C ====== */
-		i3c0: i3c@49018000 {
-			compatible = "snps,dw-i3c-master-1.00a";
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_i3c0>;
-			reg = <0x49018000 0x1000>;
-			interrupts = <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&syst_pclk>;
-			#address-cells = <3>;
-			#size-cells = <0>;
-			i2c-scl-hz = <100000>;
-
-			//clock-frequency = <100000>;
-			/* I2C device.*/
-			eeprom@50 {
-				compatible = "atmel,24c02";
-				reg = <0x50 0x0 0x50>;
-			}; 
-		}; /* I3C End*/
-
-		/*====== SBSA WDT ==== */
-		watchdog@1a300000 {
-		compatible = "arm,sbsa-gwdt";
-		reg = <0x1a300000 0x1000>,
-			<0x1a310000 0x1000>;
-		clocks = <&syst_pclk>;
-		clock-names = "apb_pclk";
-		interrupt-parent = <&gic>;
-		interrupts = <0 32 4>;
-		timeout-sec = <100>;
-		};/* WDT END */
-
-		/*====== DW I2S ====== */
-		i2s0@49014000 {
-			compatible = "snps,designware-i2s";
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_i2s0>;
-			reg = <0x49014000 0x1000>;
-			clocks = <&syst_pclk 0>;
-			clock-names = "i2sclk";
-			#sound-dai-cells = <0>;
-			interrupts = <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>;
-			//dmas = <&dma0 5>;
-			//dma-names = "tx";
-		};
-
-		i2s1@49015000 {
-			compatible = "snps,designware-i2s";
-			reg = <0x49015000 0x1000>;
-			clocks = <&syst_pclk 0>;
-			clock-names = "i2sclk";
-			#sound-dai-cells = <0>;
-			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
-			//dmas = <&dma0 5>;
-			//dma-names = "tx";
-		};
-
-		i2s2@49016000 {
-			compatible = "snps,designware-i2s";
-			reg = <0x49016000 0x1000>;
-			clocks = <&syst_pclk 0>;
-			clock-names = "i2sclk";
-			#sound-dai-cells = <0>;
-			interrupts = <GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>;
-			//dmas = <&dma0 5>;
-			//dma-names = "tx";
-		};
-
-		i2s3@49014000 {
-			compatible = "snps,designware-i2s";
-			reg = <0x49017000 0x1000>;
-			clocks = <&syst_pclk 0>;
-			clock-names = "i2sclk";
-			#sound-dai-cells = <0>;
-			interrupts = <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>;
-			//dmas = <&dma0 5>;
-			//dma-names = "tx";
-		}; /* I2S END */
-	};
 
 	apb_c: apb@49020000{
 		compatible = "Corstone-700,apb-bus","simple-bus";
@@ -902,6 +903,38 @@
 		#size-cells = <1>;
 		reg = <0x49020000 0x00010000>;
 		ranges = <>;
+
+		adc0: adc12_0@49020000 {
+			compatible = "alif,bolt-adc";
+			reg = <0x49020000 0x100>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+
+		adc1: adc12_1@49021000 {
+			compatible = "alif,bolt-adc";
+			reg = <0x49021000 0x100>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		adc2: adc16_0@49022000 {
+			compatible = "alif,bolt-adc";
+			reg = <0x49022000 0x100>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		dac0: dac12_0@49028000 {
+			compatible = "alif,bolt-dac";
+			reg = <0x49028000 0x10>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
+		dac1: dac12_1@49029000 {
+			compatible = "alif,bolt-dac";
+			reg = <0x49029000 0x10>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+		};
 	};
 	apb_d: apb@49030000{
 		compatible = "Corstone-700,apb-bus","simple-bus";
@@ -1041,7 +1074,7 @@
 
 &pinmux {
 	pinctrl_eth0: eth0grp {
-	/*	pinmux = <
+		pinmux = <
 			PIN_P1_0__ETH_RXD0_A	0x0
 			PIN_P1_1__ETH_RXD1_A	0x0
 			PIN_P1_2__ETH_CRS_DV_A	0x0
@@ -1054,7 +1087,6 @@
 			PIN_P1_9__ETH_MDIO_A	0x0
 			PIN_P1_10__ETH_MDC_A	0x0
 		>;
-	*/
 	};
 	/* UART0 is not routed out on Thunder carrier board
 	pinctrl_uart0: uart0grp {
@@ -1073,24 +1105,23 @@
 	};
 	pinctrl_uart2: uart2grp {
 		pinmux = <
-			PIN_P3_16__UART2_RX_B	0x1
+			PIN_P3_16__UART2_RX_B	0x0
 			PIN_P3_17__UART2_TX_B	0x0
 		>;
+
 	};
 	pinctrl_uart2_1: uart2grp_1 {
 		pinmux = <
 			PIN_P3_18__UART2_CTS_B	0x0
 			PIN_P3_19__UART2_RTS_B	0x0
 		>;
+
 	};
 	pinctrl_uart4: uart4grp {
 		pinmux = <
-		/*	PIN_P3_1__UART4_RX_B	0x0
+			PIN_P3_1__UART4_RX_B	0x0
 			PIN_P3_2__UART4_TX_B	0x0
 			PIN_P3_3__UART4_DE_B	0x0
-		*/
-			PIN_P1_2__UART4_RX_A	0x0
-			PIN_P1_3__UART4_TX_A	0x0
 		>;
 	};
 	pinctrl_i3c0: i3c0grp {
