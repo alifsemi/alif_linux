@@ -377,6 +377,7 @@ static int bolt_pmx_set_one_pin(struct bolt_pinctrl *ipctl,
 	}
 
 	val = readl(ipctl->pinmux_base + offset);
+	val &= ~(0xF << bitshift);
 	val |= (pin->mux) << bitshift;
 	writel(val, ipctl->pinmux_base + offset);
 
@@ -835,10 +836,10 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 #endif
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
 	info->expmst0_base = devm_ioremap_resource(&pdev->dev, res);
-//	writel((1 << 0) | (1 << 4), info->expmst0_base);
 	writel(0x11, info->expmst0_base);
-	/* UART4*/
-	writel((1 << 12) | (1 << 4), info->expmst0_base + 0x8);
+	/* Enable UART2, UART4*/
+	writel(	(1 << 12) | (1 << 4) |
+		(1 << 10) | (1 << 2), info->expmst0_base + 0x8);
 	/* I3C */
 	writel(0x01000001, info->expmst0_base + 0x24);
 
