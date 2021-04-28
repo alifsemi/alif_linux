@@ -1022,6 +1022,16 @@ config SENSORS_LM70
 	  This driver can also be built as a module. If so, the module
 	  will be called lm70.
 
+config SENSORS_DS1722
+	tristate "Dallas Semiconductor DS1722 and compatibles"
+	depends on SPI_MASTER
+	help
+	  If you say yes here you get support for Dallas Semiconductor
+	  Integrated DS1722 sensor chips and compatible models including:
+
+	  This driver can also be built as a module. If so, the module
+	  will be called ds1722.
+
 config SENSORS_LM73
 	tristate "National Semiconductor LM73"
 	depends on I2C
