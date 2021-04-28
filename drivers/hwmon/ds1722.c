@@ -81,7 +81,6 @@ static int ds1722_set_mode(struct ds1722_data *data, u8 mode)
 static ssize_t ds1722_temp_show(struct device *dev,
 				  struct device_attribute *attr, char *buf)
 {
-	ssize_t ret;
 	struct ds1722_data *data = dev_get_drvdata(dev);
 	u32 dec_val;
 	u16 res;
@@ -183,11 +182,12 @@ static ssize_t ds1722_temp_show(struct device *dev,
 		break;
 	}
 
-	pr_info("\n %d.%d Degree Celsius\n\n", (char)(res >> 8), dec_val);
 	/* CE Low  */
 	writel(DISABLE_HIGH_OUPUT, gpio2_dr);
 	writel(DISABLE_HIGH_OUPUT, gpio2_ddr);
 	udelay(1);
+
+	return pr_info("\n %d.%d Degree Celsius\n\n", (char)(res >> 8), dec_val);
 }
 
 static SENSOR_DEVICE_ATTR_RO(temp1_input, ds1722_temp, 0);
