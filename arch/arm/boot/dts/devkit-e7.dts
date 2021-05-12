@@ -7,7 +7,7 @@
 /dts-v1/;
 
 #include <dt-bindings/interrupt-controller/arm-gic.h>
-#include "bolt_pinmux.h"
+#include "devkit_e7_pinmux.h"
 
 / {
 	model = "corstone700";
