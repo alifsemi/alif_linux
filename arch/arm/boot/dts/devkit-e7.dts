@@ -19,6 +19,7 @@
 	chosen {
 		bootargs = "console=ttyS1,115200n8 \
 		root=mtd:physmap-flash.0 \
+		rootfstype=cramfs \
 		ro \
 		loglevel=9";
 	};
@@ -363,11 +364,16 @@
 
 		sdhci@48102000 {
 			compatible = "snps,dwcmshc-sdhci";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_sdhci>;
 			reg = <0x48102000 0x1000>;
-			interrupts = <GIC_SPI 29 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&syst_pclk>;
-			clocks-names = "core";
-			bus-width = <8>;
+			interrupts = <GIC_SPI 29 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_hclk>, <&syst_hclk>;
+			clock-names = "core", "bus";
+			bus-width = <4>;
+			vmmc-supply = <&reg_3p3v>;
+			vqmmc-supply = <&reg_3p3v>;
+			max-frequency = <50000000>;
 		};
 
                spi0: spi@48103000 {
@@ -1199,6 +1205,16 @@
 			PIN_P2_22__SPI3_MOSI_B	0x0
 			PIN_P2_23__SPI3_SCLK_B	0x0
 			PIN_P2_24__GPIO		0x0
+		>;
+	};
+	pinctrl_sdhci: sdhci0grp {
+		pinmux = <
+			PIN_P3_10__SD_CMD_B	0x0
+			PIN_P3_11__SD_CLK_B	0x0
+			PIN_P3_12__SD_D0_B	0x0
+			PIN_P3_13__SD_D1_B	0x0
+			PIN_P3_14__SD_D2_B	0x0
+			PIN_P3_15__SD_D3_B	0x0
 		>;
 	};
 };
