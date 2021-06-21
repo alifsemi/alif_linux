@@ -278,6 +278,14 @@ config LPC18XX_DAC
 	  To compile this driver as a module, choose M here: the module will be
 	  called lpc18xx_dac.
 
+config ENSEMBLE_DAC
+	tristate "Alif Ensemble DAC driver"
+	depends on ARCH_BOLT || COMPILE_TEST
+	depends on OF && HAS_IOMEM
+	help
+	  Say yes here to build support for Alif Ensemble DAC.
+	  To compile this driver as a module, choose M here.
+
 config M62332
 	tristate "Mitsubishi M62332 DAC driver"
 	depends on I2C

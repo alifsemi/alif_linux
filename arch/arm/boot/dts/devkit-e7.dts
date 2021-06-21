@@ -993,13 +993,13 @@
 			clock-names = "apb_pclk" ;
 		};
 		dac0: dac12_0@49028000 {
-			compatible = "alif,bolt-dac";
+			compatible = "alif,ensemble-dac";
 			reg = <0x49028000 0x10>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
 		};
 		dac1: dac12_1@49029000 {
-			compatible = "alif,bolt-dac";
+			compatible = "alif,ensemble-dac";
 			reg = <0x49029000 0x10>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
