@@ -10,8 +10,8 @@
 #include "devkit_e7_pinmux.h"
 
 / {
-	model = "corstone700";
-	compatible = "arm,Corstone-700";
+	model = "devkit-e7";
+	compatible = "arm,Devkit-E7";
 	interrupt-parent = <&gic>;
 	#address-cells = <1>;
 	#size-cells = <1>;
@@ -330,7 +330,7 @@
 	};
 
 	ahb@48000000 {
-		compatible = "Corstone-700,ahb-bus","simple-bus";
+		compatible = "Devkit-E7,ahb-bus","simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x48000000 0x01000000>;
@@ -467,7 +467,7 @@
 
 	/* ====== EXPMST0 APB ====== */
 	apb_a: apb@49000000{
-		compatible = "Corstone-700,apb-bus","simple-bus";
+		compatible = "Devkit-E7,apb-bus","simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x49000000 0x00010000>;
@@ -678,7 +678,7 @@
 		};
 	};
 	apb_b: apb@49010000{
-		compatible = "Corstone-700,apb-bus","simple-bus";
+		compatible = "Devkit-E7,apb-bus","simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x49010000 0x00010000>;
@@ -961,7 +961,7 @@
 	};
 
 	apb_c: apb@49020000{
-		compatible = "Corstone-700,apb-bus","simple-bus";
+		compatible = "Devkit-E7,apb-bus","simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x49020000 0x00010000>;
@@ -1000,14 +1000,14 @@
 		};
 	};
 	apb_d: apb@49030000{
-		compatible = "Corstone-700,apb-bus","simple-bus";
+		compatible = "Devkit-E7,apb-bus","simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x49030000 0x00010000>;
 		ranges = <>;
 	};
 	apb_e: apb@49040000{
-		compatible = "Corstone-700,apb-bus","simple-bus";
+		compatible = "Devkit-E7,apb-bus","simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x49040000 0x000c0000>;
@@ -1118,7 +1118,7 @@
 	};
 
 	lpaon: apb@71000000{
-		compatible = "Corstone-700,apb-bus","simple-bus";
+		compatible = "Devkit-E7,apb-bus","simple-bus";
 		#address-cells = <1>;
 		#size-cells = <1>;
 		reg = <0x71000000 0x00010000>;
