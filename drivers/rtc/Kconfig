@@ -1837,10 +1837,10 @@ config RTC_DRV_XGENE
 	  This driver can also be built as a module, if so, the module
 	  will be called "rtc-xgene".
 
-config RTC_DRV_BOLT
-       tristate "Alif Bolt RTC"
+config RTC_DRV_ENSEMBLE
+       tristate "Alif Devkit-Ex RTC"
        depends on HAS_IOMEM
-       depends on ARCH_BOLT || COMPILE_TEST
+       depends on ARCH_ENSEMBLE || COMPILE_TEST
        help
          If you say yes here you get support for Alif Bolt SoC real time
          clock.

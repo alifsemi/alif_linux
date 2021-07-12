@@ -353,7 +353,7 @@ config ARM_SP805_WATCHDOG
 
 config ARM_SBSA_WATCHDOG
 	tristate "ARM SBSA Generic Watchdog"
-	depends on (ARM64 || ARCH_BOLT)
+	depends on (ARM64 || ARCH_ENSEMBLE)
 	depends on ARM_ARCH_TIMER
 	select WATCHDOG_CORE
 	help

@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
-menuconfig ARCH_BOLT
-	bool "Alif Bolt SoCs"
-	#depends on ARCH_MULTI_V4T || ARCH_MULTI_V5 || ARCH_MULTI_V7 || ARM_SINGLE_ARMV7M
+menuconfig ARCH_ENSEMBLE
+	bool "Alif Devkit-Ex SoCs"
 	depends on ARM_SINGLE_ARMV7A
 	select GPIOLIB
 	select PINCTRL
@@ -24,9 +23,9 @@ menuconfig ARCH_BOLT
 	  processor based ARM core and logic (FPGA) tiles on the Versatile
 	  Express motherboard.
 
-if ARCH_BOLT
-config SOC_BOLT
-	bool "Alif Bolt C8"
+if ARCH_ENSEMBLE
+config SOC_ENSEMBLE
+	bool "Alif Devkit-Ex"
 	#select COMMON_CLK_AT91
 	#select PINCTRL_AT91
 	help

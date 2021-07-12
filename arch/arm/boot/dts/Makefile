@@ -44,7 +44,7 @@ dtb-$(CONFIG_SOC_AT91SAM9) += \
 	at91sam9g35ek.dtb \
 	at91sam9x25ek.dtb \
 	at91sam9x35ek.dtb
-dtb-$(CONFIG_SOC_BOLT) += \
+dtb-$(CONFIG_SOC_ENSEMBLE) += \
 	devkit-e7.dtb
 dtb-$(CONFIG_SOC_SAM_V7) += \
 	at91-kizbox2.dtb \

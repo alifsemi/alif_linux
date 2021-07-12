@@ -111,8 +111,8 @@ config PINCTRL_AMD
 
 config PINCTRL_BOLT
 	bool "Alif Bolt pin controller driver"
-	#depends on ARCH_BOLT
-	depends on SOC_BOLT
+	#depends on ARCH_ENSEMBLE
+	depends on SOC_ENSEMBLE
 	depends on OF
 	select PINMUX
 	select PINCONF
