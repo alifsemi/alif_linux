@@ -23,3 +23,6 @@
 #define RTSS_HE_MHU1 "enabled"
 #define SE_MHU0 "enabled"
 #define SE_MHU1 "enabled"
+
+// Ethernet defines
+#define ETH_STATUS "enabled"

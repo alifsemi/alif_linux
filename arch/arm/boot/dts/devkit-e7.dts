@@ -367,6 +367,7 @@
 					reg = <0x1>;
 				};
 			};
+			status = ETH_STATUS;
 		}; /*End of ethernet */
 
 		sdhci@48102000 {
