@@ -8,6 +8,7 @@
 
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include "devkit_e7_pinmux.h"
+#include "devkit_ex_dct_defines.h"
 
 / {
 	model = "devkit-e7";
@@ -249,6 +250,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-m55_hp-mhu0";
+		status = RTSS_HP_MHU0;
 	};
 
 	mbox_m55_hp_mhu1: mhu@1b020000 {
@@ -261,6 +263,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-m55_hp-mhu1";
+		status = RTSS_HP_MHU1;
 	};
 
 	mbox_m55_he_mhu0: mhu@1b040000 {
@@ -273,6 +276,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-m55_he-mhu0";
+		status = RTSS_HE_MHU0;
 	};
 
 	mbox_m55_he_mhu1: mhu@1b060000 {
@@ -285,6 +289,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-m55_he-mhu1";
+		status = RTSS_HE_MHU1;
 	};
 
 
@@ -298,6 +303,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-se-mhu0";
+		status = SE_MHU0;
 	};
 
 	mbox_se_mhu1: mhu@1b820000 {
@@ -310,6 +316,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-se-mhu1";
+		status = SE_MHU1;
 	};
 
 	client {
@@ -827,6 +834,7 @@
 			interrupts = <0 96 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM0_STATUS;
 		};
 		hwsem1: hwsem1@4901b010 {
 			compatible = "alif,hwsem";
@@ -836,6 +844,7 @@
 			interrupts = <0 97 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM1_STATUS;
 		};
 		hwsem2: hwsem2@4901b020 {
 			compatible = "alif,hwsem";
@@ -845,6 +854,7 @@
 			interrupts = <0 98 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM2_STATUS;
 		};
 		hwsem3: hwsem3@4901b030 {
 			compatible = "alif,hwsem";
@@ -854,6 +864,7 @@
 			interrupts = <0 99 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM3_STATUS;
 		};
 		hwsem4: hwsem4@4901b040 {
 			compatible = "alif,hwsem";
@@ -863,6 +874,7 @@
 			interrupts = <0 100 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM4_STATUS;
 		};
 		hwsem5: hwsem5@4901b050 {
 			compatible = "alif,hwsem";
@@ -872,6 +884,7 @@
 			interrupts = <0 101 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM5_STATUS;
 		};
 		hwsem6: hwsem6@4901b060 {
 			compatible = "alif,hwsem";
@@ -881,6 +894,7 @@
 			interrupts = <0 102 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM6_STATUS;
 		};
 		hwsem7: hwsem7@4901b070 {
 			compatible = "alif,hwsem";
@@ -890,6 +904,7 @@
 			interrupts = <0 103 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM7_STATUS;
 		};
 		hwsem8: hwsem8@4901b080 {
 			compatible = "alif,hwsem";
@@ -899,6 +914,7 @@
 			interrupts = <0 104 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM8_STATUS;
 		};
 		hwsem9: hwsem9@4901b090 {
 			compatible = "alif,hwsem";
@@ -908,6 +924,7 @@
 			interrupts = <0 105 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM9_STATUS;
 		};
 		hwsem10: hwsem10@4901b0A0 {
 			compatible = "alif,hwsem";
@@ -917,6 +934,7 @@
 			interrupts = <0 106 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM10_STATUS;
 		};
 		hwsem11: hwsem11@4901b0B0 {
 			compatible = "alif,hwsem";
@@ -926,6 +944,7 @@
 			interrupts = <0 107 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM11_STATUS;
 		};
 		hwsem12: hwsem12@4901b0C0 {
 			compatible = "alif,hwsem";
@@ -935,6 +954,7 @@
 			interrupts = <0 108 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM12_STATUS;
 		};
 		hwsem13: hwsem13@4901b0D0 {
 			compatible = "alif,hwsem";
@@ -944,6 +964,7 @@
 			interrupts = <0 109 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM13_STATUS;
 		};
 		hwsem14: hwsem14@4901b0E0 {
 			compatible = "alif,hwsem";
@@ -953,6 +974,7 @@
 			interrupts = <0 110 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM14_STATUS;
 		};
 		hwsem15: hwsem15@4901b0F0 {
 			compatible = "alif,hwsem";
@@ -962,6 +984,7 @@
 			interrupts = <0 111 4>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = HWSEM15_STATUS;
 		};
 
 	};
