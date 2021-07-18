@@ -357,6 +357,7 @@
 			mac-address = [92 60 04 02 c3 e6];
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_eth0>;
+			status = ETH_STATUS;
 			mdio{
 				#address-cells = <0x1>;
 				#size-cells = <0x0>;
@@ -367,7 +368,6 @@
 					reg = <0x1>;
 				};
 			};
-			status = ETH_STATUS;
 		}; /*End of ethernet */
 
 		sdhci@48102000 {
