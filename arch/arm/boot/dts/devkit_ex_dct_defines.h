@@ -17,12 +17,15 @@
 #define HWSEM15_STATUS "okay"
 
 // MHU defines
-#define RTSS_HP_MHU0 "okay"
-#define RTSS_HP_MHU1 "okay"
-#define RTSS_HE_MHU0 "okay"
-#define RTSS_HE_MHU1 "okay"
-#define SE_MHU0 "okay"
-#define SE_MHU1 "okay"
+#define RTSS_HP_MHU0_STATUS "okay"
+#define RTSS_HP_MHU1_STATUS "okay"
+#define RTSS_HE_MHU0_STATUS "okay"
+#define RTSS_HE_MHU1_STATUS "okay"
+#define SE_MHU0_STATUS "okay"
+#define SE_MHU1_STATUS "okay"
 
 // Ethernet defines
 #define ETH_STATUS "okay"
+
+//SDMMC defines
+#define SDHCI_STATUS "okay"

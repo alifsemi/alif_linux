@@ -250,7 +250,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-m55_hp-mhu0";
-		status = RTSS_HP_MHU0;
+		status = RTSS_HP_MHU0_STATUS;
 	};
 
 	mbox_m55_hp_mhu1: mhu@1b020000 {
@@ -263,7 +263,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-m55_hp-mhu1";
-		status = RTSS_HP_MHU1;
+		status = RTSS_HP_MHU1_STATUS;
 	};
 
 	mbox_m55_he_mhu0: mhu@1b040000 {
@@ -276,7 +276,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-m55_he-mhu0";
-		status = RTSS_HE_MHU0;
+		status = RTSS_HE_MHU0_STATUS;
 	};
 
 	mbox_m55_he_mhu1: mhu@1b060000 {
@@ -289,7 +289,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-m55_he-mhu1";
-		status = RTSS_HE_MHU1;
+		status = RTSS_HE_MHU1_STATUS;
 	};
 
 
@@ -303,7 +303,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-se-mhu0";
-		status = SE_MHU0;
+		status = SE_MHU0_STATUS;
 	};
 
 	mbox_se_mhu1: mhu@1b820000 {
@@ -316,7 +316,7 @@
 		interrupt-names = "mhu_rx";
 		#mbox-cells = <1>;
 		mbox-name = "arm-se-mhu1";
-		status = SE_MHU1;
+		status = SE_MHU1_STATUS;
 	};
 
 	client {
@@ -382,6 +382,7 @@
 			vmmc-supply = <&reg_3p3v>;
 			vqmmc-supply = <&reg_3p3v>;
 			max-frequency = <50000000>;
+			status = SDHCI_STATUS;
 		};
 
                spi0: spi@48103000 {
