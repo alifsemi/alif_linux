@@ -29,3 +29,64 @@
 
 //SDMMC defines
 #define SDHCI_STATUS "disabled"
+
+//SPI defines
+#define SPI0_STATUS "disabled"
+#define SPI1_STATUS "disabled"
+#define SPI2_STATUS "disabled"
+#define SPI3_STATUS "disabled"
+
+//UART defines
+#define UART0_STATUS "disabled"
+#define UART1_STATUS "disabled"
+#define UART2_STATUS "disabled"
+#define UART3_STATUS "disabled"
+#define UART4_STATUS "disabled"
+#define UART5_STATUS "disabled"
+#define UART6_STATUS "disabled"
+#define UART7_STATUS "disabled"
+
+//USB defines
+#define HSUSB_STATUS "disabled"
+
+//UTIMER defines
+#define UTIMER0_STATUS "disabled"
+#define UTIMER1_STATUS "disabled"
+#define UTIMER2_STATUS "disabled"
+#define UTIMER3_STATUS "disabled"
+#define UTIMER4_STATUS "disabled"
+#define UTIMER5_STATUS "disabled"
+#define UTIMER6_STATUS "disabled"
+#define UTIMER7_STATUS "disabled"
+#define UTIMER8_STATUS "disabled"
+#define UTIMER9_STATUS "disabled"
+#define UTIMER10_STATUS "disabled"
+#define UTIMER11_STATUS "disabled"
+
+//DSI defines
+#define DSI_STATUS "disabled"
+
+//DPI defines
+#define DPI_STATUS "disabled"
+
+//CSI defines
+#define CSI_STATUS "disabled"
+
+//CPI defines
+#define CPI_STATUS "disabled"
+
+//ADC defines
+#define ADC120_STATUS "disabled"
+#define ADC121_STATUS "disabled"
+#define ADC122_STATUS "disabled"
+
+//CMP defines
+#define CMP0_STATUS "disabled"
+#define CMP1_STATUS "disabled"
+#define CMP2_STATUS "disabled"
+#define CMP3_STATUS "disabled"
+
+//DAC defines
+#define DAC120_STATUS "disabled"
+#define DAC121_STATUS "disabled"
+#define DAC122_STATUS "disabled"

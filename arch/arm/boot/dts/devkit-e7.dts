@@ -397,6 +397,7 @@
                        reg-io-width = <4>;
                        spi-tx-bus-width = <1>;
                        spi-rx-bus-width = <1>;
+                       status = SPI0_STATUS;
                }; /* SPI0 */
 
                spi1: spi@48104000 {
@@ -411,6 +412,7 @@
                        reg-io-width = <4>;
                        spi-tx-bus-width = <1>;
                        spi-rx-bus-width = <1>;
+                       status = SPI1_STATUS;
                }; /* SPI1 */
 
                spi2: spi@48105000 {
@@ -425,6 +427,7 @@
                        reg-io-width = <4>;
                        spi-tx-bus-width = <1>;
                        spi-rx-bus-width = <1>;
+                       status = SPI2_STATUS;
                }; /* SPI2 */
 
 		spi3: spi@48106000 {
@@ -441,6 +444,7 @@
                        reg-io-width = <4>;
                        spi-tx-bus-width = <1>;
                        spi-rx-bus-width = <1>;
+                       status = SPI3_STATUS;
                        ds1722@0 {
                                compatible="ds,ds1722";
                                reg = <0>;
@@ -459,7 +463,7 @@
 			vdd33-supply = <&reg_3p3v>;
 			//vbus-supply = <&reg_5p0v>;
 			ranges;
-			status = "okay";
+			status = HSUSB_STATUS;
 			usbdual_hs: usb-dual@48200000 {
 			compatible = "snps","snps,dwc3";
 			reg = <0x48200000 0x100000>;
@@ -475,7 +479,7 @@
 			snps,incr-burst-type-adjustment = <1>, <4>, <8>, <16>;
 			snps,quirk-frame-length-adjustment = <0x20>;
 			snps,usb2-lpm-disable;
-			status = "okay";
+			status = HSUSB_STATUS;
 			};
 		};/* End of DWC3 layer */
 	};
@@ -611,6 +615,7 @@
 			interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
+			status = UART0_STATUS;
 		};*/
 
 		uart1@49009000 {
@@ -622,6 +627,7 @@
 			interrupts = <GIC_SPI 116 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
+			status = UART1_STATUS;
 		};
 
 		uart2@4900A000 {
@@ -635,6 +641,7 @@
 			interrupts = <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
+			status = UART2_STATUS;
 		};
 
 		uart3@4900B000 {
@@ -646,6 +653,7 @@
 			interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
+			status = UART3_STATUS;
 		};
 
 		uart4@4900C000 {
@@ -657,6 +665,7 @@
 			interrupts = <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
+			status = UART4_STATUS;
 		};
 
 		uart5@4900D000 {
@@ -668,6 +677,7 @@
 			interrupts = <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
+			status = UART5_STATUS;
 		};
 
 		uart6@4900E000 {
@@ -679,6 +689,7 @@
 			interrupts = <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
+			status = UART6_STATUS;
 		};
 
 		uart7@4900F000 {
@@ -690,6 +701,7 @@
 			interrupts = <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>;
 			reg-shift = <2>;
 			reg-io-width = <4>;
+			status = UART7_STATUS;
 		};
 	};
 	apb_b: apb@49010000{
@@ -1003,6 +1015,7 @@
 			reg = <0x49020000 0x100>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = ADC120_STATUS;
 		};
 
 		adc1: adc12_1@49021000 {
@@ -1010,24 +1023,28 @@
 			reg = <0x49021000 0x100>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = ADC121_STATUS;
 		};
 		adc2: adc16_0@49022000 {
 			compatible = "alif,bolt-adc";
 			reg = <0x49022000 0x100>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = ADC122_STATUS;
 		};
 		dac0: dac12_0@49028000 {
 			compatible = "alif,ensemble-dac";
 			reg = <0x49028000 0x10>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = DAC120_STATUS;
 		};
 		dac1: dac12_1@49029000 {
 			compatible = "alif,ensemble-dac";
 			reg = <0x49029000 0x10>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
+			status = DAC121_STATUS;
 		};
 	};
 	apb_d: apb@49030000{
