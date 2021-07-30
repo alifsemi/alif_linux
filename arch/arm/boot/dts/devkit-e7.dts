@@ -454,14 +454,11 @@
                }; /* SPI3  */
 
 		hsusb: dwc3-drd {
-			compatible = "alif,bolt-usb3";
+			compatible = "alif,ensemble-usb3";
 			#address-cells = <1>;
 			#size-cells = <1>;
-			//clocks = <&syst_hclk>;
-			//clock-names = "ahb_clk";
 			vdd18-supply = <&reg_1p8v>;
 			vdd33-supply = <&reg_3p3v>;
-			//vbus-supply = <&reg_5p0v>;
 			ranges;
 			status = HSUSB_STATUS;
 			usbdual_hs: usb-dual@48200000 {

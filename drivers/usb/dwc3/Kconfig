@@ -138,8 +138,8 @@ config USB_DWC3_QCOM
 	  for peripheral mode support.
 	  Say 'Y' or 'M' if you have one such device.
 
-config USB_DWC3_BOLT
-        tristate "ALIF bolt Platform"
+config USB_DWC3_ENSEMBLE
+        tristate "ALIF ENSEMBLE Platform"
         depends on (ARM) && OF
         default USB_DWC3
         help

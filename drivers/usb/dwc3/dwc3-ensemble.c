@@ -162,7 +162,7 @@ static const struct dwc3_bolt_driverdata dwc3_bolt_drvdata = {
 
 static const struct of_device_id dwc3_bolt_match[] = {
 	{
-		.compatible = "alif,bolt-usb3",
+		.compatible = "alif,ensemble-usb3",
 		.data = &dwc3_bolt_drvdata,
 	},
 };
