@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for pin control for bolt Alif Semiconductor
+ * Driver for pin control for Devkit Alif Semiconductor
  * Heavily based off other pinctrl drivers
  *
  * Copyright (C) 2021 Alif Semiconductor
@@ -862,19 +862,19 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "fail to probe dt properties\n");
 	}
 
-	dev_info(&pdev->dev, "Bolt pinctrl initialized\n");
+	dev_info(&pdev->dev, "Devkit pinctrl initialized\n");
 	return 0;
 }
 
 static const struct of_device_id bolt_pctl_of_match[] = {
-	{ .compatible = "alif,pinctrl-bolt" },
+	{ .compatible = "alif,pinctrl-devkit" },
 	{ }
 };
 
 
 static struct platform_driver bolt_pctl_driver = {
 	.driver = {
-		.name = "bolt-pinctrl",
+		.name = "devkit-pinctrl",
 		.of_match_table = bolt_pctl_of_match,
 	},
 	.probe = bolt_pctl_probe,

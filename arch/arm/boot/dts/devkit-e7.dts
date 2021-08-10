@@ -1170,7 +1170,7 @@
 		ranges = <>;
 
 		pinmux: pinctrl@71006000 {
-			compatible = "alif,pinctrl-bolt";
+			compatible = "alif,pinctrl-devkit";
 			/*padctrl: aon@71007000 */
 			reg = 	<0x71006000 0x00001000>,
 				<0x71007000 0x00001000>,
