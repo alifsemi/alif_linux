@@ -214,7 +214,7 @@ static int bolt_rtc_remove(struct platform_device *pdev)
 
 #ifdef CONFIG_OF
 static const struct of_device_id bolt_rtc_of_match[] = {
-	{.compatible = "alif,bolt-rtc" },
+	{.compatible = "alif,devkit-rtc" },
 	{ }
 };
 MODULE_DEVICE_TABLE(of, bolt_rtc_of_match);
@@ -224,13 +224,13 @@ static struct platform_driver bolt_rtc_driver = {
 	.probe		= bolt_rtc_probe,
 	.remove		= bolt_rtc_remove,
 	.driver		= {
-		.name	= "bolt-rtc",
+		.name	= "devkit-rtc",
 		.of_match_table	= of_match_ptr(bolt_rtc_of_match),
 	},
 };
 
 module_platform_driver(bolt_rtc_driver);
 
-MODULE_DESCRIPTION("Alif Bolt SoC RTC driver");
+MODULE_DESCRIPTION("Alif Devkit SoC RTC driver");
 MODULE_AUTHOR("Harith George <harith.g@alifsemi.com>");
 MODULE_LICENSE("GPL");

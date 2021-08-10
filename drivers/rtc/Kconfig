@@ -1837,12 +1837,12 @@ config RTC_DRV_XGENE
 	  This driver can also be built as a module, if so, the module
 	  will be called "rtc-xgene".
 
-config RTC_DRV_ENSEMBLE
+config RTC_DRV_DEVKIT
        tristate "Alif Devkit-Ex RTC"
        depends on HAS_IOMEM
        depends on ARCH_ENSEMBLE || COMPILE_TEST
        help
-         If you say yes here you get support for Alif Bolt SoC real time
+         If you say yes here you get support for Alif Devkit SoC real time
          clock.
 
 config RTC_DRV_PIC32
