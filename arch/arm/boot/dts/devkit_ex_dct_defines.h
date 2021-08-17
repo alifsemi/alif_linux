@@ -1,40 +1,40 @@
 // HWSEM defines
-#define HWSEM0_STATUS "disabled"
-#define HWSEM1_STATUS "disabled"
-#define HWSEM2_STATUS "disabled"
-#define HWSEM3_STATUS "disabled"
-#define HWSEM4_STATUS "disabled"
-#define HWSEM5_STATUS "disabled"
-#define HWSEM6_STATUS "disabled"
-#define HWSEM7_STATUS "disabled"
-#define HWSEM8_STATUS "disabled"
-#define HWSEM9_STATUS "disabled"
-#define HWSEM10_STATUS "disabled"
-#define HWSEM11_STATUS "disabled"
-#define HWSEM12_STATUS "disabled"
-#define HWSEM13_STATUS "disabled"
-#define HWSEM14_STATUS "disabled"
-#define HWSEM15_STATUS "disabled"
+#define HWSEM0_STATUS "okay"
+#define HWSEM1_STATUS "okay"
+#define HWSEM2_STATUS "okay"
+#define HWSEM3_STATUS "okay"
+#define HWSEM4_STATUS "okay"
+#define HWSEM5_STATUS "okay"
+#define HWSEM6_STATUS "okay"
+#define HWSEM7_STATUS "okay"
+#define HWSEM8_STATUS "okay"
+#define HWSEM9_STATUS "okay"
+#define HWSEM10_STATUS "okay"
+#define HWSEM11_STATUS "okay"
+#define HWSEM12_STATUS "okay"
+#define HWSEM13_STATUS "okay"
+#define HWSEM14_STATUS "okay"
+#define HWSEM15_STATUS "okay"
 
 // MHU defines
-#define RTSS_HP_MHU0_STATUS "disabled"
-#define RTSS_HP_MHU1_STATUS "disabled"
-#define RTSS_HE_MHU0_STATUS "disabled"
-#define RTSS_HE_MHU1_STATUS "disabled"
-#define SE_MHU0_STATUS "disabled"
-#define SE_MHU1_STATUS "disabled"
+#define RTSS_HP_MHU0_STATUS "okay"
+#define RTSS_HP_MHU1_STATUS "okay"
+#define RTSS_HE_MHU0_STATUS "okay"
+#define RTSS_HE_MHU1_STATUS "okay"
+#define SE_MHU0_STATUS "okay"
+#define SE_MHU1_STATUS "okay"
 
 // Ethernet defines
-#define ETH_STATUS "disabled"
+#define ETH_STATUS "okay"
 
 //SDMMC defines
-#define SDHCI_STATUS "disabled"
+#define SDHCI_STATUS "okay"
 
 //SPI defines
-#define SPI0_STATUS "disabled"
-#define SPI1_STATUS "disabled"
-#define SPI2_STATUS "disabled"
-#define SPI3_STATUS "disabled"
+#define SPI0_STATUS "okay"
+#define SPI1_STATUS "okay"
+#define SPI2_STATUS "okay"
+#define SPI3_STATUS "okay"
 
 //UART defines
 #define UART0_STATUS "disabled"
@@ -47,46 +47,46 @@
 #define UART7_STATUS "disabled"
 
 //USB defines
-#define HSUSB_STATUS "disabled"
+#define HSUSB_STATUS "okay"
 
 //UTIMER defines
-#define UTIMER0_STATUS "disabled"
-#define UTIMER1_STATUS "disabled"
-#define UTIMER2_STATUS "disabled"
-#define UTIMER3_STATUS "disabled"
-#define UTIMER4_STATUS "disabled"
-#define UTIMER5_STATUS "disabled"
-#define UTIMER6_STATUS "disabled"
-#define UTIMER7_STATUS "disabled"
-#define UTIMER8_STATUS "disabled"
-#define UTIMER9_STATUS "disabled"
-#define UTIMER10_STATUS "disabled"
-#define UTIMER11_STATUS "disabled"
+#define UTIMER0_STATUS "okay"
+#define UTIMER1_STATUS "okay"
+#define UTIMER2_STATUS "okay"
+#define UTIMER3_STATUS "okay"
+#define UTIMER4_STATUS "okay"
+#define UTIMER5_STATUS "okay"
+#define UTIMER6_STATUS "okay"
+#define UTIMER7_STATUS "okay"
+#define UTIMER8_STATUS "okay"
+#define UTIMER9_STATUS "okay"
+#define UTIMER10_STATUS "okay"
+#define UTIMER11_STATUS "okay"
 
 //DSI defines
-#define DSI_STATUS "disabled"
+#define DSI_STATUS "okay"
 
 //DPI defines
-#define DPI_STATUS "disabled"
+#define DPI_STATUS "okay"
 
 //CSI defines
-#define CSI_STATUS "disabled"
+#define CSI_STATUS "okay"
 
 //CPI defines
-#define CPI_STATUS "disabled"
+#define CPI_STATUS "okay"
 
 //ADC defines
-#define ADC120_STATUS "disabled"
-#define ADC121_STATUS "disabled"
-#define ADC122_STATUS "disabled"
+#define ADC120_STATUS "okay"
+#define ADC121_STATUS "okay"
+#define ADC122_STATUS "okay"
 
 //CMP defines
-#define CMP0_STATUS "disabled"
-#define CMP1_STATUS "disabled"
-#define CMP2_STATUS "disabled"
-#define CMP3_STATUS "disabled"
+#define CMP0_STATUS "okay"
+#define CMP1_STATUS "okay"
+#define CMP2_STATUS "okay"
+#define CMP3_STATUS "okay"
 
 //DAC defines
-#define DAC120_STATUS "disabled"
-#define DAC121_STATUS "disabled"
-#define DAC122_STATUS "disabled"
+#define DAC120_STATUS "okay"
+#define DAC121_STATUS "okay"
+#define DAC122_STATUS "okay"
