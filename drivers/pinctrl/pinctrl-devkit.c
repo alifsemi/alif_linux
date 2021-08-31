@@ -837,11 +837,17 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 2);
 	info->expmst0_base = devm_ioremap_resource(&pdev->dev, res);
 	writel(0x11, info->expmst0_base);
+
 	/* Enable UART2, UART4*/
 	writel(	(1 << 12) | (1 << 4) |
 		(1 << 10) | (1 << 2), info->expmst0_base + 0x8);
+
 	/* I3C */
 	writel(0x01000001, info->expmst0_base + 0x24);
+
+	/*padctrl for i3c/i2c*/
+	writel(0x09, info->padctrl_base + 0x120);
+	writel(0x09, info->padctrl_base + 0x124);
 
 	platform_set_drvdata(pdev, info);
 

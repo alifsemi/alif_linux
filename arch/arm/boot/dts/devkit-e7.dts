@@ -777,17 +777,17 @@
 			reg = <0x49018000 0x1000>;
 			interrupts = <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&syst_pclk>;
+			clock-frequency = <100000000>;
 			#address-cells = <3>;
 			#size-cells = <0>;
 			i2c-scl-hz = <100000>;
+			status = I3C_STATUS;
 
-			//clock-frequency = <100000>;
-			/* I2C device.*/
-		/*	eeprom@50 {
-				compatible = "atmel,24c02";
-				reg = <0x50 0x0 0x50>;
+			/* I2C device. BNO055 */
+			bno055@28 {
+				compatible = "bno055";
+				reg = <0x28 0x0 0x100>;
 			};
-		*/
 		};
 
 		/*====== DW I2S ====== */

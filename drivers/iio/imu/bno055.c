@@ -7,6 +7,9 @@
  * the GNU General Public License.  See the file COPYING in the main
  * directory of this archive for more details.
  *
+ * Minor modifications by Harith George (harith.g@alifsemi.com) while adding
+ * it to Alif repo.
+ *
  * TODO:
  *  - buffering
  *  - interrupt support
@@ -113,55 +116,10 @@ struct bno055_data {
 	enum bno055_operation_mode op_mode;
 };
 
-/*
- * Note: The BNO055 has two pages of registers.  All the addresses below
- * are page 0 addresses.  If the driver ever uses page 1 registers, it
- * is expected to manually switch between pages via the PAGE ID register
- * and make sure that no other transactions happen.  It also cannot use
- * the regmap interface for accessing registers in page 1.
- */
-static const struct regmap_range bno055_writable_ranges[] = {
-	regmap_reg_range(BNO055_REG_ACC_OFFSET_X_LSB, BNO055_REG_MAG_RADIUS_MSB),
-	regmap_reg_range(BNO055_REG_OPR_MODE, BNO055_REG_AXIS_MAP_SIGN),
-	regmap_reg_range(BNO055_REG_UNIT_SEL, BNO055_REG_UNIT_SEL),
-	/* Listed as read-only in the datasheet, but probably an error. */
-	regmap_reg_range(BNO055_REG_PAGE_ID, BNO055_REG_PAGE_ID),
-};
-
-static const struct regmap_access_table bno055_writable_regs = {
-	.yes_ranges = bno055_writable_ranges,
-	.n_yes_ranges = ARRAY_SIZE(bno055_writable_ranges),
-};
-
-/* Only reserved registers are non-readable. */
-static const struct regmap_range bno055_non_readable_reg_ranges[] = {
-	regmap_reg_range(BNO055_REG_AXIS_MAP_SIGN + 1, BNO055_REG_ACC_OFFSET_X_LSB - 1),
-};
-
-static const struct regmap_access_table bno055_readable_regs = {
-	.no_ranges = bno055_non_readable_reg_ranges,
-	.n_no_ranges = ARRAY_SIZE(bno055_non_readable_reg_ranges),
-};
-
-static const struct regmap_range bno055_volatile_reg_ranges[] = {
-	regmap_reg_range(BNO055_REG_ACC_DATA_X_LSB, BNO055_REG_SYS_ERR),
-};
-
-static const struct regmap_access_table bno055_volatile_regs = {
-	.yes_ranges = bno055_volatile_reg_ranges,
-	.n_yes_ranges = ARRAY_SIZE(bno055_volatile_reg_ranges),
-};
-
 static const struct regmap_config bno055_regmap_config = {
 	.reg_bits = 8,
 	.val_bits = 8,
-
-	.max_register = BNO055_REG_MAG_RADIUS_MSB + 1,
-	.cache_type = REGCACHE_RBTREE,
-
-	.wr_table = &bno055_writable_regs,
-	.rd_table = &bno055_readable_regs,
-	.volatile_table = &bno055_volatile_regs,
+	.disable_locking = true,
 };
 
 static int bno055_read_simple_chan(struct iio_dev *indio_dev,
@@ -335,25 +293,6 @@ static int bno055_init_chip(struct iio_dev *indio_dev)
 		return -EINVAL;
 	}
 
-	ret = regmap_write(data->regmap, BNO055_REG_PAGE_ID, 0);
-	if (ret < 0) {
-		dev_err(dev, "failed to switch to register page 0\n");
-		return ret;
-	}
-
-	/*
-	 * Configure units to what we care about.  Also configure
-	 * Android orientation mode.  See datasheet Section 4.3.60.
-	 */
-	ret = regmap_write(data->regmap, BNO055_REG_UNIT_SEL,
-			   BNO055_ANDROID_ORIENTATION | BNO055_TEMP_CELSIUS |
-			   BNO055_EUL_RADIANS | BNO055_GYR_RADIANS |
-			   BNO055_ACC_MPSS);
-	if (ret < 0) {
-		dev_err(dev, "failed to set measurement units\n");
-		return ret;
-	}
-
 	ret = regmap_bulk_read(data->regmap, BNO055_REG_CHIP_ID,
 			       chip_id_bytes, sizeof(chip_id_bytes));
 	if (ret < 0) {
@@ -364,6 +303,7 @@ static int bno055_init_chip(struct iio_dev *indio_dev)
 	chip_id = le32_to_cpu(*(u32 *)chip_id_bytes);
 	sw_rev = le16_to_cpu(*(u16 *)&chip_id_bytes[4]);
 
+	pr_info("BNO055 chip_id read -> 0x%x sw_rev -> 0x%x\n",chip_id, sw_rev);
 	if (chip_id != BNO055_CHIP_ID) {
 		dev_err(dev, "bad chip id; got %08x expected %08x\n",
 			chip_id, BNO055_CHIP_ID);
@@ -504,7 +444,6 @@ static int bno055_init_channels(struct iio_dev *indio_dev)
 }
 
 static const struct iio_info bno055_info = {
-	.driver_module = THIS_MODULE,
 	.read_raw_multi = &bno055_read_raw_multi,
 };
 

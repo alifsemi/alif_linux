@@ -90,3 +90,6 @@
 #define DAC120_STATUS "okay"
 #define DAC121_STATUS "okay"
 #define DAC122_STATUS "okay"
+
+//I2C/I3C defines
+#define I3C_STATUS "okay"
