@@ -93,3 +93,8 @@
 
 //I2C/I3C defines
 #define I3C_STATUS "okay"
+
+// GPIO defines
+#define GPIO_STATUS "okay"
+#define GPIO_1_STATUS "okay"
+#define GPIO_2_STATUS "okay"

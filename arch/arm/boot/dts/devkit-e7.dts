@@ -496,7 +496,7 @@
 			reg = <0x49000000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "disabled";
+			status = "GPIO_STATUS";
 
 			/* Port 1 */
 			port1: gpio-controller@0 {
@@ -534,7 +534,7 @@
 			reg = <0x49001000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "disabled";
+			status = "GPIO_1_STATUS";
 
 			/* Port 2 */
 			port2: gpio-controller@0 {
@@ -572,7 +572,7 @@
 			reg = <0x49002000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "disabled";
+			status = "GPIO_2_STATUS";
 
 			/* Port 3 */
 			port3: gpio-controller@0 {
