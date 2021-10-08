@@ -14,6 +14,7 @@
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_atomic_helper.h>
+#include <drm/drm_probe_helper.h>
 
 #include <video/display_timing.h>
 #include <video/of_display_timing.h>
@@ -162,7 +163,7 @@ int cdc_lvds_connector_init(struct cdc_device *cdc, struct cdc_encoder *enc,
 		return ret;
 	}
 
-	ret = drm_mode_connector_attach_encoder(connector, encoder);
+	ret = drm_connector_attach_encoder(connector, encoder);
 	if (ret < 0) {
 		dev_err(cdc->dev, "Error attaching encoder and connector: %d\n",
 			ret);

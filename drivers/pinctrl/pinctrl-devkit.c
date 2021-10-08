@@ -808,6 +808,7 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	struct resource *res;
 	struct bolt_pinctrl *info;
 	struct pinctrl_desc *pctl_desc;
+	void __iomem *tmp;
 
 	if (!pdev->dev.of_node) {
 		dev_err(&pdev->dev, "device node not found.\n");
@@ -848,6 +849,22 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	/*padctrl for i3c/i2c*/
 	writel(0x09, info->padctrl_base + 0x120);
 	writel(0x09, info->padctrl_base + 0x124);
+
+	/* Set the EXPSLV1 CDC200 clock divider
+	 * Input clock is 400Mhz. Can be divided by min 2 to max 511.
+	 * For Parallel display, pixel clk needs to be between
+	 * 5MHz and 12 Mhz
+	 * bit 0: Enable
+	 * bit [24:16]: Divider value (Set to 80(0x50) to get 5Mhz)
+	 * bit [24:16]: Divider value (Set to 50(0x32) to get 8Mhz)
+	 * bit [24:16]: Divider value (Set to 40(0x28) to get 10Mhz)
+	 * bit [24:16]: Divider value (Set to 16(0x10) to get 25Mhz)
+	 * bit [24:16]: Divider value (Set to 12(0x0c) to get 33.3Mhz)
+	 */
+	/* Map the expslv1 reg region */
+	tmp = ioremap(0x4903F000, 0x40);
+	writel(0x280001, tmp + 0x4);
+	iounmap(tmp);
 
 	platform_set_drvdata(pdev, info);
 

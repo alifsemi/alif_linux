@@ -27,6 +27,8 @@
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_fb_cma_helper.h>
 #include <drm/drm_gem_cma_helper.h>
+#include <drm/drm_fb_helper.h>
+#include <drm/drm_probe_helper.h>
 
 #include "cdc_regs.h"
 
@@ -139,12 +141,14 @@ bool cdc_init_irq (struct cdc_device *cdc)
 	return true;
 }
 
+#if 0
 static void cdc_lastclose (struct drm_device *dev)
 {
 	struct cdc_device *cdc = dev->dev_private;
 
 	drm_fbdev_cma_restore_mode(cdc->fbdev);
 }
+#endif
 
 static int cdc_enable_vblank (struct drm_device *dev, unsigned int pipe)
 {
@@ -311,7 +315,7 @@ long cdc_ioctl (struct file *filp, unsigned int cmd, unsigned long arg)
 			cdc_hw_setCBAddress(cdc, 0,
 				(unsigned int) set_cb->phy_addr);
 			if(cdc->dswz) {
-				dswz_set_fb_addr(cdc->dswz, set_cb->phy_addr);
+				dswz_set_fb_addr(cdc->dswz, (u32) set_cb->phy_addr);
 				dswz_set_mode(cdc->dswz, DSWZ_MODE_DESWIZZLE);
 				dswz_retrigger(cdc->dswz);
 			}
@@ -381,8 +385,8 @@ static const struct file_operations cdc_fops = {
 };
 
 static struct drm_driver cdc_driver = {
-	.driver_features = DRIVER_GEM | DRIVER_MODESET | DRIVER_PRIME | DRIVER_ATOMIC,
-	.lastclose = cdc_lastclose,
+	.driver_features = DRIVER_GEM | DRIVER_MODESET | DRIVER_ATOMIC,
+	.lastclose = drm_fb_helper_lastclose,
 	.enable_vblank = cdc_enable_vblank,
 	.disable_vblank = cdc_disable_vblank,
 	.gem_free_object = drm_gem_cma_free_object,
@@ -451,16 +455,13 @@ static int cdc_remove (struct platform_device *pdev)
 
 	drm_dev_unregister(ddev);
 
-	if (cdc->fbdev)
-		drm_fbdev_cma_fini(cdc->fbdev);
-
 	drm_kms_helper_poll_fini(ddev);
 	drm_mode_config_cleanup(ddev);
 
 	cdc_write_reg(cdc, CDC_REG_GLOBAL_IRQ_ENABLE, 0x0);
 	cdc_hw_setEnabled(cdc, false);
 
-	drm_dev_unref(ddev);
+	drm_dev_put(ddev);
 
 	return 0;
 }
@@ -616,6 +617,8 @@ static int cdc_probe (struct platform_device *pdev)
 	if(cdc->dswz)
 		drm_crtc_vblank_get(&cdc->crtc);
 
+	/* Setup framebuffer with 16 bits/pixel */
+	drm_fbdev_generic_setup(ddev, 16);
 	return 0;
 
 error:

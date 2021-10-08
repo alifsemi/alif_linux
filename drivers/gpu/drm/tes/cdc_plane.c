@@ -194,7 +194,7 @@ static void cdc_plane_reset(struct drm_plane *plane)
 	struct cdc_plane_state *state;
 
 	if (plane->state && plane->state->fb)
-		drm_framebuffer_unreference(plane->state->fb);
+		drm_framebuffer_put(plane->state->fb);
 
 	kfree(plane->state);
 	plane->state = NULL;
@@ -221,7 +221,7 @@ static struct drm_plane_state *
 		return NULL;
 
 	if (copy->state.fb)
-		drm_framebuffer_reference(copy->state.fb);
+		drm_framebuffer_get(copy->state.fb);
 
 	return &copy->state;
 }
@@ -230,7 +230,7 @@ static void cdc_plane_atomic_destroy_state(struct drm_plane *plane,
 	struct drm_plane_state *state)
 {
 	if (state->fb)
-		drm_framebuffer_unreference(state->fb);
+		drm_framebuffer_put(state->fb);
 
 	kfree(to_cdc_plane_state(state));
 }

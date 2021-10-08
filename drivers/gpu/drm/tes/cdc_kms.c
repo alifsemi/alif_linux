@@ -20,6 +20,9 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_fb_cma_helper.h>
 #include <drm/drm_gem_cma_helper.h>
+#include <drm/drm_gem_framebuffer_helper.h>
+#include <drm/drm_fb_helper.h>
+#include <drm/drm_probe_helper.h>
 
 #include <video/display_timing.h>
 #include <video/of_display_timing.h>
@@ -83,7 +86,7 @@ static struct drm_framebuffer *cdc_fb_create(struct drm_device *dev,
 		return ERR_PTR(-EINVAL);
 	}
 
-	fb = drm_fb_cma_create(dev, file_priv, mode_cmd);
+	fb = drm_gem_fb_create(dev, file_priv, mode_cmd);
 
 	gem = drm_fb_cma_get_gem_obj(fb, 0);
 
@@ -92,6 +95,7 @@ static struct drm_framebuffer *cdc_fb_create(struct drm_device *dev,
 	return fb;
 }
 
+#if 0
 static void cdc_output_poll_changed(struct drm_device *dev)
 {
 	struct cdc_device *cdc = dev->dev_private;
@@ -103,6 +107,7 @@ static void cdc_output_poll_changed(struct drm_device *dev)
 	else
 		drm_fbdev_cma_hotplug_event(cdc->fbdev);
 }
+#endif
 
 static int cdc_atomic_check(struct drm_device *dev,
 	struct drm_atomic_state *state)
@@ -228,7 +233,7 @@ static int cdc_atomic_commit(struct drm_device *dev,
 
 static const struct drm_mode_config_funcs cdc_mode_config_funcs = {
 	.fb_create = cdc_fb_create,
-	.output_poll_changed = cdc_output_poll_changed,
+	.output_poll_changed = drm_fb_helper_output_poll_changed,
 	.atomic_check = cdc_atomic_check,
 	.atomic_commit = cdc_atomic_commit,
 };
@@ -352,7 +357,7 @@ static int cdc_encoders_init(struct cdc_device *cdc)
 int cdc_modeset_init(struct cdc_device *cdc)
 {
 	struct drm_device *dev = cdc->ddev;
-	struct drm_fbdev_cma *fbdev;
+	/*struct drm_fbdev_cma *fbdev;*/
 	int ret;
 
 	dev_dbg(cdc->dev, "%s\n", __func__);
@@ -383,6 +388,7 @@ int cdc_modeset_init(struct cdc_device *cdc)
 	drm_mode_config_reset(dev);
 	drm_kms_helper_poll_init(dev);
 
+#if 0
 	if (dev->mode_config.num_connector) {
 		dev_dbg(cdc->dev, "Initializing FBDEV CMA...\n");
 		fbdev = drm_fbdev_cma_init(dev, 32, 1);
@@ -405,6 +411,7 @@ int cdc_modeset_init(struct cdc_device *cdc)
 
 	dev_dbg(cdc->dev, "Added FB at 0x%08x\n",
 		cdc->ddev->mode_config.fb_base);
+#endif
 
 	return 0;
 }

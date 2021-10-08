@@ -41,6 +41,10 @@
 		device_type = "memory";
 		reg = <0x02000000 0x400000>;
 	};
+	memory@08200000 {
+		device_type = "memory";
+		reg = <0x08200000 0x80000>;
+	};
 
 	gic: interrupt-controller@1c000000 {
 		compatible = "arm,gic-400";
@@ -153,6 +157,15 @@
 			clock-frequency = <100000000>;
 			clock-output-names = "baudclk";
 		};
+
+		pixelclk: pixelclk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			/*clock-frequency = <33333333>;*/
+			clock-frequency = <10000000>;
+			clock-output-names = "pixelclk";
+		};
+
 	};
 
 	/* Regulators entry */
@@ -1050,6 +1063,32 @@
 		#size-cells = <1>;
 		reg = <0x49030000 0x00010000>;
 		ranges = <>;
+
+		cdc200: cdc200@49031000 {
+			compatible = "tes,cdc-2.1";
+			reg = <0x49031000 0x100>;
+			interrupt-parent = <&gic>;
+			interrupts =	<0 313 IRQ_TYPE_LEVEL_HIGH>,
+					<0 314 IRQ_TYPE_LEVEL_HIGH>,
+					<0 315 IRQ_TYPE_LEVEL_HIGH>,
+					<0 316 IRQ_TYPE_LEVEL_HIGH>,
+					<0 317 IRQ_TYPE_LEVEL_HIGH>,
+					<0 318 IRQ_TYPE_LEVEL_HIGH>,
+					<0 319 IRQ_TYPE_LEVEL_HIGH>,
+					<0 320 IRQ_TYPE_LEVEL_HIGH>,
+					<0 321 IRQ_TYPE_LEVEL_HIGH>,
+					<0 322 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&pixelclk>;
+			max-clock-frequency = <200000000>;
+
+			ports {
+				port@0 {
+					cdc_out_rgb: endpoint {
+						remote-endpoint = <&lvdsenc_in>;
+					};
+				};
+			};
+		};
 	};
 	apb_e: apb@49040000{
 		compatible = "Devkit-E7,apb-bus","simple-bus";
@@ -1177,6 +1216,39 @@
 				<0x4902F000 0x00001000>;
 		};
 	};
+
+	lvds-encoder {
+		compatible = "lvds-encoder";
+		width-mm = <108>;
+		height-mm = <65>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_cdc>;
+
+		panel-timing {
+			/*clock-frequency = <33333333>;*/
+			clock-frequency = <10000000>;
+			hactive = <800>;
+			vactive = <480>;
+			hfront-porch = <210>;
+			hback-porch = <46>;
+			hsync-len = <1>;
+			vfront-porch = <22>;
+			vback-porch = <23>;
+			vsync-len = <1>;
+			hsync-active = <0>;
+			vsync-active = <0>;
+			de-active = <1>;
+			pixelclk-active = <1>;
+		};
+
+		ports {
+			port@0 {
+				lvdsenc_in: endpoint {
+					remote-endpoint = <&cdc_out_rgb>;
+				};
+			};
+		};
+	};
 };
 
 
@@ -1254,6 +1326,38 @@
 			PIN_P3_13__SD_D1_B	0x0
 			PIN_P3_14__SD_D2_B	0x0
 			PIN_P3_15__SD_D3_B	0x0
+		>;
+	};
+	pinctrl_cdc: cdc200grp {
+		pinmux = <
+			PIN_P1_0__CDC_PCLK	0x0
+			PIN_P1_1__CDC_D0	0x0
+			PIN_P1_2__CDC_D1	0x0
+			PIN_P1_3__CDC_D2	0x0
+			PIN_P1_4__CDC_D3	0x0
+			PIN_P1_5__CDC_D4	0x0
+			PIN_P1_6__CDC_D5	0x0
+			PIN_P1_7__CDC_D6	0x0
+			PIN_P1_8__CDC_D7	0x0
+			PIN_P1_9__CDC_D8	0x0
+			PIN_P1_10__CDC_D9	0x0
+			PIN_P1_11__CDC_D10	0x0
+			PIN_P1_12__CDC_D11	0x0
+			PIN_P1_13__CDC_D12	0x0
+			PIN_P1_14__CDC_D13	0x0
+			PIN_P1_15__CDC_D14	0x0
+			PIN_P1_16__CDC_D15	0x0
+			PIN_P1_17__CDC_D16	0x0
+			PIN_P1_18__CDC_D17	0x0
+			PIN_P1_19__CDC_D18	0x0
+			PIN_P1_20__CDC_D19	0x0
+			PIN_P1_21__CDC_D20	0x0
+			PIN_P1_22__CDC_D21	0x0
+			PIN_P1_23__CDC_D22	0x0
+			PIN_P1_24__CDC_D23	0x0
+			PIN_P1_25__CDC_DE	0x0
+			PIN_P1_26__CDC_HSYNC	0x0
+			PIN_P1_27__CDC_VSYNC	0x0
 		>;
 	};
 };
