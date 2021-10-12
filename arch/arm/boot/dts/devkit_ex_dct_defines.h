@@ -98,3 +98,6 @@
 #define GPIO_STATUS "okay"
 #define GPIO_1_STATUS "okay"
 #define GPIO_2_STATUS "okay"
+
+// CDC-200
+#define CDC200_STATUS "disabled"

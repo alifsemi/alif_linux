@@ -41,10 +41,6 @@
 		device_type = "memory";
 		reg = <0x02000000 0x400000>;
 	};
-	memory@08200000 {
-		device_type = "memory";
-		reg = <0x08200000 0x80000>;
-	};
 
 	gic: interrupt-controller@1c000000 {
 		compatible = "arm,gic-400";
@@ -509,7 +505,7 @@
 			reg = <0x49000000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "GPIO_STATUS";
+			status = GPIO_STATUS;
 
 			/* Port 1 */
 			port1: gpio-controller@0 {
@@ -547,7 +543,7 @@
 			reg = <0x49001000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "GPIO_1_STATUS";
+			status = GPIO_1_STATUS;
 
 			/* Port 2 */
 			port2: gpio-controller@0 {
@@ -585,7 +581,7 @@
 			reg = <0x49002000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "GPIO_2_STATUS";
+			status = GPIO_2_STATUS;
 
 			/* Port 3 */
 			port3: gpio-controller@0 {
@@ -1068,6 +1064,7 @@
 			compatible = "tes,cdc-2.1";
 			reg = <0x49031000 0x100>;
 			interrupt-parent = <&gic>;
+			status = CDC200_STATUS;
 			interrupts =	<0 313 IRQ_TYPE_LEVEL_HIGH>,
 					<0 314 IRQ_TYPE_LEVEL_HIGH>,
 					<0 315 IRQ_TYPE_LEVEL_HIGH>,
