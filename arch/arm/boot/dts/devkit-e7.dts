@@ -503,12 +503,12 @@
 			#size-cells = <0>;
 			compatible = "snps,dw-apb-gpio";
 			reg = <0x49000000 0x1000>;
-			/*clocks = <&l4_mp_clk>;
-			resets = <&rst GPIO0_RESET>;*/
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_gpio0>;
 			status = GPIO_STATUS;
 
 			/* Port 1 */
-			port1: gpio-controller@0 {
+			port1: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
 				gpio-controller;
 				#gpio-cells = <2>;
@@ -541,12 +541,12 @@
 			#size-cells = <0>;
 			compatible = "snps,dw-apb-gpio";
 			reg = <0x49001000 0x1000>;
-			/*clocks = <&l4_mp_clk>;
-			resets = <&rst GPIO0_RESET>;*/
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_gpio1>;
 			status = GPIO_1_STATUS;
 
 			/* Port 2 */
-			port2: gpio-controller@0 {
+			port2: gpio-port@1 {
 				compatible = "snps,dw-apb-gpio-port";
 				reg = <0>;
 				gpio-controller;
@@ -579,12 +579,12 @@
 			#size-cells = <0>;
 			compatible = "snps,dw-apb-gpio";
 			reg = <0x49002000 0x1000>;
-			/*clocks = <&l4_mp_clk>;
-			resets = <&rst GPIO0_RESET>;*/
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_gpio2>;
 			status = GPIO_2_STATUS;
 
 			/* Port 3 */
-			port3: gpio-controller@0 {
+			port3: gpio-port@2 {
 				compatible = "snps,dw-apb-gpio-port";
 				gpio-controller;
 				#gpio-cells = <2>;
@@ -1250,6 +1250,25 @@
 
 
 &pinmux {
+	pinctrl_gpio0: gpio0grp {
+		pinmux = <
+			PIN_P1_14__GPIO		0x0
+			PIN_P1_15__GPIO		0x0
+		>;
+	};
+	pinctrl_gpio1: gpio2grp {
+		pinmux = <
+			PIN_P2_20__GPIO		0x0
+			PIN_P2_28__GPIO		0x0
+		>;
+	};
+	pinctrl_gpio2: gpio3grp {
+		pinmux = <
+			PIN_P3_0__GPIO		0x0
+			PIN_P3_4__GPIO		0x0
+			PIN_P3_5__GPIO		0x0
+		>;
+	};
 	pinctrl_eth0: eth0grp {
 		pinmux = <
 			PIN_P1_0__ETH_RXD0_A	0x0
