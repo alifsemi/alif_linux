@@ -259,7 +259,7 @@ static int cdc_mm_show(struct seq_file *m, void *arg)
 static struct drm_info_list cdc_debugfs_list[] = {
 	{ "regs", cdc_regs_show, 0 },
 	{ "mm", cdc_mm_show, 0 },
-	{ "fb", drm_fb_cma_debugfs_show, 0 },
+//	{ "fb", drm_fb_cma_debugfs_show, 0 },
 	{ "fbdump", cdc_dump_fb, 0 },
 };
 
