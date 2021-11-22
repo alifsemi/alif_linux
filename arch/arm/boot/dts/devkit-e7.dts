@@ -361,9 +361,9 @@
 			interrupts = <GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x48100000 0x2000>;
 			phy-handle = <&phy2>;
-			max-speed = <100>;
+			max-speed = <10>;
 			phy-mode = "rmii";
-			mac-address = [92 60 04 02 c3 e6];
+			mac-address = [96 49 00 06 63 c6];
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_eth0>;
 			status = ETH_STATUS;
@@ -373,7 +373,6 @@
 				phy2: phy@0{
 					compatible = "ethernet-phy-ieee802.3-c22";
 					device_type = "ethernet-phy";
-					micrel,led-mode = <1>;
 					reg = <0x1>;
 				};
 			};
