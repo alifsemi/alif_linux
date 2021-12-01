@@ -361,7 +361,7 @@
 			interrupts = <GIC_SPI 144 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x48100000 0x2000>;
 			phy-handle = <&phy2>;
-			max-speed = <10>;
+			max-speed = <100>;
 			phy-mode = "rmii";
 			mac-address = [96 49 00 06 63 c6];
 			pinctrl-names = "default";
