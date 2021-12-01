@@ -866,6 +866,14 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	writel(0x280001, tmp + 0x4);
 	iounmap(tmp);
 
+	/* I2S0 */
+	/* Set to 160Mhz clock and divide by 69 (0x45) */
+	writel(0x10045, info->expmst0_base + 0x10);
+
+	/* I2S2 */
+	/* Set to 160Mhz clock and divide by 69 (0x45) */
+	writel(0x10045, info->expmst0_base + 0x18);
+
 	platform_set_drvdata(pdev, info);
 
 	pctl_desc->name		= dev_name(&pdev->dev);

@@ -132,12 +132,20 @@
 			clock-frequency = <80000000>;
 			clock-output-names = "canfd_clk";
 		};
-		i2s_clk: i2s_sclk {
-			/* Max 80Mhz */
+		i2s0_clk: i2s_sclk {
+			/* 2.318Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <80000000>;
-			clock-output-names = "i2s_sclk";
+			clock-frequency = <2318841>;
+			clock-output-names = "i2sclk";
+		};
+		/* Oscillator on Carrier board just for the wm8524 DAC */
+		wm8524clk: wm8524clk {
+			/* clock - 24.576MHz */
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <24576000>;
+			clock-output-names = "wm8524clk";
 		};
 		uartclk: uartclk {
 			/* uart clock - 10MHz */
@@ -344,6 +352,80 @@
 		reg = <0x1A010310 0x4>,
 		      <0x1A010314 0x4>;
 		reg-names = "rstreg", "streg";
+	};
+
+	/* Tested audio playback using max98357 breakout board for A1 silicon */
+	/*max98357: audio-codec {
+		#sound-dai-cells = <0>;
+		compatible = "maxim,max98357a";
+	};
+
+	sound-max98357 {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "max98357-audio";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,frame-master = <&cpudai_0>;
+		simple-audio-card,bitclock-master = <&cpudai_0>;
+		simple-audio-card,widgets =
+			"Headphone Jack", "Line Out";
+		simple-audio-card,routing =
+			"Line Out", "Speaker";
+
+		cpudai_0: simple-audio-card,cpu {
+			sound-dai = <&i2s0>;
+		};
+
+		acodec: simple-audio-card,codec {
+			sound-dai = <&max98357>;
+		};
+	};*/
+	/* Not tested with wm8524 as the DAC chip was not populated on baseboard rev1
+	 wm8524: audio-codec {
+		#sound-dai-cells = <0>;
+		compatible = "wlf,wm8524";
+		wlf,mute-gpios = <&gpio5 21 GPIO_ACTIVE_LOW>;
+	};
+	sound-wm8524 {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "wm8524-audio";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,frame-master = <&cpudai_0>;
+		simple-audio-card,bitclock-master = <&cpudai_0>;
+		simple-audio-card,widgets =
+			"Headphone Jack", "Left Line Out",
+			"Headphone Jack", "Right Line Out";
+		simple-audio-card,routing =
+			"Left Line Out", "LINEVOUTL",
+			"Right Line Out", "LINEVOUTR";
+
+		cpudai_0: simple-audio-card,cpu {
+			sound-dai = <&i2s0>;
+		};
+		acodec: simple-audio-card,codec {
+			sound-dai = <&wm8524>;
+			clocks = <&wm8524clk 0>;
+		};
+	};*/
+
+	sph0645: acodec {
+		#sound-dai-cells = <0>;
+		compatible = "knowles,sph0645";
+	};
+
+	sound-memsmic {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "mems-mic";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,frame-master = <&cpudai_1>;
+		simple-audio-card,bitclock-master = <&cpudai_1>;
+
+		cpudai_1: simple-audio-card,cpu {
+			sound-dai = <&i2s2>;
+		};
+
+		mcodec: simple-audio-card,codec {
+			sound-dai = <&sph0645>;
+		};
 	};
 
 	ahb@48000000 {
@@ -799,17 +881,15 @@
 		};
 
 		/*====== DW I2S ====== */
-		i2s0@49014000 {
+		i2s0: i2s0@49014000 {
 			compatible = "snps,designware-i2s";
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_i2s0>;
 			reg = <0x49014000 0x1000>;
-			clocks = <&syst_pclk 0>;
+			interrupts = <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&i2s0_clk 0>;
 			clock-names = "i2sclk";
 			#sound-dai-cells = <0>;
-			interrupts = <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>;
-			//dmas = <&dma0 5>;
-			//dma-names = "tx";
 		};
 
 		i2s1@49015000 {
@@ -823,8 +903,10 @@
 			//dma-names = "tx";
 		};
 
-		i2s2@49016000 {
+		i2s2: i2s2@49016000 {
 			compatible = "snps,designware-i2s";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2s2>;
 			reg = <0x49016000 0x1000>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "i2sclk";
@@ -1298,6 +1380,13 @@
 			PIN_P2_31__I2S0_WS_B	0x0
 		>;
 	};
+	pinctrl_i2s2: i2s2grp {
+		pinmux = <
+			PIN_P2_1__I2S2_SDI_A	0x0
+			PIN_P2_3__I2S2_SCLK_A	0x0
+			PIN_P2_4__I2S2_WS_A	0x0
+		>;
+	};
 	pinctrl_uart2: uart2grp {
 		pinmux = <
 			PIN_P3_16__UART2_RX_B	0x0
@@ -1316,7 +1405,6 @@
 		pinmux = <
 			PIN_P3_1__UART4_RX_B	0x0
 			PIN_P3_2__UART4_TX_B	0x0
-			PIN_P3_3__UART4_DE_B	0x0
 		>;
 	};
 	pinctrl_i3c0: i3c0grp {

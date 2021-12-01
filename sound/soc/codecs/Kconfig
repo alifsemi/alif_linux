@@ -1054,6 +1054,9 @@ config SND_SOC_SIRF_AUDIO_CODEC
 config SND_SOC_SPDIF
 	tristate "S/PDIF CODEC"
 
+config SND_SOC_SPH0645
+	tristate "Knowles SPH0645 MEMS I2S Microphone"
+
 config SND_SOC_SSM2305
 	tristate "Analog Devices SSM2305 Class-D Amplifier"
 	help
