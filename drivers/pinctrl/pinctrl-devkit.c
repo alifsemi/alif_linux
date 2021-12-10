@@ -809,6 +809,7 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	struct bolt_pinctrl *info;
 	struct pinctrl_desc *pctl_desc;
 	void __iomem *tmp;
+	unsigned int val;
 
 	if (!pdev->dev.of_node) {
 		dev_err(&pdev->dev, "device node not found.\n");
@@ -850,6 +851,26 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	writel(0x09, info->padctrl_base + 0x120);
 	writel(0x09, info->padctrl_base + 0x124);
 
+	/* Configure source to crystal.
+	 * May not be needed as M0 should take care of this.
+	 * Map the 0x71007410 area for this. */
+	tmp = ioremap(0x71007410, 0x4);
+	writel(0x0, tmp + 0x0);
+	writel(0x2, tmp + 0x0);
+	iounmap(tmp);
+
+	tmp = ioremap(0x7100a100, 0x4);
+	writel(0x00010A29, tmp + 0x0);
+	iounmap(tmp);
+
+	/* Enable MIPI DSI PHY power.
+	 * Map the 0x7004001C area for this */
+	tmp = ioremap(0x7004001C, 0x4);
+	val = readl(tmp);
+	val |= (1U << 10);
+	writel(val, tmp + 0x0);
+	iounmap(tmp);
+
 	/* Set the EXPSLV1 CDC200 clock divider
 	 * Input clock is 400Mhz. Can be divided by min 2 to max 511.
 	 * For Parallel display, pixel clk needs to be between
@@ -860,10 +881,14 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	 * bit [24:16]: Divider value (Set to 40(0x28) to get 10Mhz)
 	 * bit [24:16]: Divider value (Set to 16(0x10) to get 25Mhz)
 	 * bit [24:16]: Divider value (Set to 12(0x0c) to get 33.3Mhz)
+	 * bit [24:16]: Divider value (Set to  4(0x04) to get 100Mhz)
 	 */
 	/* Map the expslv1 reg region */
 	tmp = ioremap(0x4903F000, 0x40);
 	writel(0x280001, tmp + 0x4);
+	//writel(0x40001, tmp + 0x4);
+	/* Master-side D-PHY implementation (tx_rxz=1) */
+	writel(0x100, tmp + 0x30);
 	iounmap(tmp);
 
 	/* I2S0 */

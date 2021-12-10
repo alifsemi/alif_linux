@@ -164,12 +164,31 @@
 			clock-output-names = "baudclk";
 		};
 
-		pixelclk: pixelclk {
+		pixclk: cdc200_pixclk {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			/*clock-frequency = <33333333>;*/
-			clock-frequency = <10000000>;
-			clock-output-names = "pixelclk";
+			clock-frequency = <10000000>; /* 10 Mhz */
+			clock-output-names = "cdc200_pixclk";
+		};
+
+		dpi_pixclk: cdc200_dpi_pixclk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <10000000>; /* 10 Mhz */
+			clock-output-names = "cdc200_dpi_pixclk";
+		};
+
+		pllref: mipi_tx_dphy_refclk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <38400000>;
+			clock-output-names = "pll_refclk";
+		};
+		cfgclk: mipi_tx_dphy_cfg_clk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <38400000>;
+			clock-output-names = "tx_dphy_cfg_clk";
 		};
 
 	};
@@ -1182,16 +1201,75 @@
 					<0 320 IRQ_TYPE_LEVEL_HIGH>,
 					<0 321 IRQ_TYPE_LEVEL_HIGH>,
 					<0 322 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&pixelclk>;
+			clocks = <&pixclk>;
 			max-clock-frequency = <200000000>;
 
 			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
 				port@0 {
+					reg = <0>;
 					cdc_out_rgb: endpoint {
-						remote-endpoint = <&lvdsenc_in>;
+						//remote-endpoint = <&lvdsenc_in>;
+					};
+				};
+				port@1 {
+					reg = <1>;
+					cdc_out1_rgb: endpoint {
+						remote-endpoint = <&dsi_in>;
 					};
 				};
 			};
+		};
+
+		dsi: dsi@0x49032000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "alif,ensemble-dsi";
+			reg = <0x49032000 0x1000>;
+			interrupts = <0 323 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&dpi_pixclk>,
+				 <&pllref>,
+				 <&cfgclk>;
+			clock-names = "pclk", "ref", "cfgclk";
+			status = "okay";
+
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				port@0 {
+					reg = <0>;
+					dsi_in: endpoint {
+						remote-endpoint = <&cdc_out1_rgb>;
+					};
+				};
+				port@1 {
+					reg = <1>;
+					dsi_out: endpoint {
+						remote-endpoint = <&panel_dsi>;
+					};
+				};
+			};
+			paneldsi: panel-dsi@0 {
+				reg = <0>;
+				compatible = "focuslcd,fw405";
+				/*reset-gpios = <&gpio4 6 GPIO_ACTIVE_LOW>;*/
+				backlight = <&panel_backlight>;
+				power-supply = <&reg_3p3v>;
+				status = "okay";
+
+				port {
+					panel_dsi: endpoint {
+						remote-endpoint = <&dsi_out>;
+					};
+				};
+			};
+		};
+		panel_backlight: panel-backlight {
+			compatible = "gpio-backlight";
+			gpios = <&port4 4 GPIO_ACTIVE_HIGH>;
+			default-on;
+			status = "okay";
 		};
 	};
 	apb_e: apb@49040000{
@@ -1321,7 +1399,8 @@
 		};
 	};
 
-	lvds-encoder {
+
+/*	lvds-encoder {
 		compatible = "lvds-encoder";
 		width-mm = <108>;
 		height-mm = <65>;
@@ -1329,7 +1408,6 @@
 		pinctrl-0 = <&pinctrl_cdc>;
 
 		panel-timing {
-			/*clock-frequency = <33333333>;*/
 			clock-frequency = <10000000>;
 			hactive = <800>;
 			vactive = <480>;
@@ -1352,9 +1430,8 @@
 				};
 			};
 		};
-	};
+	};*/
 };
-
 
 &pinmux {
 	pinctrl_gpio1: gpio1grp {
