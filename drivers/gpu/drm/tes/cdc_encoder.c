@@ -103,7 +103,7 @@ int cdc_encoder_init (struct cdc_device *cdc, u32 enc_type,
 	encoder->possible_clones = 0;
 
 	ret = drm_encoder_init(cdc->ddev, encoder, &encoder_funcs,
-			       DRM_MODE_ENCODER_NONE, NULL);
+			       DRM_MODE_ENCODER_DPI, NULL);
 	if (ret < 0)
 		goto done;
 

@@ -474,6 +474,10 @@ static int compare_name_dswz(struct device *dev, void *data)
 	return (strstr(dev->driver->name, "dswz") != NULL);
 }
 
+/*TODO - Need to fix this properly later. Panel driver probe should be called before cdc_probe
+ * Defer probe a couple of times to make sure this happens.
+ */
+static int defer = 0;
 static int cdc_probe (struct platform_device *pdev)
 {
 	struct device_node *np = pdev->dev.of_node;
@@ -484,6 +488,12 @@ static int cdc_probe (struct platform_device *pdev)
 	int max_clock;
 	int ret = 0;
 
+	while(defer < 2){
+		defer++;
+		printk("## cdc_probe -> deferring %d times\n",defer);
+		return -EPROBE_DEFER;
+	}
+	printk("## cdc_probe -> going ahead now\n");
 	if (np == NULL) {
 		dev_err(&pdev->dev, "no platform data\n");
 		return -ENODEV;
