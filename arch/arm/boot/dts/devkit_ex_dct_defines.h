@@ -95,9 +95,10 @@
 #define I3C_STATUS "okay"
 
 // GPIO defines
-#define GPIO_STATUS "okay"
-#define GPIO_1_STATUS "okay"
-#define GPIO_2_STATUS "okay"
+#define GPIO_1_STATUS "disabled"
+#define GPIO_2_STATUS "disabled"
+#define GPIO_3_STATUS "disabled"
+#define GPIO_4_STATUS "okay"
 
 // CDC-200
 #define CDC200_STATUS "disabled"

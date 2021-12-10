@@ -7,6 +7,7 @@
 /dts-v1/;
 
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/gpio/gpio.h>
 #include "devkit_e7_pinmux.h"
 #include "devkit_ex_dct_defines.h"
 
@@ -580,17 +581,17 @@
 		reg = <0x49000000 0x00010000>;
 		ranges = <>;
 
-		gpio0: gpio@49000000 {
+		gpio1: gpio@49000000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
 			compatible = "snps,dw-apb-gpio";
 			reg = <0x49000000 0x1000>;
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_gpio0>;
-			status = GPIO_STATUS;
+			pinctrl-0 = <&pinctrl_gpio1>;
+			status = GPIO_1_STATUS;
 
 			/* Port 1 */
-			port1: gpio-port@0 {
+			port1: gpio-port@1 {
 				compatible = "snps,dw-apb-gpio-port";
 				gpio-controller;
 				#gpio-cells = <2>;
@@ -618,17 +619,17 @@
 			};
 		};
 
-		gpio1: gpio@49001000 {
+		gpio2: gpio@49001000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
 			compatible = "snps,dw-apb-gpio";
 			reg = <0x49001000 0x1000>;
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_gpio1>;
-			status = GPIO_1_STATUS;
+			pinctrl-0 = <&pinctrl_gpio2>;
+			status = GPIO_2_STATUS;
 
 			/* Port 2 */
-			port2: gpio-port@1 {
+			port2: gpio-port@2 {
 				compatible = "snps,dw-apb-gpio-port";
 				reg = <0>;
 				gpio-controller;
@@ -656,17 +657,17 @@
 			};
 		};
 
-		gpio2: gpio@49002000 {
+		gpio3: gpio@49002000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
 			compatible = "snps,dw-apb-gpio";
 			reg = <0x49002000 0x1000>;
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_gpio2>;
-			status = GPIO_2_STATUS;
+			pinctrl-0 = <&pinctrl_gpio3>;
+			status = GPIO_3_STATUS;
 
 			/* Port 3 */
-			port3: gpio-port@2 {
+			port3: gpio-port@3 {
 				compatible = "snps,dw-apb-gpio-port";
 				gpio-controller;
 				#gpio-cells = <2>;
@@ -687,6 +688,30 @@
 						<GIC_SPI 265 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 266 IRQ_TYPE_LEVEL_HIGH>,
 						<GIC_SPI 267 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 268 IRQ_TYPE_LEVEL_HIGH>,
 						<GIC_SPI 269 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 270 IRQ_TYPE_LEVEL_HIGH>;
+			};
+		};
+
+		gpio4: gpio@70000000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "snps,dw-apb-gpio";
+			reg = <0x70000000 0x1000>;
+			status = GPIO_4_STATUS;
+
+			/* Port 4 */
+			port4: gpio-port@4 {
+				compatible = "snps,dw-apb-gpio-port";
+				gpio-controller;
+				#gpio-cells = <2>;
+				snps,nr-gpios = <8>;
+				reg = <0>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				interrupt-parent = <&gic>;
+				interrupts = 	<GIC_SPI 175 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>,
+						<GIC_SPI 177 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 178 IRQ_TYPE_LEVEL_HIGH>,
+						<GIC_SPI 179 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 180 IRQ_TYPE_LEVEL_HIGH>,
+						<GIC_SPI 181 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 182 IRQ_TYPE_LEVEL_HIGH>;
 			};
 		};
 
@@ -1332,19 +1357,19 @@
 
 
 &pinmux {
-	pinctrl_gpio0: gpio0grp {
+	pinctrl_gpio1: gpio1grp {
 		pinmux = <
 			PIN_P1_14__GPIO		0x0
 			PIN_P1_15__GPIO		0x0
 		>;
 	};
-	pinctrl_gpio1: gpio2grp {
+	pinctrl_gpio2: gpio2grp {
 		pinmux = <
 			PIN_P2_20__GPIO		0x0
 			PIN_P2_28__GPIO		0x0
 		>;
 	};
-	pinctrl_gpio2: gpio3grp {
+	pinctrl_gpio3: gpio3grp {
 		pinmux = <
 			PIN_P3_0__GPIO		0x0
 			PIN_P3_4__GPIO		0x0
