@@ -268,6 +268,20 @@ config DRM_VKMS
 config DRM_ATI_PCIGART
         bool
 
+config DRM_ALIF
+	bool "DRM Support for Alif Ensemble SoC Series"
+	depends on DRM && OF
+	depends on ARCH_ENSEMBLE
+	select DRM_TES_CDC
+	select DRM_PANEL_BRIDGE
+	select VIDEOMODE_HELPERS
+
+	help
+	  Enable support for the on-chip display controller on
+	  Alif Ensemble SoCs.
+
+source "drivers/gpu/drm/alif/Kconfig"
+
 source "drivers/gpu/drm/tes/Kconfig"
 
 source "drivers/gpu/drm/exynos/Kconfig"

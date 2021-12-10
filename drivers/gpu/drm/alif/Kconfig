@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: GPL-2.0
+config DRM_ALIF_DSI
+	bool "Alif Ensemble specific extensions for Synopsys MIPI DSI"
+	depends on DRM_ALIF
+	select DRM_DW_MIPI_DSI
+	help
+	  Choose this option for MIPI DSI support on Alif Ensemble SoC.
