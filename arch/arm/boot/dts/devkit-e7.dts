@@ -39,7 +39,8 @@
 
 	memory@02000000 {
 		device_type = "memory";
-		reg = <0x02000000 0x400000>;
+		reg = <0x02000000 0x400000
+		       0x08000000 0x280000>;
 	};
 
 	gic: interrupt-controller@1c000000 {
