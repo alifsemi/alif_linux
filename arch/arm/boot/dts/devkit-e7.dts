@@ -167,14 +167,14 @@
 		pixclk: cdc200_pixclk {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <10000000>; /* 10 Mhz */
+			clock-frequency = <50000000>; /* 50 Mhz */
 			clock-output-names = "cdc200_pixclk";
 		};
 
 		dpi_pixclk: cdc200_dpi_pixclk {
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <10000000>; /* 10 Mhz */
+			clock-frequency = <50000000>; /* 50 Mhz */
 			clock-output-names = "cdc200_dpi_pixclk";
 		};
 
@@ -1202,7 +1202,7 @@
 					<0 321 IRQ_TYPE_LEVEL_HIGH>,
 					<0 322 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&pixclk>;
-			max-clock-frequency = <200000000>;
+			max-clock-frequency = <400000000>;
 
 			ports {
 				#address-cells = <1>;

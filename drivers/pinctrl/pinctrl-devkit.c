@@ -881,12 +881,13 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	 * bit [24:16]: Divider value (Set to 40(0x28) to get 10Mhz)
 	 * bit [24:16]: Divider value (Set to 16(0x10) to get 25Mhz)
 	 * bit [24:16]: Divider value (Set to 12(0x0c) to get 33.3Mhz)
+	 * bit [24:16]: Divider value (Set to  8(0x08) to get 50Mhz)
 	 * bit [24:16]: Divider value (Set to  4(0x04) to get 100Mhz)
 	 */
 	/* Map the expslv1 reg region */
 	tmp = ioremap(0x4903F000, 0x40);
-	writel(0x280001, tmp + 0x4);
-	//writel(0x40001, tmp + 0x4);
+	writel(0x80001, tmp + 0x4);
+
 	/* Master-side D-PHY implementation (tx_rxz=1) */
 	writel(0x100, tmp + 0x30);
 	iounmap(tmp);
