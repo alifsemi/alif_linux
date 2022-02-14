@@ -841,11 +841,13 @@ static int bolt_pctl_probe(struct platform_device *pdev)
 	writel(0x11, info->expmst0_base);
 
 	/* Enable UART2, UART4*/
-	writel(	(1 << 12) | (1 << 4) |
-		(1 << 10) | (1 << 2), info->expmst0_base + 0x8);
+	val = readl(info->expmst0_base + 0x8);
+	writel(val | (1 << 12) | (1 << 4) | (1 << 10) | (1 << 2),
+		info->expmst0_base + 0x8);
 
 	/* I3C */
-	writel(0x01000001, info->expmst0_base + 0x24);
+	val = readl(info->expmst0_base + 0x24);
+	writel(val | 0x01000001, info->expmst0_base + 0x24);
 
 	/*padctrl for i3c/i2c*/
 	writel(0x09, info->padctrl_base + 0x120);
