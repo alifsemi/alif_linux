@@ -790,6 +790,8 @@
 
 		uart4@4900C000 {
 			compatible = "snps,dw-apb-uart";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_uart4>;
 			reg = <0x4900C000 0x1000>;
 			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
