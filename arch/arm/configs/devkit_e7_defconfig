@@ -1277,8 +1277,8 @@ CONFIG_ICST=y
 # CONFIG_COMMON_CLK_FIXED_MMIO is not set
 # end of Common Clock Framework
 
-CONFIG_HWSPINLOCK=y
-CONFIG_HWSEM_ALIF=y
+# CONFIG_HWSPINLOCK is not set
+# CONFIG_HWSEM_ALIF is not set
 
 #
 # Clock Source drivers
