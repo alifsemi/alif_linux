@@ -566,6 +566,20 @@ config VIDEO_APTINA_PLL
 config VIDEO_SMIAPP_PLL
 	tristate
 
+config VIDEO_ARX3A0
+	tristate "onsemi ARX3A0 sensor support"
+	depends on I2C && VIDEO_V4L2
+	depends on I2C && VIDEO_V4L2 && VIDEO_V4L2_SUBDEV_API
+	depends on MEDIA_CONTROLLER
+	depends on MEDIA_CAMERA_SUPPORT
+	select V4L2_FWNODE
+	help
+	 This is a Video4Linux2 sensor-level driver for the onsemi ARX3A0
+	 camera.
+
+	 To compile this driver as a module, choose M here: the
+	 module will be called arx3a0.
+
 config VIDEO_IMX214
 	tristate "Sony IMX214 sensor support"
 	depends on GPIOLIB && I2C && VIDEO_V4L2 && VIDEO_V4L2_SUBDEV_API
