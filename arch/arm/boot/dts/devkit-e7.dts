@@ -191,7 +191,13 @@
 			clock-frequency = <38400000>;
 			clock-output-names = "tx_dphy_cfg_clk";
 		};
-
+		ext_clk: camera_xvclk {
+			/* 20MHz clock */
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <20000000>;
+			clock-output-names = "ext_clk";
+		};
 	};
 
 	/* Regulators entry */
@@ -207,12 +213,28 @@
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
+		reg_1p2v: reg12@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "fixed-1.2V";
+			regulator-min-microvolt = <1200000>;
+			regulator-max-microvolt = <1200000>;
+			regulator-always-on;
+		};
 		reg_1p8v: reg18@0 {
 			compatible = "regulator-fixed";
 			reg = <0>;
 			regulator-name = "fixed-1.8V";
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
+			regulator-always-on;
+		};
+		reg_2p7v: reg27@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "fixed-2.7V";
+			regulator-min-microvolt = <2700000>;
+			regulator-max-microvolt = <2700000>;
 			regulator-always-on;
 		};
 		reg_5p0v: reg5@0 {
@@ -989,6 +1011,24 @@
 				compatible = "bno055";
 				reg = <0x28 0x0 0x100>;
 			};
+			arx3a0: camera-sensor@36 {
+				compatible = "onnn,arx3a0";
+				reg = <0x36 0x0 0x4000>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_camera>;
+				clocks = <&ext_clk>;
+				clock-names = "extclk";
+				/*reset-gpios = <&gpio4 5 GPIO_ACTIVE_LOW> */
+				vaa-supply = <&reg_2p7v>;
+				vdd-supply = <&reg_1p2v>;
+				vdd_io-supply = <&reg_1p8v>;
+				port {
+					arx3a0_csi2_ep: endpoint {
+						remote-endpoint = <&mipi_csi2_in>;
+						data-lanes = <1 2>;
+					};
+				};
+			};
 		};
 
 		/*====== DW I2S ====== */
@@ -1337,6 +1377,42 @@
 			default-on;
 			status = "okay";
 		};
+		mipi_dphy_rx:  dphy@d00003040 {
+			compatible = "snps,dw-dphy-rx";
+			reg = <0xd0003040 0x20>;
+			#phy-cells = <1>;
+			bus-width = <12>;
+			clocks = <&syst_pclk>;
+			snps,dphy-frequency = <300000>;
+			snps,phy_type = <1>;
+		};
+
+		csi2:  mipi-csi2@49033000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			compatible = "snps,dw-csi";
+			reg = <0x49033000 0x1000>;
+			phys = <&mipi_dphy_rx 1>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 324 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_pclk>;
+			clocks-names = "pclk";
+			status = "ok";
+			ports {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				port@0 {
+					reg = <0>;
+					mipi_csi2_in: endpoint {
+						bus-type = <4>;
+						clock-lanes = <2>;
+						data-lanes = <1 2>;
+						lane-polarites = <1 1 1>;
+						remote-endpoint = <&arx3a0_csi2_ep>;
+					};
+				};
+			};
+		};
 	};
 	apb_e: apb@49040000{
 		compatible = "Devkit-E7,apb-bus","simple-bus";
@@ -1632,4 +1708,31 @@
 			PIN_P1_27__CDC_VSYNC	0x0
 		>;
 	};
+	pinctrl_camera: camgrp {
+		pinmux = < PIN_P2_7__CAM_XVCLK_B   0x0 >;
+		/* Below pinmux needed for parallel camera */
+		/* pinmux = <
+			PIN_P2_4__CAM_HSYNC_B   0x0
+			PIN_P2_5__CAM_VSYNC_B   0x0
+			PIN_P2_6__CAM_PCLK_B    0x0
+			PIN_P2_7__CAM_XVCLK_B   0x0
+			PIN_P2_8__CAM_D0_B      0x0
+			PIN_P2_9__CAM_D1_B      0x0
+			PIN_P2_10__CAM_D2_B     0x0
+			PIN_P2_11__CAM_D3_B     0x0
+			PIN_P2_12__CAM_D4_B     0x0
+			PIN_P2_13__CAM_D5_B     0x0
+			PIN_P2_14__CAM_D6_B     0x0
+			PIN_P2_15__CAM_D7_B     0x0
+			PIN_P2_16__CAM_D8_B     0x0
+			PIN_P2_17__CAM_D9_B     0x0
+			PIN_P2_18__CAM_D10_B    0x0
+			PIN_P2_19__CAM_D11_B    0x0
+			PIN_P2_20__CAM_D12_B    0x0
+			PIN_P2_21__CAM_D13_B    0x0
+			PIN_P2_22__CAM_D14_B    0x0
+			PIN_P2_23__CAM_D15_B    0x0
+		>;*/
+	};
+
 };
