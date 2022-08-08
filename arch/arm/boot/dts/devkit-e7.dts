@@ -621,6 +621,13 @@
                        };
                }; /* SPI3  */
 
+		crc: crc@48107000 {
+                        compatible = "alif,alif-crccode";
+                        reg = <0x48107000 0x1000>;
+                        clocks = <&syst_hclk>;
+                        clock-names = "ahb_clk";
+		};
+
 		hsusb: dwc3-drd {
 			compatible = "alif,ensemble-usb3";
 			#address-cells = <1>;

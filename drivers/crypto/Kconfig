@@ -805,6 +805,15 @@ config CRYPTO_DEV_CCREE
 	  cryptographic operations on the system REE.
 	  If unsure say Y.
 
+config CRYPTO_DEV_ALIF_CRC
+	tristate "Support for Alif CRC hardware"
+	depends on CRYPTO && CRYPTO_HW && OF
+	default n
+	select CRYPTO_HASH
+	help
+	  Say 'Y' to enable driver for the Alif CRC hardware
+
+
 source "drivers/crypto/hisilicon/Kconfig"
 
 endif # CRYPTO_HW
