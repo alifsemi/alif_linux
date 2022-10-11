@@ -579,17 +579,6 @@ static int dw_i2c_clk_cfg(struct dw_i3c_master *master)
 	lcnt = DIV_ROUND_UP(I3C_BUS_I2C_FM_TLOW_MIN_NS, core_period);
 	hcnt = DIV_ROUND_UP(core_rate, I3C_BUS_I2C_FM_SCL_RATE) - lcnt;
 
-	/* TODO: For the Alif SoC, talking to BNO055 over I2C is not working
-	 * on the I2C over I3C interface unless the clock speed is <5Khz.
-	 * Reason not investigated completely but could be due to the I3C
-	 * bus not supporting clock streching. So hard HACK here,
-	 * to set the I2C timings to 2.5Khz */
-	/* 100Khz 50% duty cycle hcnt = 0x1F4;  lcnt = 0x1F4;
-	 * 400Khz 33% duty cycle hcnt = 0x54;   lcnt = 0xA6;
-	 * 2.5Khz 50% duty cycle hcnt = 0x4E20; lcnt = 0x4E20; */
-	hcnt = 0x4E20;
-	lcnt = 0x4E20;
-
 	scl_timing = SCL_I2C_FM_TIMING_HCNT(hcnt) |
 		     SCL_I2C_FM_TIMING_LCNT(lcnt);
 	writel(scl_timing, master->regs + SCL_I2C_FM_TIMING);
