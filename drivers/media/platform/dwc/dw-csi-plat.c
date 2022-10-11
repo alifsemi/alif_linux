@@ -73,7 +73,7 @@ const struct mipi_dt csi_dt[] = {
 		.name = "RAW16",
 	},
 };
-
+#if 0
 static struct mipi_fmt *
 find_dw_mipi_csi_format(struct v4l2_mbus_framefmt *mf)
 {
@@ -85,7 +85,7 @@ find_dw_mipi_csi_format(struct v4l2_mbus_framefmt *mf)
 
 	return NULL;
 }
-
+#endif
 static int dw_mipi_csi_enum_mbus_code(struct v4l2_subdev *sd,
 				      struct v4l2_subdev_pad_config *cfg,
 				      struct v4l2_subdev_mbus_code_enum *code)
@@ -100,6 +100,7 @@ static int dw_mipi_csi_enum_mbus_code(struct v4l2_subdev *sd,
 	return 0;
 }
 
+#if 0
 static struct mipi_fmt *
 dw_mipi_csi_try_format(struct v4l2_mbus_framefmt *mf)
 {
@@ -113,6 +114,7 @@ dw_mipi_csi_try_format(struct v4l2_mbus_framefmt *mf)
 
 	return fmt;
 }
+#endif
 
 static struct v4l2_mbus_framefmt *
 dw_mipi_csi_get_format(struct dw_csi *dev, struct v4l2_subdev_pad_config *cfg,
@@ -139,6 +141,7 @@ dw_mipi_csi_set_fmt(struct v4l2_subdev *sd,
 		    struct v4l2_subdev_pad_config *cfg,
 		    struct v4l2_subdev_format *fmt)
 {
+#if 0
 	struct dw_csi *dev = sd_to_mipi_csi_dev(sd);
 	struct mipi_fmt *dev_fmt;
 	struct v4l2_mbus_framefmt *mf = dw_mipi_csi_get_format(dev, cfg,
@@ -170,6 +173,7 @@ dw_mipi_csi_set_fmt(struct v4l2_subdev *sd,
 			dev_vdbg(dev->dev, "Using data type %s\n",
 				 csi_dt[i].name);
 		}
+#endif
 	return 0;
 }
 
@@ -200,11 +204,11 @@ dw_mipi_csi_s_power(struct v4l2_subdev *sd, int on)
 	dev_vdbg(dev->dev, "%s: on=%d\n", __func__, on);
 
 	if (on) {
-		dw_mipi_csi_hw_stdby(dev);
+		//TODO ALIF	dw_mipi_csi_hw_stdby(dev);
 		dw_mipi_csi_start(dev);
 	} else {
 		phy_power_off(dev->phy);
-		dw_mipi_csi_mask_irq_power_off(dev);
+		//dw_mipi_csi_mask_irq_power_off(dev);
 		/* reset data type */
 		dev->ipi_dt = 0x0;
 	}
@@ -214,10 +218,9 @@ dw_mipi_csi_s_power(struct v4l2_subdev *sd, int on)
 static int
 dw_mipi_csi_log_status(struct v4l2_subdev *sd)
 {
-	struct dw_csi *dev = sd_to_mipi_csi_dev(sd);
+	//struct dw_csi *dev = sd_to_mipi_csi_dev(sd);
 
-	dw_mipi_csi_dump(dev);
-
+	//dw_mipi_csi_dump(dev);
 	return 0;
 }
 
@@ -246,6 +249,14 @@ static int dw_mipi_csi_init_cfg(struct v4l2_subdev *sd,
 	return 0;
 }
 
+static int dw_mipi_csi_s_stream(struct v4l2_subdev *sd, int enable)
+{
+	struct dw_csi *csi = sd_to_mipi_csi_dev(sd);
+
+	dw_mipi_csi_start_ipi(csi, enable);
+	return 0;
+}
+
 static struct v4l2_subdev_core_ops dw_mipi_csi_core_ops = {
 	.s_power = dw_mipi_csi_s_power,
 	.log_status = dw_mipi_csi_log_status,
@@ -261,9 +272,14 @@ static struct v4l2_subdev_pad_ops dw_mipi_csi_pad_ops = {
 	.set_fmt = dw_mipi_csi_set_fmt,
 };
 
+static struct v4l2_subdev_video_ops dw_mipi_csi_video_ops = {
+	.s_stream = dw_mipi_csi_s_stream,
+};
+
 static struct v4l2_subdev_ops dw_mipi_csi_subdev_ops = {
 	.core = &dw_mipi_csi_core_ops,
 	.pad = &dw_mipi_csi_pad_ops,
+	.video = &dw_mipi_csi_video_ops,
 };
 
 static irqreturn_t dw_mipi_csi_irq1(int irq, void *dev_id)
@@ -412,7 +428,10 @@ static int dw_csi_probe(struct platform_device *pdev)
 	csi->format.code = dw_mipi_csi_formats[0].mbus_code;
 
 	sd->entity.function = MEDIA_ENT_F_IO_V4L;
-
+	//##TODO
+	/*{	sd->entity.function = MEDIA_ENT_F_VID_IF_BRIDGE;
+		csi->sd.dev = dev;
+	}*/
 	if (dev->of_node) {
 		csi->pads[CSI_PAD_SINK].flags = MEDIA_PAD_FL_SINK;
 		csi->pads[CSI_PAD_SOURCE].flags = MEDIA_PAD_FL_SOURCE;
@@ -438,6 +457,21 @@ static int dw_csi_probe(struct platform_device *pdev)
 	dev_vdbg(dev, "v4l2.name: %s\n", csi->v4l2_dev.name);
 
 	v4l2_set_subdevdata(&csi->sd, pdev);
+
+	/* Set the default config options - currently based on the arx3a0
+	 * sensor on A1 development platform */
+	csi->hw.num_lanes = 2;
+	csi->hw.hsa = 0x2;
+	csi->hw.hbp = 0x0;
+	csi->hw.hsd = 0x118;
+	csi->hw.htotal = 0x2 + 0x118 + 0x230 ;
+	csi->hw.vsa = 0x4;
+	csi->hw.vbp = 0x4;
+	csi->hw.vfp = 0x4;
+	csi->hw.vactive = 0x230;
+	csi->hw.ipi_color_mode = 1;
+	csi->hw.ipi_auto_flush = 1;
+
 	platform_set_drvdata(pdev, &csi->sd);
 	dev_set_drvdata(dev, sd);
 
@@ -447,15 +481,17 @@ static int dw_csi_probe(struct platform_device *pdev)
 #if IS_ENABLED(CONFIG_DWC_MIPI_TC_DPHY_GEN3)
 	dw_csi_create_capabilities_sysfs(pdev);
 #endif
+	/* ALIF comment off for now 
 	dw_mipi_csi_get_version(csi);
 	dw_mipi_csi_specific_mappings(csi);
-	dw_mipi_csi_mask_irq_power_off(csi);
+	dw_mipi_csi_mask_irq_power_off(csi); */
 
 	dev_info(dev, "DW MIPI CSI-2 Host registered successfully HW v%u.%u\n",
 		 csi->hw_version_major, csi->hw_version_minor);
 
 	phy_init(csi->phy);
 
+	phy_power_on(csi->phy);
 	return 0;
 end:
 #if IS_ENABLED(CONFIG_OF)

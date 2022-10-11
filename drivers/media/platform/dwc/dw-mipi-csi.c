@@ -10,13 +10,15 @@
 
 #include "dw-mipi-csi.h"
 
+#define MASK(h,l)   (((~(0U)) << (l)) & (~(0U) >> (32 - 1 - (h))))
+
 static struct R_CSI2 reg = {
 	.VERSION = 0x00,
 	.N_LANES = 0x04,
-	.CTRL_RESETN = 0x08,
-	.INTERRUPT = 0x0C,
+	.CSI2_RESETN = 0x08,
+	.INT_ST_MAIN = 0x0C,
 	.DATA_IDS_1 = 0x10,
-	.DATA_IDS_2 = 0x14,
+	.DATA_IDS_VC_1 = 0x14,
 	.IPI_MODE = 0x80,
 	.IPI_VCID = 0x84,
 	.IPI_DATA_TYPE = 0x88,
@@ -31,21 +33,21 @@ static struct R_CSI2 reg = {
 	.IPI_VBP_LINES = 0xB4,
 	.IPI_VFP_LINES = 0xB8,
 	.IPI_VACTIVE_LINES = 0xBC,
-	.INT_PHY_FATAL = 0xe0,
-	.MASK_INT_PHY_FATAL = 0xe4,
-	.FORCE_INT_PHY_FATAL = 0xe8,
-	.INT_PKT_FATAL = 0xf0,
-	.MASK_INT_PKT_FATAL = 0xf4,
-	.FORCE_INT_PKT_FATAL = 0xf8,
-	.INT_PHY = 0x110,
-	.MASK_INT_PHY = 0x114,
-	.FORCE_INT_PHY = 0x118,
-	.INT_LINE = 0x130,
-	.MASK_INT_LINE = 0x134,
-	.FORCE_INT_LINE = 0x138,
-	.INT_IPI = 0x140,
-	.MASK_INT_IPI = 0x144,
-	.FORCE_INT_IPI = 0x148,
+	.INT_ST_PHY_FATAL = 0xe0,
+	.INT_MSK_PHY_FATAL = 0xe4,
+	.INT_FORCE_PHY_FATAL = 0xe8,
+	.INT_ST_PKT_FATAL = 0xf0,
+	.INT_MSK_PKT_FATAL = 0xf4,
+	.INT_FORCE_PKT_FATAL = 0xf8,
+	.INT_ST_PHY = 0x110,
+	.INT_MSK_PHY = 0x114,
+	.INT_FORCE_PHY = 0x118,
+	.INT_ST_LINE = 0x130,
+	.INT_MSK_LINE = 0x134,
+	.INT_FORCE_LINE = 0x138,
+	.INT_ST_IPI_FATAL = 0x140,
+	.INT_MSK_IPI_FATAL = 0x144,
+	.INT_FORCE_IPI_FATAL = 0x148,
 };
 
 struct interrupt_type csi_int = {
@@ -69,11 +71,12 @@ void dw_mipi_csi_write_part(struct dw_csi *dev, u32 address, u32 data,
 	dw_mipi_csi_write(dev, address, temp);
 }
 
+#if 0
 void dw_mipi_csi_reset(struct dw_csi *csi_dev)
 {
-	dw_mipi_csi_write(csi_dev, reg.CTRL_RESETN, 0);
+	dw_mipi_csi_write(csi_dev, reg.CSI2_RESETN, 0);
 	usleep_range(100, 200);
-	dw_mipi_csi_write(csi_dev, reg.CTRL_RESETN, 1);
+	dw_mipi_csi_write(csi_dev, reg.CSI2_RESETN, 1);
 }
 
 int dw_mipi_csi_mask_irq_power_off(struct dw_csi *csi_dev)
@@ -81,18 +84,18 @@ int dw_mipi_csi_mask_irq_power_off(struct dw_csi *csi_dev)
 	if (csi_dev->hw_version_major == 1) {
 		/* set only one lane (lane 0) as active (ON) */
 		dw_mipi_csi_write(csi_dev, reg.N_LANES, 0);
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_PHY_FATAL, 0);
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_PKT_FATAL, 0);
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_PHY, 0);
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_LINE, 0);
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_IPI, 0);
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_PHY_FATAL, 0);
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_PKT_FATAL, 0);
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_PHY, 0);
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_LINE, 0);
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_IPI_FATAL, 0);
 
 		/* only for version 1.30 */
 		if (csi_dev->hw_version_minor == 30)
 			dw_mipi_csi_write(csi_dev,
 					  reg.MASK_INT_FRAME_FATAL, 0);
 
-		dw_mipi_csi_write(csi_dev, reg.CTRL_RESETN, 0);
+		dw_mipi_csi_write(csi_dev, reg.CSI2_RESETN, 0);
 
 		/* only for version 1.40 */
 		if (csi_dev->hw_version_minor == 40) {
@@ -107,7 +110,6 @@ int dw_mipi_csi_mask_irq_power_off(struct dw_csi *csi_dev)
 			dw_mipi_csi_write(csi_dev, reg.MSK_ECC_CORRECT, 0);
 		}
 	}
-
 	return 0;
 }
 
@@ -126,13 +128,13 @@ int dw_mipi_csi_hw_stdby(struct dw_csi *csi_dev)
 					  GENMASK(31, 0));
 
 		/* common */
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_PHY_FATAL,
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_PHY_FATAL,
 				  GENMASK(8, 0));
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_PKT_FATAL,
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_PKT_FATAL,
 				  GENMASK(1, 0));
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_PHY, GENMASK(23, 0));
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_LINE, GENMASK(23, 0));
-		dw_mipi_csi_write(csi_dev, reg.MASK_INT_IPI, GENMASK(5, 0));
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_PHY, GENMASK(23, 0));
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_LINE, GENMASK(23, 0));
+		dw_mipi_csi_write(csi_dev, reg.INT_MSK_IPI_FATAL, GENMASK(5, 0));
 
 		/* only for version 1.40 */
 		if (csi_dev->hw_version_minor == 40) {
@@ -243,7 +245,6 @@ void dw_mipi_csi_set_ipi_fmt(struct dw_csi *csi_dev)
 	}
 	dev_info(dev, "Selected IPI Data Type 0x%X\n", csi_dev->ipi_dt);
 }
-
 void dw_mipi_csi_fill_timings(struct dw_csi *dev,
 			      struct v4l2_subdev_format *fmt)
 {
@@ -271,16 +272,34 @@ void dw_mipi_csi_fill_timings(struct dw_csi *dev,
 		dev_dbg(dev->dev, "Vertical Active: %d\n", dev->hw.vactive);
 	}
 }
+#endif
 
 void dw_mipi_csi_start(struct dw_csi *csi_dev)
 {
 	struct device *dev = csi_dev->dev;
 
-	dw_mipi_csi_write(csi_dev, reg.N_LANES, (csi_dev->hw.num_lanes - 1));
-	dev_info(dev, "number of lanes: %d\n", csi_dev->hw.num_lanes);
+	printk("##ALIF MIPI CSI CONFIGURATION!!!\n");
+	dw_mipi_csi_write_part(csi_dev, reg.CSI2_RESETN, 0, 0, 1);
+	dw_mipi_csi_write_part(csi_dev, reg.N_LANES, (csi_dev->hw.num_lanes - 1), 0, 2);
+//	dev_info(dev, "number of lanes: %d\n", csi_dev->hw.num_lanes);
+
+	dw_mipi_csi_write_part(csi_dev, reg.INT_MSK_PHY_FATAL, MASK(8,0), 0, 9); //.INT_MSK_PHY_FATAL
+	dw_mipi_csi_write_part(csi_dev, reg.INT_MSK_PKT_FATAL, MASK(1,0), 0, 2);
+	dw_mipi_csi_write_part(csi_dev, reg.INT_MSK_PHY, MASK(7,0), 0, 8);
+	dw_mipi_csi_write_part(csi_dev, reg.INT_MSK_PHY, MASK(23,16), 16, 8);
+	dw_mipi_csi_write_part(csi_dev, reg.INT_MSK_LINE, MASK(7,0), 0, 8);
+	dw_mipi_csi_write_part(csi_dev, reg.INT_MSK_LINE, MASK(23,16), 16, 8);
+	dw_mipi_csi_write_part(csi_dev, reg.INT_MSK_IPI_FATAL, MASK(5,0), 0, 6);
+	dw_mipi_csi_write_part(csi_dev, 0x284, MASK(31,0), 0, 32);
+	dw_mipi_csi_write_part(csi_dev, 0x294, MASK(31,0), 0, 32);
+	dw_mipi_csi_write_part(csi_dev, 0x2A4, MASK(31,0), 0, 32);
+	dw_mipi_csi_write_part(csi_dev, 0x2B4, MASK(31,0), 0, 32);
+	dw_mipi_csi_write_part(csi_dev, 0x2C4, MASK(31,0), 0, 32);
+	dw_mipi_csi_write_part(csi_dev, 0x2D4, MASK(31,0), 0, 32);
 
 	/* IPI Related Configuration */
-	if (csi_dev->hw.output == IPI_OUT || csi_dev->hw.output == BOTH_OUT) {
+//	if (csi_dev->hw.output == IPI_OUT || csi_dev->hw.output == BOTH_OUT) {
+#if 0 
 		if (csi_dev->hw_version_major >= 1) {
 			if (csi_dev->hw_version_minor >= 20)
 				dw_mipi_csi_write(csi_dev,
@@ -306,22 +325,27 @@ void dw_mipi_csi_start(struct dw_csi *csi_dev)
 					  EN_BLANKING |
 					  EN_EMBEDDED);
 		}
+#endif
+		dw_mipi_csi_write_part(csi_dev,
+				       reg.IPI_MODE,
+				       csi_dev->hw.ipi_mode,
+				       0, 1);
 		dw_mipi_csi_write_part(csi_dev,
 				       reg.IPI_MODE,
 				       csi_dev->hw.ipi_color_mode,
 				       8, 1);
-		dw_mipi_csi_write_part(csi_dev,
-				       reg.IPI_MODE,
-				       csi_dev->hw.ipi_cut_through,
-				       16, 1);
-		dw_mipi_csi_write_part(csi_dev,
-				       reg.IPI_VCID,
-				       csi_dev->hw.virtual_ch,
-				       0, 2);
+//		dw_mipi_csi_write_part(csi_dev,
+//				       reg.IPI_MODE,
+//				       csi_dev->hw.ipi_cut_through,
+//				       16, 1);
 		dw_mipi_csi_write_part(csi_dev,
 				       reg.IPI_MEM_FLUSH,
 				       csi_dev->hw.ipi_auto_flush,
 				       8, 1);
+		dw_mipi_csi_write_part(csi_dev,
+				       reg.IPI_VCID,
+				       csi_dev->hw.virtual_ch,
+				       0, 2);
 
 		dev_vdbg(dev, "*********** config *********\n");
 		dev_vdbg(dev, "IPI enable: %s\n",
@@ -336,11 +360,10 @@ void dw_mipi_csi_start(struct dw_csi *csi_dev)
 			 csi_dev->hw.virtual_ch);
 		dev_vdbg(dev, "Auto-flush: %d\n",
 			 csi_dev->hw.ipi_auto_flush);
-		dw_mipi_csi_write(csi_dev, reg.IPI_SOFTRSTN, 1);
-
-		if (csi_dev->hw.ipi_mode == AUTO_TIMING)
-			phy_power_on(csi_dev->phy);
-
+//		dw_mipi_csi_write(csi_dev, reg.IPI_SOFTRSTN, 1);
+//		if (csi_dev->hw.ipi_mode == AUTO_TIMING)
+//			phy_power_on(csi_dev->phy);
+		dw_mipi_csi_write(csi_dev, reg.IPI_DATA_TYPE, 0x2b);
 		dw_mipi_csi_write(csi_dev,
 				  reg.IPI_HSA_TIME, csi_dev->hw.hsa);
 		dw_mipi_csi_write(csi_dev,
@@ -357,8 +380,18 @@ void dw_mipi_csi_start(struct dw_csi *csi_dev)
 				  reg.IPI_VFP_LINES, csi_dev->hw.vfp);
 		dw_mipi_csi_write(csi_dev,
 				  reg.IPI_VACTIVE_LINES, csi_dev->hw.vactive);
+		dw_mipi_csi_write_part(csi_dev, reg.CSI2_RESETN, 1, 0, 1);
+//	}
+}
+
+void dw_mipi_csi_start_ipi(struct dw_csi *csi, int enable)
+{
+	if(enable){
+		dw_mipi_csi_write_part(csi, reg.IPI_MODE, 1, 24, 1);
 	}
-	phy_power_on(csi_dev->phy);
+	else{
+		dw_mipi_csi_write_part(csi, reg.IPI_MODE, 0, 24, 1);
+	}
 }
 
 int dw_mipi_csi_irq_handler(struct dw_csi *csi_dev)
@@ -368,35 +401,37 @@ int dw_mipi_csi_irq_handler(struct dw_csi *csi_dev)
 	unsigned long flags;
 
 	spin_lock_irqsave(&csi_dev->slock, flags);
-	global_int_status = dw_mipi_csi_read(csi_dev, reg.INTERRUPT);
+	global_int_status = dw_mipi_csi_read(csi_dev, reg.INT_ST_MAIN);
+
+	printk("##mipi csi_irq status 0x%x\n",global_int_status);
 
 	if (global_int_status & csi_int.PHY_FATAL) {
-		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_PHY_FATAL);
+		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_ST_PHY_FATAL);
 		dev_err_ratelimited(dev, "int %08X: PHY FATAL: %08X\n",
-				    reg.INT_PHY_FATAL, i_sts);
+				    reg.INT_ST_PHY_FATAL, i_sts);
 	}
 
 	if (global_int_status & csi_int.PKT_FATAL) {
-		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_PKT_FATAL);
+		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_ST_PKT_FATAL);
 		dev_err_ratelimited(dev, "int %08X: PKT FATAL: %08X\n",
-				    reg.INT_PKT_FATAL, i_sts);
+				    reg.INT_ST_PKT_FATAL, i_sts);
 	}
 
-	if (global_int_status & csi_int.FRAME_FATAL &&
+/*	if (global_int_status & csi_int.FRAME_FATAL &&
 	    csi_dev->hw_version_major == 1 &&
 	    csi_dev->hw_version_minor == 30) {
 		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_FRAME_FATAL);
 		dev_err_ratelimited(dev, "int %08X: FRAME FATAL: %08X\n",
 				    reg.INT_FRAME_FATAL, i_sts);
 	}
-
+*/
 	if (global_int_status & csi_int.PHY) {
-		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_PHY);
+		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_ST_PHY);
 		dev_err_ratelimited(dev, "int %08X: PHY: %08X\n",
-				    reg.INT_PHY, i_sts);
+				    reg.INT_ST_PHY, i_sts);
 	}
 
-	if (global_int_status & csi_int.PKT &&
+/*	if (global_int_status & csi_int.PKT &&
 	    csi_dev->hw_version_major == 1 &&
 	    csi_dev->hw_version_minor <= 30) {
 		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_PKT);
@@ -405,15 +440,15 @@ int dw_mipi_csi_irq_handler(struct dw_csi *csi_dev)
 	}
 
 	if (global_int_status & csi_int.LINE) {
-		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_LINE);
+		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_ST_LINE);
 		dev_err_ratelimited(dev, "int %08X: LINE: %08X\n",
-				    reg.INT_LINE, i_sts);
+				    reg.INT_ST_LINE, i_sts);
 	}
 
 	if (global_int_status & csi_int.IPI) {
-		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_IPI);
+		i_sts = dw_mipi_csi_read(csi_dev, reg.INT_ST_IPI_FATAL);
 		dev_err_ratelimited(dev, "int %08X: IPI: %08X\n",
-				    reg.INT_IPI, i_sts);
+				    reg.INT_ST_IPI_FATAL, i_sts);
 	}
 
 	if (global_int_status & csi_int.BNDRY_FRAME_FATAL) {
@@ -454,13 +489,14 @@ int dw_mipi_csi_irq_handler(struct dw_csi *csi_dev)
 		i_sts = dw_mipi_csi_read(csi_dev, reg.ST_ECC_CORRECT);
 		dev_err_ratelimited(dev, "int %08X: ST_ECC_CORRECT: %08X\n",
 				    reg.ST_ECC_CORRECT, i_sts);
-	}
+	} */
 
 	spin_unlock_irqrestore(&csi_dev->slock, flags);
 
 	return 1;
 }
 
+#if 0
 void dw_mipi_csi_get_version(struct dw_csi *csi_dev)
 {
 	u32 hw_version;
@@ -545,10 +581,10 @@ void dw_mipi_csi_dump(struct dw_csi *csi_dev)
 {
 	dw_print(reg.VERSION);
 	dw_print(reg.N_LANES);
-	dw_print(reg.CTRL_RESETN);
-	dw_print(reg.INTERRUPT);
+	dw_print(reg.CSI2_RESETN);
+	dw_print(reg.INT_ST_MAIN);
 	dw_print(reg.DATA_IDS_1);
-	dw_print(reg.DATA_IDS_2);
+	dw_print(reg.DATA_IDS_VC_1);
 	dw_print(reg.IPI_MODE);
 	dw_print(reg.IPI_VCID);
 	dw_print(reg.IPI_DATA_TYPE);
@@ -567,3 +603,4 @@ void dw_mipi_csi_dump(struct dw_csi *csi_dev)
 	dw_print(reg.VERSION);
 	dw_print(reg.IPI_ADV_FEATURES);
 }
+#endif

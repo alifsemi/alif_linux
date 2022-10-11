@@ -10,6 +10,27 @@
 
 #include "dw-dphy-rx.h"
 
+#define MASK(h,l)   (((~(0U)) << (l)) & (~(0U) >> (32 - 1 - (h))))
+
+
+#define MIPI_CSI2_N_LANES	2
+// Camera Clk configured to 20 Mhz
+#define DPHY_FCFG_CLOCK_MHZ	25
+
+#define TX_PLL_13		(0x16A)
+#define TX_CB_0			(0x1AA)
+#define TX_CB_1			(0x1AB)
+#define RX_CLKLANE_LANE_6	(0x307)
+#define RX_SYS_1		(0x01F)
+#define RX_STARTUP_OVR_2	(0x0E2)
+#define RX_STARTUP_OVR_3	(0x0E3)
+#define RX_STARTUP_OVR_4	(0x0E4)
+
+
+#define DPHY_STOPSTATE_LANE0	(1U << 0)
+#define DPHY_STOPSTATE_LANE1	(1U << 1)
+#define DPHY_STOPSTATE_CLOCK	(1U << 2)
+
 struct range_dphy_gen2 {
 	u32 freq;
 	u8 hsfregrange;
@@ -62,8 +83,40 @@ struct range_dphy_gen3 range_gen3[] = {
 	{ 2400, 0x47, 0x1A4 }, { 2450, 0x48, 0x1AD }, { 2500, 0x49, 0x1B6 }
 };
 
+static uint8_t dphy_stopstate(struct dw_dphy_rx *dphy)
+{
+	uint32_t reg_status = 0;
+	uint8_t ret = 0;
+
+	reg_status = dw_dphy_read(dphy, R_CSI2_DPHY_STOPSTATE);
+
+	if(reg_status & 0x1) 		ret |= DPHY_STOPSTATE_LANE0;
+	if(reg_status & (0x1 << 1)) 	ret |= DPHY_STOPSTATE_LANE1;
+	if(reg_status & (0x1 << 16)) 	ret |= DPHY_STOPSTATE_CLOCK;
+
+	return ret;
+}
+
+
+static int dw_dphy_te_12b_read(struct dw_dphy_rx *dphy, u32 addr);
+static void dw_dphy_te_12b_write(struct dw_dphy_rx *dphy, u16 addr, u8 data);
+
+static inline void csi_dphy_write_msk(struct dw_dphy_rx *dphy, u32 address, u32 data, u8 shift,
+		       u8 width)
+{
+	u32 temp = dw_dphy_te_12b_read(dphy, address);
+	u32 mask = (1 << width) - 1;
+
+	temp &= ~(mask << shift);
+	temp |= (data & mask) << shift;
+
+	dw_dphy_te_12b_write(dphy, address, temp);
+}
+
+
 u8 dw_dphy_setup_config(struct dw_dphy_rx *dphy)
 {
+#if 0
 #if IS_ENABLED(CONFIG_DWC_MIPI_TC_DPHY_GEN3)
 	int ret;
 
@@ -90,9 +143,11 @@ u8 dw_dphy_setup_config(struct dw_dphy_rx *dphy)
 	return ret;
 
 #endif /* CONFIG_DWC_MIPI_TC_DPHY_GEN3 */
+#endif
 	return CTRL_4_LANES;
 }
 
+#if 0
 #if IS_ENABLED(CONFIG_DWC_MIPI_TC_DPHY_GEN3)
 void dw_dphy_if_write(struct dw_dphy_rx *dphy, u32 address, u32 data)
 {
@@ -125,9 +180,10 @@ end:
 	return if1;
 }
 #endif
-
+#endif
 void dw_dphy_write(struct dw_dphy_rx *dphy, u32 address, u32 data)
 {
+#if 0
 	iowrite32(data, dphy->base_address + address);
 
 	if (dphy->lanes_config == CTRL_4_LANES)
@@ -137,10 +193,13 @@ void dw_dphy_write(struct dw_dphy_rx *dphy, u32 address, u32 data)
 		iowrite32(data, dphy->base_address + R_CSI2_DPHY2_TST_CTRL0);
 	else if (address == R_CSI2_DPHY_TST_CTRL1)
 		iowrite32(data, dphy->base_address + R_CSI2_DPHY2_TST_CTRL1);
+#endif
+	writel(data, dphy->base_address + address);
 }
 
 u32 dw_dphy_read(struct dw_dphy_rx *dphy, u32 address)
 {
+#if 0
 	int dphy1 = 0, dphy2 = 0;
 
 	dphy1 = ioread32(dphy->base_address + address);
@@ -156,6 +215,11 @@ u32 dw_dphy_read(struct dw_dphy_rx *dphy, u32 address)
 		return -ENODEV;
 end:
 	return dphy1;
+#endif
+	u32 val;
+	val = readl(dphy->base_address + address);
+//printk("dw_dphy_read: addr 0x%x = val 0x%x\n",dphy->base_address + address, val);
+	return val;
 }
 
 void dw_dphy_write_msk(struct dw_dphy_rx *dev, u32 address, u32 data, u8 shift,
@@ -171,31 +235,31 @@ void dw_dphy_write_msk(struct dw_dphy_rx *dev, u32 address, u32 data, u8 shift,
 
 static void dw_dphy_te_12b_write(struct dw_dphy_rx *dphy, u16 addr, u8 data)
 {
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0, PHY_TESTEN, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, PHY_TESTCLK, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 1, PHY_TESTEN, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, PHY_TESTCLK, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0x00, PHY_TESTDIN, 8);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, PHY_TESTCLK, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0, PHY_TESTEN, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, 1, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0, 16, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 1, 16, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, 1, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0x0, 0, 8);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, 1, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0, 16, 1);
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, (u8)(addr >> 8),
 			  PHY_TESTDIN, 8);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, PHY_TESTCLK, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, PHY_TESTCLK, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 1, PHY_TESTEN, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, PHY_TESTCLK, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, (u8)addr, PHY_TESTDIN,
-			  8);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, PHY_TESTCLK, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0, PHY_TESTEN, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, (u8)data, PHY_TESTDIN,
-			  8);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, PHY_TESTCLK, 1);
-	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, PHY_TESTCLK, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, 1, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, 1, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 1, 16, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, 1, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, (u8)(addr & 0xFF), 0, 8);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, 1, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0, 16, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, (u8)data, 0, 8);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, 1, 1);
+	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, 1, 1);
 }
 
+#if 0
 static void dw_dphy_te_8b_write(struct dw_dphy_rx *dphy, u8 addr, u8 data)
 {
+printk("#alif dw_dphy_te_8b_write addr 0x%x data 0x%x\n",addr,data);
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, PHY_TESTCLK, 1);
 	dw_dphy_write(dphy, R_CSI2_DPHY_TST_CTRL1, addr);
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 1, PHY_TESTEN, 1);
@@ -205,7 +269,6 @@ static void dw_dphy_te_8b_write(struct dw_dphy_rx *dphy, u8 addr, u8 data)
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 1, PHY_TESTCLK, 1);
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, PHY_TESTCLK, 1);
 }
-
 static void dw_dphy_te_write(struct dw_dphy_rx *dphy, u16 addr, u8 data)
 {
 	if (dphy->dphy_te_len == BIT12)
@@ -213,13 +276,14 @@ static void dw_dphy_te_write(struct dw_dphy_rx *dphy, u16 addr, u8 data)
 	else
 		dw_dphy_te_8b_write(dphy, addr, data);
 }
+#endif
 
 static int dw_dphy_te_12b_read(struct dw_dphy_rx *dphy, u32 addr)
 {
 	u8 ret;
 
-	dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 0);
-	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0);
+//	dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 0);
+//	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0);
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL0, 0, PHY_TESTCLK, 1);
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0, PHY_TESTEN, 1);
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 1, PHY_TESTEN, 1);
@@ -239,12 +303,12 @@ static int dw_dphy_te_12b_read(struct dw_dphy_rx *dphy, u32 addr)
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0x00, 0, PHY_TESTDIN);
 	ret = dw_dphy_read_msk(dphy, R_CSI2_DPHY_TST_CTRL1, PHY_TESTDOUT, 8);
 	dw_dphy_write_msk(dphy, R_CSI2_DPHY_TST_CTRL1, 0, PHY_TESTEN, 1);
-	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 1);
-	dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 1);
+//	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 1);
+//	dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 1);
 
 	return ret;
 }
-
+#if 0
 static int dw_dphy_te_8b_read(struct dw_dphy_rx *dphy, u32 addr)
 {
 	u8 ret;
@@ -263,19 +327,21 @@ static int dw_dphy_te_8b_read(struct dw_dphy_rx *dphy, u32 addr)
 
 	return ret;
 }
+#endif
 
 int dw_dphy_te_read(struct dw_dphy_rx *dphy, u32 addr)
 {
 	int ret;
 
-	if (dphy->dphy_te_len == BIT12)
+//	if (dphy->dphy_te_len == BIT12)
 		ret = dw_dphy_te_12b_read(dphy, addr);
-	else
-		ret = dw_dphy_te_8b_read(dphy, addr);
+//	else
+//		ret = dw_dphy_te_8b_read(dphy, addr);
 
 	return ret;
 }
 
+#if 0
 #if IS_ENABLED(CONFIG_DWC_MIPI_TC_DPHY_GEN3)
 static void dw_dphy_if_init(struct dw_dphy_rx *dphy)
 {
@@ -319,7 +385,6 @@ static void dw_dphy_gen3_12bit_tc_power_up(struct dw_dphy_rx *dphy)
 	dw_dphy_if_write(dphy, DPHYGLUEIFTESTER, RX_PHY);
 #endif
 }
-
 static void dw_dphy_gen3_8bit_tc_power_up(struct dw_dphy_rx *dphy)
 {
 	u32 input_freq = dphy->dphy_freq / 1000;
@@ -349,7 +414,7 @@ static void dw_dphy_gen3_8bit_tc_power_up(struct dw_dphy_rx *dphy)
 		dw_dphy_te_write(dphy, HS_RX_CTRL_LANE3, 0xC0);
 	}
 }
-
+#endif
 int dw_dphy_g118_settle(struct dw_dphy_rx *dphy)
 {
 	u32 input_freq, total_settle, settle_time, byte_clk, lp_time;
@@ -367,6 +432,7 @@ int dw_dphy_g118_settle(struct dw_dphy_rx *dphy)
 	return total_settle;
 }
 
+#if 0
 static void dw_dphy_pwr_down(struct dw_dphy_rx *dphy)
 {
 	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0);
@@ -437,10 +503,11 @@ static int dw_dphy_gen3_8bit_configure(struct dw_dphy_rx *dphy)
 	data = 1 << 7 | range_gen3[range].hsfregrange;
 	dw_dphy_te_write(dphy, HSFREQRANGE_8BIT, data);
 	dw_dphy_gen3_8bit_tc_power_up(dphy);
-
 	return 0;
 }
+#endif
 
+#if 0
 static int dw_dphy_gen2_configure(struct dw_dphy_rx *dphy)
 {
 	u32 input_freq = dphy->dphy_freq;
@@ -458,14 +525,163 @@ static int dw_dphy_gen2_configure(struct dw_dphy_rx *dphy)
 
 	data = range_gen2[range].hsfregrange << 1;
 	dw_dphy_te_write(dphy, HSFREQRANGE_8BIT, data);
+	return 0;
+}
+#endif
+
+int alif_dsi_phy_init(void __iomem *dsi);
+
+//static struct dw_dphy_rx *hdphy;
+
+static int32_t alif_csi_dphy_setup(struct dw_dphy_rx *dphy, uint32_t clock_frequency)
+{
+	uint32_t bitrate = (clock_frequency * 2);
+	uint8_t hsfreqrange = 0;
+	uint8_t cfgclkfreqrange = 0;
+	uint32_t osc_freq_target = 0;
+	uint8_t range = 0;
+	uint32_t reg_data = 0;
+	uint8_t stopstate_check =0;
+	uint32_t lp_count = 0;
+	void __iomem *expslv1;
+
+	expslv1 = ioremap(0x4903F000, 0x40);
+
+	for(range = 0; (range < ARRAY_SIZE(range_gen3) - 1) &&
+		((bitrate/1000000) > range_gen3[range].freq); ++range);
+
+	hsfreqrange = range_gen3[range].hsfregrange;
+	osc_freq_target = range_gen3[range].osc_freq_target;
+
+	printk("##alif_csi_dphy_setup hsfreqrange 0x%x osc_freq_target 0x%x"
+		"range %d range_gent3.hsfregrange %d\n",
+		hsfreqrange, osc_freq_target, range,
+		range_gen3[range].hsfregrange);
+
+	//dw_dphy_init(dphy);
+	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0);
+	dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 0);
+
+	//Select rx_testport (bit 4)
+	reg_data = readl(expslv1 + 0x38);
+	reg_data &= ~(1 << 8); //tx_rx
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	reg_data = readl(expslv1 + 0x38);
+	reg_data |= (1 << 4); //rx testport
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	reg_data = dw_dphy_read(dphy, R_CSI2_DPHY_TST_CTRL0);
+	reg_data |= BIT(0); //TestClr Enable
+	dw_dphy_write(dphy, R_CSI2_DPHY_TST_CTRL0, reg_data);
+
+	reg_data = readl(expslv1 + 0x38);
+	reg_data &= ~(1 << 4); //tx testport
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	reg_data = dw_dphy_read(dphy, R_CSI2_DPHY_TST_CTRL0);
+	reg_data |= BIT(0); //TestClr Enable
+	dw_dphy_write(dphy, R_CSI2_DPHY_TST_CTRL0, reg_data);
+
+	udelay(10);
+
+	reg_data = readl(expslv1 + 0x38);
+	reg_data |= (1 << 4); //rx testport
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	reg_data = dw_dphy_read(dphy, R_CSI2_DPHY_TST_CTRL0);
+	reg_data &= ~BIT(0); //TestClr Disable 
+	dw_dphy_write(dphy, R_CSI2_DPHY_TST_CTRL0, reg_data);
+
+	reg_data = readl(expslv1 + 0x38);
+	reg_data &= ~(1 << 4); //tx testport
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	reg_data = dw_dphy_read(dphy, R_CSI2_DPHY_TST_CTRL0);
+	reg_data &= ~BIT(0); //TestClr Disable 
+	dw_dphy_write(dphy, R_CSI2_DPHY_TST_CTRL0, reg_data);
+
+	reg_data = readl(expslv1 + 0x38); //rx_dphy_ctrl0
+	reg_data &= ~(MASK(22,16)); //hsfreqrange[22:16]
+	reg_data |= ((hsfreqrange << 16) & MASK(22,16));
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	csi_dphy_write_msk(dphy, TX_PLL_13, 0x3, 0, 2);
+	csi_dphy_write_msk(dphy, TX_CB_1, 0x2, 0, 2);
+	csi_dphy_write_msk(dphy, TX_CB_0, 0x2, 5, 2);
+
+	reg_data = readl(expslv1 + 0x38); //rx_dphy_ctrl0
+	reg_data |= (1 << 4); //rx testport
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	csi_dphy_write_msk(dphy, RX_CLKLANE_LANE_6, 0x1, 7, 1);
+
+	if((bitrate/1000000) == 80)
+		csi_dphy_write_msk(dphy, RX_SYS_1, 0x85, 0, 8);
+
+	csi_dphy_write_msk(dphy, RX_STARTUP_OVR_2, (uint8_t)osc_freq_target, 0, 8);
+	csi_dphy_write_msk(dphy, RX_STARTUP_OVR_3, (uint8_t)osc_freq_target >> 8, 0, 4);
+	csi_dphy_write_msk(dphy, RX_STARTUP_OVR_4, 0x1, 0, 1);
+
+	cfgclkfreqrange = (DPHY_FCFG_CLOCK_MHZ - 17) * 4;
+
+	reg_data = readl(expslv1 + 0x38); //rx_dphy_ctrl0
+	reg_data &= ~(MASK(31,24));//cfgclkfreqrange[31:24]
+	reg_data |= ((cfgclkfreqrange << 24) & MASK(31,24));
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	reg_data = readl(expslv1 + 0x38); //rx_dphy_ctrl0
+	reg_data &= ~(MASK(13,12)); //Basedir[13:12]
+	reg_data |= (((1U << MIPI_CSI2_N_LANES) - 1) << 12);
+        writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
+
+	reg_data = readl(expslv1 + 0x3C); //rx_dphy_ctrl1
+	reg_data &= ~(MASK(1,0)); //forcerxmode
+	reg_data |= ((1U << MIPI_CSI2_N_LANES) - 1);
+        writel(reg_data, expslv1 + 0x3C); //rx_dphy_ctrl1
+
+	udelay(1);
+	dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 0x1);
+	udelay(1);
+	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0x1);
+
+	stopstate_check = DPHY_STOPSTATE_CLOCK | DPHY_STOPSTATE_LANE0 |
+			DPHY_STOPSTATE_LANE1;
+
+	while(dphy_stopstate(dphy) != stopstate_check)
+	{
+		printk("csi_dphy_loop>> ");
+		if(lp_count++ < 100)
+			mdelay(50);
+		else{
+			printk("## CSI DPHY STOP STATE != STOPSTATE CHECK!!!!");
+			return -1;
+		}
+	}
+	reg_data = readl(expslv1 + 0x3C); //rx_dphy_ctrl1
+	reg_data &= ~(MASK(1,0)); //forcerxmode
+        writel(reg_data, expslv1 + 0x3C); //rx_dphy_ctrl1
+
+	iounmap(expslv1);
 
 	return 0;
 }
 
 static int dw_dphy_configure(struct dw_dphy_rx *dphy)
 {
-	dw_dphy_pwr_down(dphy);
+//	struct dw_dphy_rx *dphy = hdphy;
+	void __iomem *dsi_base;
 
+	printk("#dw_dphy_configure! \n");
+	dsi_base = ioremap(0x49032000, 0x1000);
+	alif_dsi_phy_init(dsi_base);
+	iounmap(dsi_base);	
+
+	printk("alif_csi_dphy_setup ->400000000\n");
+	alif_csi_dphy_setup(dphy, 400000000);
+
+//	dw_dphy_pwr_down(dphy);
+#if 0
 	if (dphy->dphy_gen == GEN3) {
 #if IS_ENABLED(CONFIG_DWC_MIPI_TC_DPHY_GEN3)
 		dw_dphy_if_init(dphy);
@@ -478,10 +694,10 @@ static int dw_dphy_configure(struct dw_dphy_rx *dphy)
 		dw_dphy_gen2_configure(dphy);
 	}
 	dw_dphy_pwr_up(dphy);
-
+#endif
 	return 0;
 }
-
+#if 0
 #if IS_ENABLED(CONFIG_DWC_MIPI_TC_DPHY_GEN3)
 int dw_dphy_if_set_idelay(struct dw_dphy_rx *dphy, u8 dly, u8 cells)
 {
@@ -549,13 +765,12 @@ int dw_dphy_if_set_idelay_lane(struct dw_dphy_rx *dphy, u8 dly, u8 lane)
 	return 0;
 }
 #endif
-
+#endif
 int dw_dphy_init(struct phy *phy)
 {
 	struct dw_dphy_rx *dphy = phy_get_drvdata(phy);
 
 	dev_vdbg(&dphy->phy->dev, "Init DPHY.\n");
-
 	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0);
 	dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 0);
 
@@ -564,8 +779,13 @@ int dw_dphy_init(struct phy *phy)
 
 static int dw_dphy_set_phy_state(struct dw_dphy_rx *dphy, u32 on)
 {
-	u8 hs_freq;
-
+	//u8 hs_freq;
+	if(on){
+		printk("dw_dphy_set_phy_state -> ON\n");
+		dw_dphy_configure(dphy);
+	}
+	else printk("dw_dphy_set_phy_state -> OFF\n");
+#if 0
 	dphy->lanes_config = dw_dphy_setup_config(dphy);
 
 	if (dphy->dphy_te_len == BIT12)
@@ -581,7 +801,7 @@ static int dw_dphy_set_phy_state(struct dw_dphy_rx *dphy, u32 on)
 		dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 0);
 		dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0);
 	}
-
+#endif
 	return 0;
 }
 
@@ -601,11 +821,13 @@ int dw_dphy_power_off(struct phy *phy)
 
 int dw_dphy_reset(struct phy *phy)
 {
+#if 0
 	struct dw_dphy_rx *dphy = phy_get_drvdata(phy);
 
 	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0);
 	usleep_range(100, 200);
 	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 1);
-
+#endif
 	return 0;
 }
+

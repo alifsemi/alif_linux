@@ -21,11 +21,10 @@
 /* The subdevices' group IDs. */
 #define GRP_ID_SENSOR		(10)
 #define GRP_ID_CSI		(20)
-#define GRP_ID_VIF		(30)
+#define GRP_ID_CPI		(30)
 #define GRP_ID_VIDEODEV		(40)
 
-#define CSI_MAX_ENTITIES	(2)
-#define VIF_MAX_ENTITIES	(2)
+#define CSI_MAX_ENTITIES	(1)
 #define PLAT_MAX_SENSORS	(2)
 
 struct pdata_names {
@@ -33,16 +32,15 @@ struct pdata_names {
 };
 
 enum video_dev_pads {
-	VIDEO_DEV_SD_PAD_SINK_VIF1,
-	VIDEO_DEV_SD_PAD_SINK_VIF2,
-	VIDEO_DEV_SD_PAD_SOURCE_DMA,
-	VIDEO_DEV_SD_PADS_NUM,
+	VIDEO_DEV_PAD_SINK_CPI,
+	VIDEO_DEV_PAD_SOURCE,
+	VIDEO_DEV_PADS_NUM,
 };
 
-enum vif_pads {
-	VIF_PAD_SINK_CSI,
-	VIF_PAD_SOURCE_DMA,
-	VIF_PADS_NUM,
+enum cpi_pads {
+	CPI_PAD_SINK_CSI,
+	CPI_PAD_SOURCE,
+	CPI_PADS_NUM,
 };
 
 enum mipi_csi_pads {
