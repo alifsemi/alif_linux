@@ -40,8 +40,9 @@
 
 	memory@02000000 {
 		device_type = "memory";
-		reg = <0x02000000 0x400000
-		       0x08000000 0x27F000>;
+		/*reg = <0x02000000 0x400000>;*/
+		reg = <0x02000000 0x400000>, <0x08200000 0x7FFFF>;
+		 /*      0x08000000 0x27F000>;*/
                 /* 0x0827F000 - 0x0827FFFF used for MHU services */
 	};
 
@@ -190,6 +191,12 @@
 			#clock-cells = <0>;
 			clock-frequency = <38400000>;
 			clock-output-names = "tx_dphy_cfg_clk";
+		};
+		camera_pixclk: camera_pixclk {
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <20000000>; /* 20 Mhz */
+			clock-output-names = "camera_pixclk";
 		};
 		ext_clk: camera_xvclk {
 			/* 20MHz clock */
@@ -796,30 +803,6 @@
 			};
 		};
 
-		gpio4: gpio@70000000 {
-			#address-cells = <1>;
-			#size-cells = <0>;
-			compatible = "snps,dw-apb-gpio";
-			reg = <0x70000000 0x1000>;
-			status = GPIO_4_STATUS;
-
-			/* Port 4 */
-			port4: gpio-port@4 {
-				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
-				#gpio-cells = <2>;
-				snps,nr-gpios = <8>;
-				reg = <0>;
-				interrupt-controller;
-				#interrupt-cells = <2>;
-				interrupt-parent = <&gic>;
-				interrupts = 	<GIC_SPI 175 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>,
-						<GIC_SPI 177 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 178 IRQ_TYPE_LEVEL_HIGH>,
-						<GIC_SPI 179 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 180 IRQ_TYPE_LEVEL_HIGH>,
-						<GIC_SPI 181 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 182 IRQ_TYPE_LEVEL_HIGH>;
-			};
-		};
-
 		/* ====== DW UART ====== */
 		/* uart0 not routed out on Thunder Carrier board
 		uart0@49008000 {
@@ -1007,25 +990,25 @@
 			status = I3C_STATUS;
 
 			/* I2C device. BNO055 */
-			bno055@28 {
+			/*bno055@28 {
 				compatible = "bno055";
 				reg = <0x28 0x0 0x100>;
-			};
-			arx3a0: camera-sensor@36 {
+			};*/
+			arx3a0@36 {
 				compatible = "onnn,arx3a0";
 				reg = <0x36 0x0 0x4000>;
-				pinctrl-names = "default";
-				pinctrl-0 = <&pinctrl_camera>;
 				clocks = <&ext_clk>;
 				clock-names = "extclk";
-				/*reset-gpios = <&gpio4 5 GPIO_ACTIVE_LOW> */
+				reset-gpio = <&port4 5 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
 				vaa-supply = <&reg_2p7v>;
 				vdd-supply = <&reg_1p2v>;
 				vdd_io-supply = <&reg_1p8v>;
-				port {
-					arx3a0_csi2_ep: endpoint {
-						remote-endpoint = <&mipi_csi2_in>;
+				port@0 {
+					arx3a0_csi2_ep: endpoint@0 {
+						bus-type = <4>;
+						clock-lanes = <0>;
 						data-lanes = <1 2>;
+						remote-endpoint = <&csi2_in>;
 					};
 				};
 			};
@@ -1377,41 +1360,65 @@
 			default-on;
 			status = "okay";
 		};
-		mipi_dphy_rx:  dphy@d00003040 {
+		cpi:  camera_ctrl@49030000 {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_camera>;
+			compatible = "alif,ensemble-cpi";
+			reg = <0x49030000 0x1000>;
+			interrupt-parent = <&gic>;
+			interrupts = <GIC_SPI 325 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&camera_pixclk>;
+			clocks-names = "camera_pixclk";
+			status = "ok";
+			port {
+				#address-cells = <1>;
+				#size-cells = <0>;
+				cpi_csi2_in: endpoint@0 {
+					reg = <0>;
+					remote-endpoint = <&csi2_out>;
+				};
+				/*cpi_parallel_in: endpoint {
+					//Parallel camera
+				};*/
+			};
+		};
+		mipi_dphy_rx:  dphy@49033040 {
 			compatible = "snps,dw-dphy-rx";
-			reg = <0xd0003040 0x20>;
+			reg = <0x49033040 0x40>;
 			#phy-cells = <1>;
 			bus-width = <12>;
 			clocks = <&syst_pclk>;
-			snps,dphy-frequency = <300000>;
+			snps,dphy-frequency = <400000000>;
 			snps,phy_type = <1>;
 		};
-
-		csi2:  mipi-csi2@49033000 {
+		csi2: csi2@49033000 {
+			compatible = "snps,dw-csi";
 			#address-cells = <1>;
 			#size-cells = <0>;
-			compatible = "snps,dw-csi";
 			reg = <0x49033000 0x1000>;
 			phys = <&mipi_dphy_rx 1>;
+			/*resets = <&dw_rst 1>;*/
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 324 IRQ_TYPE_LEVEL_HIGH>;
-			clocks = <&syst_pclk>;
-			clocks-names = "pclk";
-			status = "ok";
-			ports {
-				#address-cells = <1>;
-				#size-cells = <0>;
-				port@0 {
-					reg = <0>;
-					mipi_csi2_in: endpoint {
-						bus-type = <4>;
-						clock-lanes = <2>;
-						data-lanes = <1 2>;
-						lane-polarites = <1 1 1>;
-						remote-endpoint = <&arx3a0_csi2_ep>;
-					};
+
+			port@1 {
+				reg = <1>;
+				csi2_in: endpoint {
+					bus-type = <4>;
+					clock-lanes = <0>;
+					data-lanes = <2 1>;
+					remote-endpoint = <&arx3a0_csi2_ep>;
 				};
 			};
+			port@2 {
+				reg = <2>;
+				csi2_out: endpoint {
+					remote-endpoint = <&cpi_csi2_in>;
+				};
+			};
+
 		};
 	};
 	apb_e: apb@49040000{
@@ -1516,6 +1523,30 @@
 			//reset-names = "dma", "dma-ocp";
 		};
 	};
+	gpio4: gpio@70000000 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		compatible = "snps,dw-apb-gpio";
+		reg = <0x70000000 0x1000>;
+		status = GPIO_4_STATUS;
+
+			/* Port 4 */
+			port4: gpio-port@4 {
+				compatible = "snps,dw-apb-gpio-port";
+				gpio-controller;
+				#gpio-cells = <2>;
+				snps,nr-gpios = <8>;
+				reg = <0>;
+				interrupt-controller;
+				#interrupt-cells = <2>;
+				interrupt-parent = <&gic>;
+				interrupts = 	<GIC_SPI 175 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 176 IRQ_TYPE_LEVEL_HIGH>,
+						<GIC_SPI 177 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 178 IRQ_TYPE_LEVEL_HIGH>,
+						<GIC_SPI 179 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 180 IRQ_TYPE_LEVEL_HIGH>,
+						<GIC_SPI 181 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 182 IRQ_TYPE_LEVEL_HIGH>;
+			};
+		};
+
 
 	rtc: rtc@70010000 {
 		compatible = "alif,devkit-rtc";
@@ -1629,13 +1660,14 @@
 		pinmux = <
 			PIN_P2_1__I2S2_SDI_A	0x0
 			PIN_P2_3__I2S2_SCLK_A	0x0
-			PIN_P2_4__I2S2_WS_A	0x0
+	/*		PIN_P2_4__I2S2_WS_A	0x0*/
 		>;
 	};
 	pinctrl_uart2: uart2grp {
 		pinmux = <
 			PIN_P3_16__UART2_RX_B	0x0
 			PIN_P3_17__UART2_TX_B	0x0
+			PIN_P2_7__CAM_XVCLK_B   0x0
 		>;
 
 	};
@@ -1709,7 +1741,7 @@
 		>;
 	};
 	pinctrl_camera: camgrp {
-		pinmux = < PIN_P2_7__CAM_XVCLK_B   0x0 >;
+	/*	pinmux = < PIN_P2_7__CAM_XVCLK_B   0x0 >;*/
 		/* Below pinmux needed for parallel camera */
 		/* pinmux = <
 			PIN_P2_4__CAM_HSYNC_B   0x0
