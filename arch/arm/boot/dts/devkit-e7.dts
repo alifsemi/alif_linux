@@ -1666,7 +1666,7 @@
 		pinmux = <
 			PIN_P3_16__UART2_RX_B	0x0
 			PIN_P3_17__UART2_TX_B	0x0
-			PIN_P2_7__CAM_XVCLK_B   0x0
+	/*		PIN_P2_7__CAM_XVCLK_B   0x0 */
 		>;
 
 	};
