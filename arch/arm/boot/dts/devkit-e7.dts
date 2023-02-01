@@ -1276,7 +1276,7 @@
 
 		cdc200: cdc200@49031000 {
 			compatible = "tes,cdc-2.1";
-			reg = <0x49031000 0x100>;
+			reg = <0x49031000 0x1000>;
 			interrupt-parent = <&gic>;
 			status = CDC200_STATUS;
 			interrupts =	<0 313 IRQ_TYPE_LEVEL_HIGH>,
