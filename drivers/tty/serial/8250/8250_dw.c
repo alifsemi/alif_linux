@@ -393,8 +393,8 @@ static int dw8250_probe(struct platform_device *pdev)
 	int err;
 	u32 val;
 
-	void __iomem *regs_e = ioremap(0x71007408, 4);
-        writel(0x1, regs_e);
+	//void __iomem *regs_e = ioremap(0x71007408, 4);
+        //writel(0x1, regs_e);
 
 	if (!regs) {
 		dev_err(dev, "no registers defined\n");
