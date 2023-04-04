@@ -332,8 +332,8 @@
 			max-speed = <100>;
 			phy-mode = "rmii";
 			mac-address = [92 60 04 02 c3 e6];
-			//pinctrl-names = "default";
-			//pinctrl-0 = <&pinctrl_eth0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_eth0>;
 			status = ETH_STATUS;
 			mdio{
 				#address-cells = <0x1>;
@@ -349,8 +349,8 @@
 
 		sdhci@48102000 {
 			compatible = "snps,dwcmshc-sdhci";
-			//pinctrl-names = "default";
-			//pinctrl-0 = <&pinctrl_sdhci>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_sdhci>;
 			reg = <0x48102000 0x1000>;
 			interrupts = <GIC_SPI 27 IRQ_TYPE_LEVEL_HIGH>, <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&syst_hclk>, <&syst_hclk>;
@@ -409,8 +409,8 @@
 
 		spi3: spi@48106000 {
                        compatible = "snps,dwc-ssi-1.03a";
-                       //pinctrl-names = "default";
-                       //pinctrl-0 = <&pinctrl_spi3>;
+                       pinctrl-names = "default";
+                       pinctrl-0 = <&pinctrl_spi3>;
                        #address-cells = <1>;
                        #size-cells = <0>;
                        reg = <0x48106000 0x1000>;
@@ -881,6 +881,8 @@
 
 		uart1@49019000 {
 			compatible = "snps,dw-apb-uart";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_uart1>;
 			reg = <0x49019000 0x1000>;
 			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
@@ -893,8 +895,8 @@
 
 		uart2@4901A000 {
 			compatible = "snps,dw-apb-uart";
-			//pinctrl-names = "default";
-			//pinctrl-0 = <&pinctrl_uart2 &pinctrl_uart2_1>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_uart2>;
 			reg = <0x4901A000 0x1000>;
 			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
@@ -919,6 +921,8 @@
 
 		uart4@4901C000 {
 			compatible = "snps,dw-apb-uart";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_uart4>;
 			reg = <0x4901C000 0x1000>;
 			clocks = <&dwuartclk>, <&syst_pclk>;
 			clock-names = "baudclk", "apb_pclk";
@@ -979,7 +983,7 @@
 			i2c-sda-hold-time-ns = <300>;
 			i2c-sda-falling-time-ns = <300>;
 			i2c-scl-falling-time-ns = <300>;
-			status = I2C0_STATUS;
+			status = "disabled";
 		};
 
 		i2c1@49011000 {
@@ -995,7 +999,7 @@
 			i2c-sda-hold-time-ns = <300>;
 			i2c-sda-falling-time-ns = <300>;
 			i2c-scl-falling-time-ns = <300>;
-			status = I2C1_STATUS;
+			status = "disabled";
 		};
 
 		i2c2@49012000 {
@@ -1011,7 +1015,7 @@
 			i2c-sda-hold-time-ns = <300>;
 			i2c-sda-falling-time-ns = <300>;
 			i2c-scl-falling-time-ns = <300>;
-			status = I2C2_STATUS;
+			status = "disabled";
 		};
 
 		i2c3@49013000 {
@@ -1027,11 +1031,11 @@
 			i2c-sda-hold-time-ns = <300>;
 			i2c-sda-falling-time-ns = <300>;
 			i2c-scl-falling-time-ns = <300>;
-			status = I2C3_STATUS;
+			status = "disabled";
 		};
 
 		/* ====== DW I3C ====== */
-		/*i3c0: i3c@49018000 {
+		i3c0: i3c@49018000 {
 			compatible = "snps,dw-i3c-master-1.00a";
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_i3c0>;
@@ -1040,7 +1044,8 @@
 			clocks = <&syst_pclk>;
 			#address-cells = <3>;
 			#size-cells = <0>;
-			i2c-scl-hz = <100000>;*/
+			i2c-scl-hz = <100000>;
+			status = "disabled";
 
 			//clock-frequency = <100000>;
 			/* I2C device.*/
@@ -1049,13 +1054,11 @@
 				reg = <0x50 0x0 0x50>;
 			};
 		*/
-		//};
+		};
 
 		/*====== DW I2S ====== */
 		i2s0@49014000 {
 			compatible = "snps,designware-i2s";
-			//pinctrl-names = "default";
-			//pinctrl-0 = <&pinctrl_i2s0>;
 			reg = <0x49014000 0x1000>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "i2sclk";
@@ -1063,7 +1066,7 @@
 			interrupts = <GIC_SPI 130 IRQ_TYPE_LEVEL_HIGH>;
 			//dmas = <&dma0 5>;
 			//dma-names = "tx";
-			status = I2S0_STATUS;
+			status = "disabled";
 		};
 
 		i2s1@49015000 {
@@ -1075,7 +1078,7 @@
 			interrupts = <GIC_SPI 131 IRQ_TYPE_LEVEL_HIGH>;
 			//dmas = <&dma0 5>;
 			//dma-names = "tx";
-			status = I2S1_STATUS;
+			status = "disabled";
 		};
 
 		i2s2@49016000 {
@@ -1087,11 +1090,13 @@
 			interrupts = <GIC_SPI 132 IRQ_TYPE_LEVEL_HIGH>;
 			//dmas = <&dma0 5>;
 			//dma-names = "tx";
-			status = I2S2_STATUS;
+			status = "disabled";
 		};
 
 		i2s3@49017000 {
 			compatible = "snps,designware-i2s";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_i2s3>;
 			reg = <0x49017000 0x1000>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "i2sclk";
@@ -1099,6 +1104,7 @@
 			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
 			//dmas = <&dma0 5>;
 			//dma-names = "tx";
+			status = "disabled";
 		};
 	};
 
@@ -1432,5 +1438,86 @@
 		reg = <0x1A600000 0x00010000>;
 		ranges = <>;
 
+		pinmux: pinctrl@1A603000 {
+			compatible = "alif,pinctrl-devkit";
+			reg = 	<0x1A603000 0x00001000>,
+				<0x4902F000 0x00001000>;
+		};
+	};
+};
+
+
+&pinmux {
+	pinctrl_eth0: eth0grp {
+		pinmux = <
+			PIN_P11_3__ETH_RXD0_B		0x0
+			PIN_P11_4__ETH_RXD1_B		0x0
+			PIN_P11_5__ETH_CRS_DV_B		0x0
+			PIN_P1_2__ETH_RST_C		0x0
+			PIN_P10_4__ETH_TXD0_B		0x0
+			PIN_P10_5__ETH_TXD1_B		0x0
+			PIN_P10_6__ETH_TXEN_B		0x0
+			PIN_P1_6__ETH_IRQ_C		0x0
+			PIN_P11_0__ETH_REFCLK_B		0x0
+			PIN_P11_1__ETH_MDIO_B		0x0
+			PIN_P11_2__ETH_MDC_B		0x0
+		>;
+	};
+	/* UART0 is not routed out on Thunder carrier board
+	pinctrl_uart0: uart0grp {
+		pinmux = <
+			PIN_P1_4__UART0_RX_B	0x0
+			PIN_P1_5__UART0_TX_B	0x0
+		>;
+	}; */
+	pinctrl_uart1: uart1grp {
+		pinmux = <
+			PIN_P0_4__UART1_RX_A	0x0
+			PIN_P0_5__UART1_TX_A	0x0
+		>;
+	};
+	pinctrl_uart2: uart2grp {
+		pinmux = <
+			PIN_P1_0__UART2_RX_A	0x0
+			PIN_P1_1__UART2_TX_A	0x0
+		>;
+
+	};
+	pinctrl_uart4: uart4grp {
+		pinmux = <
+			PIN_P5_0__UART4_RX_C	0
+			PIN_P5_1__UART4_TX_C	0
+		>;
+	};
+	pinctrl_i2s3: i2s3grp { 
+		pinmux = <
+			PIN_P9_1__I2S3_SDO_B	0x0
+			PIN_P8_6__I2S3_SCLK_B	0x0
+			PIN_P8_7__I2S3_WS_B	0x0
+		>;
+	};
+	pinctrl_i3c0: i3c0grp {
+		pinmux = <
+			PIN_P7_6__I3C_SDA_D	0x0
+			PIN_P7_7__I3C_SCL_D	0x0
+		>;
+	};
+	pinctrl_spi3: spi3grp {
+		pinmux = <
+			PIN_P12_4__SPI3_MISO_A	0x0
+			PIN_P12_5__SPI3_MOSI_A	0x0
+			PIN_P12_6__SPI3_SCLK_A	0x0
+			PIN_P12_7__SPI3_SS0_A	0x0
+		>;
+	};
+	pinctrl_sdhci: sdhci0grp {
+		pinmux = <
+			PIN_P7_0__SD_CMD_A	0x0
+			PIN_P7_1__SD_CLK_A	0x0
+			PIN_P5_0__SD_D0_A	0x0
+			PIN_P5_1__SD_D1_A	0x0
+			PIN_P5_2__SD_D2_A	0x0
+			PIN_P5_3__SD_D3_A	0x0
+		>;
 	};
 };
