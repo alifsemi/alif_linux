@@ -497,7 +497,7 @@ static int ensemble_pinconf_set(struct pinctrl_dev *pctldev, unsigned pin_id,
 				val = 3;
 				break;
 			}
-			val = (val & ENSEMBLE_DSC_MASK) << ENSEMBLE_DSC_SHIFT;
+			val = ENSEMBLE_PINCONF_DRIVE_STRENGTH(val);
 			break;
 		default:
 			return -ENOTSUPP;
@@ -570,7 +570,7 @@ static int ensemble_pinconf_get(struct pinctrl_dev *pctldev,
 		arg = 1;
 		break;
 	case PIN_CONFIG_DRIVE_STRENGTH:
-		reg = (reg >> ENSEMBLE_DSC_SHIFT) & ENSEMBLE_DSC_MASK;
+		reg = (reg >> ENSEMBLE_ODS_SHIFT) & ENSEMBLE_ODS_MASK;
 		switch(reg){
 		case 0: /* 2mA */
 			arg = 2;
