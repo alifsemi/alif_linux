@@ -76,17 +76,25 @@
 #define	PIN_P0_6__GPIO			PINMUX_PIN(PIN_P0_6, 0)
 #define	PIN_P0_6__OSPI0_D6_A		PINMUX_PIN(PIN_P0_6, 1)
 #define	PIN_P0_6__UART1_CTS_A		PINMUX_PIN(PIN_P0_6, 2)
+/* FIXME: Devkit flatboard says P0_6 as ADC121_IN0 but
+B0_PinMux_Index says P0_6 as PDM_D1_A. So added
+PIN_P0_6__ADC121_IN0 entry */
 #define	PIN_P0_6__PDM_D1_A		PINMUX_PIN(PIN_P0_6, 3)
+#define	PIN_P0_6__ADC121_IN0		PINMUX_PIN(PIN_P0_6, 3)
 #define	PIN_P0_6__I2C2_SCL_A		PINMUX_PIN(PIN_P0_6, 4)
 #define	PIN_P0_6__UT3_T0_A		PINMUX_PIN(PIN_P0_6, 5)
 #define	PIN_P0_6__CAN_STBY_B		PINMUX_PIN(PIN_P0_6, 6)
-#define	PIN_P0_5__ANA_S6		PINMUX_PIN(PIN_P0_6, 7)
+#define	PIN_P0_6__ANA_S6		PINMUX_PIN(PIN_P0_6, 7)
 
 #define	PIN_P0_7			7
 #define	PIN_P0_7__GPIO			PINMUX_PIN(PIN_P0_7, 0)
 #define	PIN_P0_7__OSPI0_D7_A		PINMUX_PIN(PIN_P0_7, 1)
 #define	PIN_P0_7__UART1_RTS_A		PINMUX_PIN(PIN_P0_7, 2)
+/* FIXME: Devkit flatboard says P0_7 as ADC121_IN1 but
+B0_PinMux_Index says P0_6 as PDM_C1_A. So added
+PIN_P0_6__ADC121_IN1 entry */
 #define	PIN_P0_7__PDM_C1_A		PINMUX_PIN(PIN_P0_7, 3)
+#define	PIN_P0_7__ADC121_IN1		PINMUX_PIN(PIN_P0_7, 3)
 #define	PIN_P0_7__I2C2_SDA_A		PINMUX_PIN(PIN_P0_7, 4)
 #define	PIN_P0_7__UT3_T1_A		PINMUX_PIN(PIN_P0_7, 5)
 #define	PIN_P0_7__CDC_DE_B		PINMUX_PIN(PIN_P0_7, 6)
