@@ -76,7 +76,7 @@
 #define	PIN_P0_6__GPIO			PINMUX_PIN(PIN_P0_6, 0)
 #define	PIN_P0_6__OSPI0_D6_A		PINMUX_PIN(PIN_P0_6, 1)
 #define	PIN_P0_6__UART1_CTS_A		PINMUX_PIN(PIN_P0_6, 2)
-/* FIXME: Devkit flatboard says P0_6 as ADC121_IN0 but
+/* FIXME: Devkit flatboard schemantics says P0_6 as ADC121_IN0 but
 B0_PinMux_Index says P0_6 as PDM_D1_A. So added
 PIN_P0_6__ADC121_IN0 entry */
 #define	PIN_P0_6__PDM_D1_A		PINMUX_PIN(PIN_P0_6, 3)
@@ -90,7 +90,7 @@ PIN_P0_6__ADC121_IN0 entry */
 #define	PIN_P0_7__GPIO			PINMUX_PIN(PIN_P0_7, 0)
 #define	PIN_P0_7__OSPI0_D7_A		PINMUX_PIN(PIN_P0_7, 1)
 #define	PIN_P0_7__UART1_RTS_A		PINMUX_PIN(PIN_P0_7, 2)
-/* FIXME: Devkit flatboard says P0_7 as ADC121_IN1 but
+/* FIXME: Devkit flatboard schemantics says P0_7 as ADC121_IN1 but
 B0_PinMux_Index says P0_6 as PDM_C1_A. So added
 PIN_P0_6__ADC121_IN1 entry */
 #define	PIN_P0_7__PDM_C1_A		PINMUX_PIN(PIN_P0_7, 3)
@@ -444,6 +444,11 @@ PIN_P0_6__ADC121_IN1 entry */
 #define	PIN_P5_3__UT1_T1_B		PINMUX_PIN(PIN_P5_3, 5)
 #define	PIN_P5_3__SD_D3_A		PINMUX_PIN(PIN_P5_3, 6)
 #define	PIN_P5_3__CDC_PCLK_A		PINMUX_PIN(PIN_P5_3, 7)
+/* FIXME: Devkit flatboard schemantics says P5_3 as CDC_DE_A but
+B0_PinMux_Index says P5_3 as CDC_PCLK_A. So added
+PIN_P0_6__ADC121_IN0 entry */
+#define	PIN_P5_3__CDC_DE_A		PINMUX_PIN(PIN_P5_3, 7)
+
 
 #define	PIN_P5_4			44
 #define	PIN_P5_4__GPIO			PINMUX_PIN(PIN_P5_4, 0)
@@ -454,6 +459,10 @@ PIN_P0_6__ADC121_IN1 entry */
 #define	PIN_P5_4__UT2_T0_B		PINMUX_PIN(PIN_P5_4, 5)
 #define	PIN_P5_4__SD_D4_A		PINMUX_PIN(PIN_P5_4, 6)
 #define	PIN_P5_4__CDC_DE_A		PINMUX_PIN(PIN_P5_4, 7)
+/* FIXME: Devkit flatboard schemantics says P5_4 as CDC_PCLK_A but
+B0_PinMux_Index says P5_3 as CDC_DE_A. So added
+PIN_P0_6__ADC121_IN0 entry */
+#define PIN_P5_4__CDC_PCLK_A		PINMUX_PIN(PIN_P5_4, 7)
 
 #define	PIN_P5_5			45
 #define	PIN_P5_5__GPIO			PINMUX_PIN(PIN_P5_5, 0)
