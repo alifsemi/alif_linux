@@ -683,9 +683,9 @@
 			status = "disabled";
 
 			/* Port 1 */
-			port1: gpio-controller@0 {
+			port1: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -709,10 +709,10 @@
 			status = "disabled";
 
 			/* Port 2 */
-			port2: gpio-controller@0 {
+			port2: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
 				reg = <0>;
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				interrupt-controller;
@@ -735,9 +735,9 @@
 			status = "disabled";
 
 			/* Port 3 */
-			port3: gpio-controller@0 {
+			port3: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -761,9 +761,9 @@
 			status = "disabled";
 
 			/* Port 4 */
-			port4: gpio-controller@0 {
+			port4: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -787,9 +787,9 @@
 			status = "disabled";
 
 			/* Port 5 */
-			port5: gpio-controller@0 {
+			port5: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -813,9 +813,9 @@
 			status = "disabled";
 
 			/* Port 6 */
-			port6: gpio-controller@0 {
+			port6: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -839,9 +839,9 @@
 			status = "disabled";
 
 			/* Port 7 */
-			port7: gpio-controller@0 {
+			port7: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -865,9 +865,9 @@
 			status = "disabled";
 
 			/* Port 8 */
-			port8: gpio-controller@0 {
+			port8: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -891,9 +891,9 @@
 			status = "disabled";
 
 			/* Port 9 */
-			port9: gpio-controller@0 {
+			port9: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -917,9 +917,9 @@
 			status = "disabled";
 
 			/* Port 10 */
-			port10: gpio-controller@0 {
+			port10: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -943,9 +943,9 @@
 			status = "disabled";
 
 			/* Port 11 */
-			port11: gpio-controller@0 {
+			port11: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -969,9 +969,9 @@
 			status = "disabled";
 
 			/* Port 12 */
-			port12: gpio-controller@0 {
+			port12: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -995,9 +995,9 @@
 			status = "disabled";
 
 			/* Port 13 */
-			port13: gpio-controller@0 {
+			port13: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -1020,9 +1020,9 @@
 			status = "disabled";
 
 			/* Port 14 */
-			port14: gpio-controller@0 {
+			port14: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
@@ -1046,9 +1046,9 @@
 			status = "disabled";
 
 			/* Port 15 */
-			port15: gpio-controller@0 {
+			port15: gpio-port@0 {
 				compatible = "snps,dw-apb-gpio-port";
-				gpio-controller;
+				gpio-port;
 				#gpio-cells = <2>;
 				snps,nr-gpios = <8>;
 				reg = <0>;
