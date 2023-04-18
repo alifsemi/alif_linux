@@ -1915,7 +1915,7 @@
 			PIN_P7_3__I2C1_SCL_C	0x0
 		>;
 	};
-	pinctrl_i2s3: i2s3grp { 
+	pinctrl_i2s3: i2s3grp {
 		pinmux = <
 			PIN_P8_6__I2S3_SCLK_B	0x0
 			PIN_P8_7__I2S3_WS_B	0x0
