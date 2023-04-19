@@ -50,7 +50,7 @@
 
 #define MAX_CHANNELS            8
 
-#define MIN_PERIODS             (16)
+#define MIN_PERIODS             (4)
 #define MAX_PERIODS             (32)
 #define MIN_PERIOD_BYTES        (8 * sizeof(unsigned short))
 #define MAX_PERIOD_BYTES        (1000 * sizeof(unsigned short))
@@ -60,7 +60,7 @@ static unsigned short *circular_buffer = NULL;
 static unsigned short *temp_buffer = NULL;
 static unsigned int pcm_buffer_tail;
 static unsigned int pcm_buffer_head;
-static unsigned int pcm_buffer_num_sets;
+static unsigned int pcm_buffer_num_sets[MAX_CHANNELS] = {0};
 static spinlock_t buffer_lock;
 
 struct alif_pcm_dev {
@@ -113,7 +113,10 @@ static irqreturn_t alif_pcm_interrupt(int irq, void *dev_id)
 		}
 
 		pcm_buffer_tail = (pcm_buffer_tail+n_items) % BUFFER_SIZE;
-		pcm_buffer_num_sets += n_items;
+
+		for (k = 0; k < MAX_CHANNELS; k++) {
+			pcm_buffer_num_sets[k] += n_items;
+		}
 
 		spin_unlock_irqrestore(&buffer_lock, flags);
 
@@ -152,8 +155,8 @@ int get_pcm_data_copy(int channel, char __user *buf, int count, unsigned int pos
 
 	spin_lock(&buffer_lock);
 
-	if(count > pcm_buffer_num_sets) {
-		count = pcm_buffer_num_sets;
+	if(count > pcm_buffer_num_sets[channel]) {
+		count = pcm_buffer_num_sets[channel];
 	}
 
 	index = (channel * BUFFER_SIZE);
@@ -179,7 +182,7 @@ int get_pcm_data_copy(int channel, char __user *buf, int count, unsigned int pos
 	}
 
 	pcm_buffer_head = (pcm_buffer_head + count) % BUFFER_SIZE;
-	pcm_buffer_num_sets -= count;
+	pcm_buffer_num_sets[channel] -= count;
 
 out:
 	spin_unlock(&buffer_lock);
@@ -458,7 +461,6 @@ int setup_buffer(struct alif_pcm_dev *dev)
 
 	pcm_buffer_tail = 0;
 	pcm_buffer_head = 0;
-	pcm_buffer_num_sets = 0;
 	spin_lock_init(&buffer_lock);
 
 	return 0;
@@ -486,6 +488,7 @@ static void enable_interrupts(struct alif_pcm_dev *dev)
 
 static int alif_pcm_trigger(struct snd_pcm_substream *substream, int cmd, struct snd_soc_dai *dai)
 {
+	unsigned int channel;
 	struct alif_pcm_dev *dev = snd_soc_dai_get_drvdata(dai);
 
 	switch(cmd) {
@@ -494,7 +497,9 @@ static int alif_pcm_trigger(struct snd_pcm_substream *substream, int cmd, struct
 		/* Enable channels */
 		pcm_buffer_tail = 0;
 		pcm_buffer_head = 0;
-		pcm_buffer_num_sets = 0;
+		for (channel = 0; channel < MAX_CHANNELS; channel++) {
+			pcm_buffer_num_sets[channel] = 0;
+		}
 		record_data = 1;
 
 		/* Enable interrupts */
