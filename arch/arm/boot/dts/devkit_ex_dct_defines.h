@@ -108,3 +108,6 @@
 
 //CDC200 Defines
 #define CDC200_STATUS "disabled"
+
+//PCM Defines
+#define PCM_STATUS "disabled"

@@ -1350,11 +1350,14 @@
 
 		pcm: pcm@4902D000 {
 			compatible = "alif,alif-pcm";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_pcm0>;
 			reg = <0x4902D000 0x800>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "pclk";
 			interrupt-parent = <&gic>;
 			interrupts = <0 134 IRQ_TYPE_LEVEL_HIGH>;
+			status = PCM_STATUS;
 		};
 
 		pcmcard: pcmcard@4902D800 {
@@ -1965,6 +1968,13 @@
 			PIN_P7_1__SD_CLK_A	0x0
 		>;
 	};
+	pinctrl_pcm0: pcm0grp {
+		pinmux = <
+			PIN_P6_7__PDM_C2_A	0x0
+			PIN_P5_4__PDM_D2_B	0x0
+		>;
+	};
+
 	pinctrl_cdc200_0: cdc200_0grp {
 		pinmux = <
 			PIN_P5_3__CDC_DE_A	0x0
