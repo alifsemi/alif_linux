@@ -32,31 +32,21 @@
 #include <sound/simple_card.h>
 
 
-#define ALIF_PCM_CONFIG_REGISTER     0x0000
-#define ALIF_PCM_CTL_REGISTER        0x0004
-#define ALIF_PCM_THRESHOLD_REGISTER  0x0008
-#define ALIF_PCM_STATUS_REGISTER     0x000C
-#define ALIF_PCM_INTERRUPT_REGISTER  0x001C
-#define ALIF_PCM_DATA_REGISTER       0x0020
+#define PCM_CONFIG_REGISTER          0x0000
+#define PCM_CTL_REGISTER             0x0004
+#define PCM_THRESHOLD_REGISTER       0x0008
+#define PCM_STATUS_REGISTER          0x000C
+#define PCM_INTERRUPT_REGISTER       0x001C
+#define PCM_DATA_REGISTER            0x0020
 #define BUFFER_SIZE                  (4000)
-//for debugging purposes
+/* for debugging purposes */
 #define TEMP_BUFFER_SIZE             (100000)
+
+/* position of the Bypass IIR filter in CTL register */
+#define BYPASS_IIR_FILTER       2
 
 #define ALIF_PCM_RATES          SNDRV_PCM_RATE_8000_192000
 #define ALIF_PCM_FORMATS        (SNDRV_PCM_FMTBIT_S16_LE)
-
-#define PINMUX_ADDR                  0X1A603000
-#define CFGMASTER_ADDR               0x4902F000
-
-#define PINMUX_CLOCK0_OFFSET    0x64
-#define PINMUX_CLOCK1_OFFSET    0x6C
-#define PINMUX_CLOCK2_OFFSET    0x170
-#define PINMUX_CLOCK3_OFFSET    0x174
-
-#define PINMUX_DATA0_OFFSET     0x60
-#define PINMUX_DATA1_OFFSET     0x68
-#define PINMUX_DATA2_OFFSET     0xb0
-#define PINMUX_DATA3_OFFSET     0xb4
 
 #define MAX_CHANNELS            8
 
@@ -66,12 +56,12 @@
 #define MAX_PERIOD_BYTES        (1000 * sizeof(unsigned short))
 #define MAX_BUFFER_BYTES        (BUFFER_SIZE * MAX_CHANNELS * sizeof(unsigned short))
 
-unsigned short *circular_buffer = NULL;
-unsigned short *temp_buffer = NULL;
-unsigned int pcm_buffer_tail;
-unsigned int pcm_buffer_head;
-unsigned int pcm_buffer_num_sets;
-spinlock_t buffer_lock;
+static unsigned short *circular_buffer = NULL;
+static unsigned short *temp_buffer = NULL;
+static unsigned int pcm_buffer_tail;
+static unsigned int pcm_buffer_head;
+static unsigned int pcm_buffer_num_sets;
+static spinlock_t buffer_lock;
 
 struct alif_pcm_dev {
 	struct device	*dev;
@@ -80,14 +70,13 @@ struct alif_pcm_dev {
 	int             channel;
 };
 
-int pcm_intr_status;
+static int pcm_intr_status;
 
-int record_data = 0;
+static int record_data = 0;
+static struct snd_pcm_substream *substreamp;
 
-struct snd_pcm_substream *substreamp;
-
-static int alif_pcm_dai_probe(struct snd_soc_dai *dai);
-static int alif_pcm_dai_open(struct snd_soc_component *component, struct snd_pcm_substream *ss);
+static int pcm_dai_probe(struct snd_soc_dai *dai);
+static int pcm_dai_open(struct snd_soc_component *component, struct snd_pcm_substream *ss);
 
 static irqreturn_t alif_pcm_interrupt(int irq, void *dev_id)
 {
@@ -98,24 +87,24 @@ static irqreturn_t alif_pcm_interrupt(int irq, void *dev_id)
 	unsigned int tmp;
 	unsigned int index;
 	u32 result;
+	unsigned long flags;
 
-	pcm_intr_status = readl_relaxed(dev->mem + ALIF_PCM_STATUS_REGISTER + 8);
-
-	n_items = readl_relaxed(dev->mem + ALIF_PCM_STATUS_REGISTER);
+	pcm_intr_status = readl_relaxed(dev->mem + PCM_STATUS_REGISTER + 8);
+	n_items = readl_relaxed(dev->mem + PCM_STATUS_REGISTER);
 
 	if(record_data) {
 
-		spin_lock(&buffer_lock);
+		spin_lock_irqsave(&buffer_lock, flags);
 
-		for(i=0; i<n_items; i++) {
+		for(i = 0; i < n_items; i++) {
 
 			/* read all four data registers
 			 * They make one item.
 			 */
 
-			for(k=0; k<MAX_CHANNELS/2; k++) {
+			for(k = 0; k < MAX_CHANNELS/2; k++) {
 				index = (k * 2 * BUFFER_SIZE) + pcm_buffer_tail + i;
-				result = readl_relaxed(dev->mem + ALIF_PCM_DATA_REGISTER + (k*sizeof(u32)));
+				result = readl_relaxed(dev->mem + PCM_DATA_REGISTER + (k*sizeof(u32)));
 
 				circular_buffer[index] = result & 0x0000FFFF;
 				circular_buffer[index + BUFFER_SIZE] = (result & 0xFFFF0000) >> 16;
@@ -125,19 +114,19 @@ static irqreturn_t alif_pcm_interrupt(int irq, void *dev_id)
 
 		pcm_buffer_tail = (pcm_buffer_tail+n_items) % BUFFER_SIZE;
 		pcm_buffer_num_sets += n_items;
-		spin_unlock(&buffer_lock);
 
+		spin_unlock_irqrestore(&buffer_lock, flags);
+
+		if(substreamp)
+			snd_pcm_period_elapsed(substreamp);
 	} else {
 		/* clear the fifo */
-		for(i=0; i<n_items; i++) {
-			for(k=0; k<4; k++) {
-				tmp = readl_relaxed(dev->mem + ALIF_PCM_DATA_REGISTER + (k*sizeof(u32)));
+		for(i = 0; i < n_items; i++) {
+			for(k = 0; k < 4; k++) {
+				tmp = readl_relaxed(dev->mem + PCM_DATA_REGISTER + (k*sizeof(u32)));
 			}
 		}
 	}
-
-	if(substreamp)
-		snd_pcm_period_elapsed(substreamp);
 
 	return ret;
 }
@@ -149,44 +138,40 @@ int get_pcm_data_copy(int channel, char __user *buf, int count, unsigned int pos
 	int rc = 0;
 	unsigned int index;
 
+	if(count < 0) {
+		printk("get_pcm_data_copy: count %d\n", count);
+		rc = -EINVAL;
+		goto outerr;
+	}
+
+	if(pos >= BUFFER_SIZE) {
+		printk("get_pcm_data_copy: pos greater than buffer size: %d %d\n", pos, BUFFER_SIZE);
+		rc = -EINVAL;
+		goto outerr;
+	}
+
 	spin_lock(&buffer_lock);
 
 	if(count > pcm_buffer_num_sets) {
 		count = pcm_buffer_num_sets;
 	}
 
-	if(count < 0) {
-		printk("get_pcm_data_copy: count %d\n", count);
-		rc = -EINVAL;
-		goto out;
-	}
-
-	if(pos >= BUFFER_SIZE) {
-		printk("get_pcm_data_copy: pos greater than buffer size: %d %d\n", pos, BUFFER_SIZE);
-		rc = -EINVAL;
-		goto out;
-	}
-
 	index = (channel * BUFFER_SIZE);
 
 	if(pos + count <= BUFFER_SIZE) {
-
 		rc = copy_to_user(buf, circular_buffer + index + pos, count * sizeof(unsigned short));
 		if(rc) {
 			printk("copy_to_user error\n");
 			goto out;
 		}
-
 	} else {
 		first_n = BUFFER_SIZE - pos;
 		remaining = count - first_n;
 
 		rc = copy_to_user(buf, circular_buffer + index + pos, first_n * sizeof(unsigned short));
-
 		if (rc == 0) {
 			rc = copy_to_user(buf + first_n * sizeof(unsigned short), circular_buffer + index, remaining * sizeof(unsigned short));
 		}
-
 		if(rc) {
 			printk("get_pcm_data_copy: copy_to_user error\n");
 			goto out;
@@ -195,9 +180,11 @@ int get_pcm_data_copy(int channel, char __user *buf, int count, unsigned int pos
 
 	pcm_buffer_head = (pcm_buffer_head + count) % BUFFER_SIZE;
 	pcm_buffer_num_sets -= count;
+
 out:
 	spin_unlock(&buffer_lock);
 
+outerr:
 	if(rc < 0)
 		return rc;
 	else
@@ -209,9 +196,7 @@ static snd_pcm_uframes_t get_pcm_data_pointer(void)
 	snd_pcm_uframes_t pointer;
 
 	spin_lock(&buffer_lock);
-
 	pointer = pcm_buffer_tail;
-
 	spin_unlock(&buffer_lock);
 
 	return pointer;
@@ -221,13 +206,14 @@ static void pcm_setup(struct alif_pcm_dev *dev)
 {
 
 	/*
-	 * Set the values for each channel basaed on the simulation testing
+	 * Set the coefficient values for each channels. The values are
+	 * based on simiulation testing.
 	 */
 
 	/* Channel 0 */
 	writel_relaxed(0x00000000, dev->mem+0x040);
 	writel_relaxed(0x000007FF, dev->mem+0x044);
-	writel_relaxed(0x00000000,  dev->mem+0x048);
+	writel_relaxed(0x00000000, dev->mem+0x048);
 	writel_relaxed(0x00000004, dev->mem+0x04c);
 	writel_relaxed(0x00000004, dev->mem+0x050);
 	writel_relaxed(0x000007FC, dev->mem+0x054);
@@ -430,14 +416,23 @@ static void pcm_setup(struct alif_pcm_dev *dev)
 
 static void setup_config(struct alif_pcm_dev *dev)
 {
-	/* Configuration register setting */
-	writel_relaxed(0x500ff, dev->mem + ALIF_PCM_CONFIG_REGISTER);
+	/*
+	 * Configuration register setting
+	 * Set the pdm mode as 0x5 and enable all 8 channels
+	 */
+	writel_relaxed(0x500FF, dev->mem + PCM_CONFIG_REGISTER);
 
-	/* Control register setting */
-	writel_relaxed(0x4, dev->mem + ALIF_PCM_CTL_REGISTER);
+	/*
+	 * Control register setting
+	 * Bypass the IIR filter
+	 */
+	writel_relaxed(0x1 << BYPASS_IIR_FILTER, dev->mem + PCM_CTL_REGISTER);
 
-	/* set the threshold for interrupt */
-	writel_relaxed(7, dev->mem + ALIF_PCM_THRESHOLD_REGISTER);
+	/* set the threshold for interrupt
+	 * Interrupt will be generated once this threshold is reached
+	 * in the fifo
+	 */
+	writel_relaxed(0x7, dev->mem + PCM_THRESHOLD_REGISTER);
 
 	pcm_setup(dev);
 }
@@ -459,14 +454,11 @@ int setup_buffer(struct alif_pcm_dev *dev)
 		return -ENOMEM;
 	}
 
-	printk(KERN_DEBUG "temp buffer: %ls\n", temp_buffer);
+	printk(KERN_DEBUG "temp buffer: %x\n", (unsigned int) temp_buffer);
 
 	pcm_buffer_tail = 0;
-
 	pcm_buffer_head = 0;
-
 	pcm_buffer_num_sets = 0;
-
 	spin_lock_init(&buffer_lock);
 
 	return 0;
@@ -474,18 +466,20 @@ int setup_buffer(struct alif_pcm_dev *dev)
 
 static void disable_interrupts(struct alif_pcm_dev *dev)
 {
-	u32 value = 0x0;
-
-	writel_relaxed(value, dev->mem + ALIF_PCM_INTERRUPT_REGISTER);
+	/*
+	 * Disable interrupts for all channels
+	 */
+	writel_relaxed(0x0, dev->mem + PCM_INTERRUPT_REGISTER);
 
 	return;
 }
 
 static void enable_interrupts(struct alif_pcm_dev *dev)
 {
-	u32 value = 0xff03;
-
-	writel_relaxed(value, dev->mem + ALIF_PCM_INTERRUPT_REGISTER);
+	/*
+	 * Enable interrupts for all channels
+	 */
+	writel_relaxed(0xFF03, dev->mem + PCM_INTERRUPT_REGISTER);
 
 	return;
 }
@@ -533,7 +527,7 @@ static const struct snd_soc_dai_ops alif_pcm_dai_ops = {
 };
 
 static struct snd_soc_dai_driver alif_pcm_dai = {
-	.probe = alif_pcm_dai_probe,
+	.probe = pcm_dai_probe,
 	.capture = {
 		.stream_name = "alif-pcm",
 		.channels_min = 1,
@@ -556,12 +550,12 @@ static struct snd_pcm_hardware params_capture = {
 	.formats = SNDRV_PCM_FMTBIT_S16_LE,
 };
 
-static int alif_pcm_dai_probe(struct snd_soc_dai *dai)
+static int pcm_dai_probe(struct snd_soc_dai *dai)
 {
 	return 0;
 }
 
-static int alif_component_copy_user(struct snd_soc_component *component,
+static int component_copy_user(struct snd_soc_component *component,
 				    struct snd_pcm_substream *ss,
 				    int channel,
 				    unsigned long pos,
@@ -577,7 +571,7 @@ static int alif_component_copy_user(struct snd_soc_component *component,
 	return get_pcm_data_copy(channel, buf, count, elem);
 }
 
-static snd_pcm_uframes_t alif_component_pointer(struct snd_soc_component * component, struct snd_pcm_substream *ss)
+static snd_pcm_uframes_t component_get_pointer(struct snd_soc_component * component, struct snd_pcm_substream *ss)
 {
 	unsigned int p;
 
@@ -586,7 +580,7 @@ static snd_pcm_uframes_t alif_component_pointer(struct snd_soc_component * compo
 	return (snd_pcm_uframes_t) (p);
 }
 
-static int alif_pcm_dai_open(struct snd_soc_component *component, struct snd_pcm_substream *ss)
+static int pcm_dai_open(struct snd_soc_component *component, struct snd_pcm_substream *ss)
 {
 	struct snd_pcm_runtime *runtime = ss->runtime;
 
@@ -598,9 +592,9 @@ static int alif_pcm_dai_open(struct snd_soc_component *component, struct snd_pcm
 
 static const struct snd_soc_component_driver alif_pcm_component = {
 	.name = "alif-pcm",
-	.open = alif_pcm_dai_open,
-	.copy_user = alif_component_copy_user,
-	.pointer = alif_component_pointer,
+	.open = pcm_dai_open,
+	.copy_user = component_copy_user,
+	.pointer = component_get_pointer,
 };
 
 static int alif_pcm_probe(struct platform_device *pdev)
@@ -635,8 +629,10 @@ static int alif_pcm_probe(struct platform_device *pdev)
 		return irq;
 	}
 
+	dev_set_name(&pdev->dev, "%s", "alifpcm");
+
 	err = devm_request_irq(&pdev->dev, irq, alif_pcm_interrupt, 0,
-			       pdev->name, dev);
+			       dev_name(&pdev->dev), dev);
 	if (err) {
 		dev_err(&pdev->dev, "alif_pcm: request irq returned: %d\n", err);
 		return err;
@@ -660,8 +656,6 @@ static int alif_pcm_probe(struct platform_device *pdev)
 			"failed to enable the peripheral clock: %d\n", err);
 		return err;
 	}
-
-	dev_set_name(&pdev->dev, "%s", "alifpcm");
 
 	err = devm_snd_soc_register_component(&pdev->dev,
 					      &alif_pcm_component,
