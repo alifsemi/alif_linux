@@ -1348,6 +1348,19 @@
 		reg = <0x49020000 0x00010000>;
 		ranges = <>;
 
+		pcm: pcm@4902D000 {
+			compatible = "alif,alif-pcm";
+			reg = <0x4902D000 0x800>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "pclk";
+			interrupt-parent = <&gic>;
+			interrupts = <0 134 IRQ_TYPE_LEVEL_HIGH>;
+		};
+
+		pcmcard: pcmcard@4902D800 {
+			compatible = "alif,alif-pcm-card";
+			clocks = <&syst_pclk 0>;
+		};
 		hwsem0: hwsem0@4902E000 {
 			compatible = "alif,hwsem";
 			reg = <0x4902E000 0x4>;
