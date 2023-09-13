@@ -65,28 +65,28 @@
 			/* A32 800Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <800000000>;
 			clock-output-names = "apss_clk";
 		};
 		syst_aclk: axi_clk {
 			/* 400Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <400000000>;
 			clock-output-names = "axi_clk";
 		};
 		syst_hclk: ahb_clk {
 			/* 200Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <200000000>;
 			clock-output-names = "ahb_clk";
 		};
 		syst_pclk: apb_pclk {
 			/* 100Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <100000000>;
 			clock-output-names = "apb_pclk";
 		};
 
@@ -94,7 +94,7 @@
 			/* 20MHz clock */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <10000000>;
+			clock-frequency = <20000000>;
 			clock-output-names = "usb_clk";
 		};
 
@@ -102,14 +102,14 @@
 			/* 50MHz clock */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <50000000>;
 			clock-output-names = "eth_clk";
 		};
 		rtss_hp_clk {
 			/* 400Mhz / 300Mhz / 150Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <400000000>;
 			clock-output-names = "rtss_hp_clk";
 		};
 
@@ -117,7 +117,7 @@
 			/* 160Mhz / 120Mhz / 38.4Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <160000000>;
 			clock-output-names = "rtss_he_clk";
 		};
 		rtc_clk: rtc_clk {
@@ -131,28 +131,28 @@
 			/* Max 80Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <80000000>;
 			clock-output-names = "canfd_clk";
 		};
 		i2s_clk: i2s_sclk {
 			/* Max 80Mhz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <80000000>;
 			clock-output-names = "i2s_sclk";
 		};
 		uartclk: uartclk {
 			/* uart clock - 10MHz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <10000000>;
 			clock-output-names = "uartclk";
 		};
 		dwuartclk: dwuartclk {
 			/* clock - 100MHz */
 			compatible = "fixed-clock";
 			#clock-cells = <0>;
-			clock-frequency = <20000000>;
+			clock-frequency = <100000000>;
 			clock-output-names = "baudclk";
 		};
 	};
@@ -192,7 +192,7 @@
 	refclk: refclk@1a220000 {
 		compatible = "arm,armv7-timer-mem";
 		reg = <0x1a220000  0x1000>;
-		clock-frequency = <20000000>;
+		clock-frequency = <100000000>;
 		#address-cells = <1>;
 		#size-cells = <1>;
 		ranges;
@@ -1485,8 +1485,8 @@
 	};
 	pinctrl_uart4: uart4grp {
 		pinmux = <
-			PIN_P5_0__UART4_RX_C	0
-			PIN_P5_1__UART4_TX_C	0
+			PIN_P12_1__UART4_RX_B	0x0
+			PIN_P12_2__UART4_TX_B	0x0
 		>;
 	};
 	pinctrl_i2s3: i2s3grp { 
