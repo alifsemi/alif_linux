@@ -39,9 +39,9 @@
 //UART defines
 #define UART0_STATUS "disabled"
 #define UART1_STATUS "disabled"
-#define UART2_STATUS "disabled"
+#define UART2_STATUS "okay"
 #define UART3_STATUS "disabled"
-#define UART4_STATUS "okay"
+#define UART4_STATUS "disabled"
 #define UART5_STATUS "disabled"
 #define UART6_STATUS "disabled"
 #define UART7_STATUS "disabled"

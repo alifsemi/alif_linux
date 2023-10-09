@@ -1847,6 +1847,36 @@
 
 
 &pinmux {
+	/* syntax:
+	pinctrl_name: namegrp {
+		pinmux = <
+			PIN_NAME			<8bit pad-config value>
+			8bit pad-config values:
+			bit 0:	0 -> Read disable,
+				1 -> Read enable
+			bit 1:	0 -> Schmitt trigger disable
+				1 -> Schmitt trigger enable
+			bit 2:	0 -> Slew rate slow
+				1 -> Slew rate fast
+			bit 3 and 4:
+				00 -> High Impedance
+				01 -> Pull up
+				10 -> Pull down
+				11 -> Bus repeater
+			bit 5 and 6: Output drive strength
+				00 -> 2mA
+				01 -> 4mA
+				10 -> 8mA
+				11 -> 12mA
+			bit 7:	0 -> Push-pull
+				1 -> Open drain
+
+			Example: The below two lines set Read enable, schmitt
+			trigger,slow slew rate, High Impedance, output drive
+			strength of 4mA, and push-pull driver.
+			PIN_P1_0__UART2_RX_A		0x23
+			PIN_P1_1__UART2_TX_A		0x23
+	*/
 	pinctrl_eth0: eth0grp {
 		pinmux = <
 			PIN_P11_2__ETH_MDC_B		0x0
@@ -1877,8 +1907,8 @@
 	};*/
 	pinctrl_uart2: uart2grp {
 		pinmux = <
-			PIN_P1_0__UART2_RX_A	0x0
-			PIN_P1_1__UART2_TX_A	0x0
+			PIN_P1_0__UART2_RX_A	0x23
+			PIN_P1_1__UART2_TX_A	0x23
 		>;
 
 	};
@@ -1891,8 +1921,8 @@
 	};*/
 	pinctrl_uart4: uart4grp {
 		pinmux = <
-			PIN_P12_1__UART4_RX_B	0
-			PIN_P12_2__UART4_TX_B	0
+			PIN_P12_1__UART4_RX_B	0x23
+			PIN_P12_2__UART4_TX_B	0x23
 		>;
 	};
 
