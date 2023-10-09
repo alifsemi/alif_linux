@@ -1,23 +1,20 @@
 # SPDX-License-Identifier: GPL-2.0-only
 menuconfig ARCH_ENSEMBLE
 	bool "Alif Devkit-Ex SoCs"
-	depends on ARM_SINGLE_ARMV7A
-	select GPIOLIB
+	select ARCH_SPARSEMEM_ENABLE
+	select NEED_MACH_MEMORY_H
+	select HIGHMEM
 	select PINCTRL
 	select PINCTRL_DEVKIT
-	#select SOC_BUS
+	select GPIOLIB
 	select ARM_AMBA
 	select ARM_GIC
 	select ARM_GLOBAL_TIMER
-	select HAVE_ARM_SCU if SMP
-	select HAVE_ARM_TWD if SMP
 	select HAVE_PATA_PLATFORM
 	select ICST
 	select NO_IOPORT_MAP
 	select POWER_RESET
 	select POWER_SUPPLY
-	select REGULATOR if MMC_ARMMMCI
-	select REGULATOR_FIXED_VOLTAGE if REGULATOR
 	help
 	  This option enables support for tiny linux based systems using Cortex
 	  processor based ARM core and logic (FPGA) tiles on the Versatile
@@ -26,8 +23,6 @@ menuconfig ARCH_ENSEMBLE
 if ARCH_ENSEMBLE
 config SOC_ENSEMBLE
 	bool "Alif Devkit-Ex"
-	#select COMMON_CLK_AT91
-	#select PINCTRL_AT91
 	help
 	  Select this if you are using an SoC from Alif Bolt
 

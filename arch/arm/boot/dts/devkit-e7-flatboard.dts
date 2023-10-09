@@ -16,7 +16,7 @@
 
 / {
 	model = "devkit-e7";
-	compatible = "arm,Devkit-E7";
+	compatible = "alif,ensemble";
 	interrupt-parent = <&gic>;
 	#address-cells = <1>;
 	#size-cells = <1>;
