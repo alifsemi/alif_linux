@@ -84,7 +84,6 @@ static bool mhuv2_last_tx_done(struct mbox_chan *chan)
 
 static int mhuv2_send_data(struct mbox_chan *chan, void *data)
 {
-	struct mhuv2_link *mlink = chan->con_priv;
 	u32 *arg = data;
 	struct arm_mhuv2 *mhuv2 = mbox_to_arm_mhuv2(chan->mbox);
 	unsigned int i, pchans;
