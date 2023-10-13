@@ -541,7 +541,6 @@
 				phy2: phy@0{
 					compatible = "ethernet-phy-ieee802.3-c22";
 					device_type = "ethernet-phy";
-					micrel,led-mode = <1>;
 					reg = <0x1>;
 				};
 			};
@@ -1879,17 +1878,17 @@
 	*/
 	pinctrl_eth0: eth0grp {
 		pinmux = <
-			PIN_P11_2__ETH_MDC_B		0x0
-			PIN_P11_1__ETH_MDIO_B		0x0
-			PIN_P11_3__ETH_RXD0_B		0x0
-			PIN_P11_4__ETH_RXD1_B		0x0
-			PIN_P11_5__ETH_CRS_DV_B		0x0
-			PIN_P11_7__ETH_IRQ_B		0x0
-			PIN_P6_0__ETH_TXD0_A		0x0
-			PIN_P10_5__ETH_TXD1_B		0x0
-			PIN_P10_6__ETH_TXEN_B		0x0
-			PIN_P11_0__ETH_REFCLK_B		0x0
-			PIN_P11_6__ETH_RST_B		0x0
+			PIN_P11_2__ETH_MDC_B		0x23
+			PIN_P11_1__ETH_MDIO_B		0x23
+			PIN_P11_3__ETH_RXD0_B		0x23
+			PIN_P11_4__ETH_RXD1_B		0x23
+			PIN_P11_5__ETH_CRS_DV_B		0x23
+			PIN_P11_7__ETH_IRQ_B		0x23
+			PIN_P6_0__ETH_TXD0_A		0x23
+			PIN_P10_5__ETH_TXD1_B		0x23
+			PIN_P10_6__ETH_TXEN_B		0x23
+			PIN_P11_0__ETH_REFCLK_B		0x23
+			PIN_P11_6__ETH_RST_B		0x23
 		>;
 	};
 	pinctrl_uart0: uart0grp {
