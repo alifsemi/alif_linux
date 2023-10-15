@@ -15,6 +15,7 @@
 struct bme680_spi_bus_context {
 	struct spi_device *spi;
 	u8 current_page;
+	struct gpio_desc        *chipsel;
 };
 
 /*
@@ -33,6 +34,9 @@ static int bme680_regmap_spi_select_page(
 	if (page == ctx->current_page)
 		return 0;
 
+	/* CE Low  */
+	gpiod_set_value(ctx->chipsel, 0);
+
 	/*
 	 * Data sheet claims we're only allowed to change bit 4, so we must do
 	 * a read-modify-write on each and every page select
@@ -44,17 +48,26 @@ static int bme680_regmap_spi_select_page(
 		return ret;
 	}
 
+	/* CE high  */
+	gpiod_set_value(ctx->chipsel, 1);
+
 	buf[0] = BME680_REG_STATUS;
 	if (page)
 		buf[1] |= BME680_SPI_MEM_PAGE_BIT;
 	else
 		buf[1] &= ~BME680_SPI_MEM_PAGE_BIT;
 
+	/* CE Low  */
+	gpiod_set_value(ctx->chipsel, 0);
+
 	ret = spi_write(spi, buf, 2);
 	if (ret < 0) {
 		dev_err(&spi->dev, "failed to set page %u\n", page);
 		return ret;
 	}
+
+	/* CE high  */
+	gpiod_set_value(ctx->chipsel, 1);
 
 	ctx->current_page = page;
 
@@ -81,7 +94,15 @@ static int bme680_regmap_spi_write(void *context, const void *data,
 	 */
 	buf[0] &= ~0x80;
 
-	return spi_write(spi, buf, 2);
+	/* CE Low  */
+	gpiod_set_value(ctx->chipsel, 0);
+
+	ret = spi_write(spi, buf, 2);
+
+	/* CE high  */
+	gpiod_set_value(ctx->chipsel, 1);
+
+	return ret;
 }
 
 static int bme680_regmap_spi_read(void *context, const void *reg,
@@ -98,7 +119,15 @@ static int bme680_regmap_spi_read(void *context, const void *reg,
 
 	addr |= 0x80; /* bit7 = RW = '1' */
 
-	return spi_write_then_read(spi, &addr, 1, val, val_size);
+	/* CE Low  */
+	gpiod_set_value(ctx->chipsel, 0);
+
+	ret = spi_write_then_read(spi, &addr, 1, val, val_size);
+
+	/* CE high  */
+	gpiod_set_value(ctx->chipsel, 1);
+
+	return ret;
 }
 
 static struct regmap_bus bme680_regmap_bus = {
@@ -125,6 +154,11 @@ static int bme680_spi_probe(struct spi_device *spi)
 	bus_context = devm_kzalloc(&spi->dev, sizeof(*bus_context), GFP_KERNEL);
 	if (!bus_context)
 		return -ENOMEM;
+
+	bus_context->chipsel = devm_gpiod_get(&spi->dev, "chipsel", GPIOD_OUT_HIGH);
+	if (IS_ERR(bus_context->chipsel)) {
+		dev_err(&spi->dev, "Couldn't get our chipsel GPIO\n");
+	}
 
 	bus_context->spi = spi;
 	bus_context->current_page = 0xff; /* Undefined on warm boot */

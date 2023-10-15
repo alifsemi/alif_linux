@@ -621,12 +621,14 @@
                        spi-tx-bus-width = <1>;
                        spi-rx-bus-width = <1>;
                        status = SPI3_STATUS;
-                       ds1722@0 {
-                               compatible="ds,ds1722";
-                               reg = <0>;
-                               spi-max-frequency= <5000000>;
-                               spi-cs-high;
-                       };
+		       spi-max-frequency= <1000000>;
+			bme680@0 {
+				compatible = "bosch,bme680";
+				spi-max-frequency= <1000000>;
+				chipsel-gpios = <&port13 7 0>;
+				reg = <0>;
+			};
+
                }; /* SPI3  */
 
 		crc: crc@48107000 {
@@ -991,7 +993,7 @@
 			reg = <0x4900C000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "disabled";
+			status = "okay";
 
 			/* Port 13 */
 			port13: gpio-port@0 {
@@ -1191,7 +1193,11 @@
 			i2c-sda-hold-time-ns = <300>;
 			i2c-sda-falling-time-ns = <300>;
 			i2c-scl-falling-time-ns = <300>;
-			status = "disabled";
+			status = "okay";
+			bme680@76{
+				compatible = "bosch,bme680";
+				reg = <0x76>;
+			};
 		};
 
 		i2c1@49011000 {
@@ -1981,9 +1987,15 @@
 	};
 	pinctrl_spi3: spi3grp {
 		pinmux = <
-			PIN_P12_7__SPI3_SS0_A	0x0
+		/* Commenting the SSO_A pinumux as the slave select
+		 * is controlled via gpio from the sensor driver BME680
+		 * PIN_P12_4__SPI3_MISO_A is value set as 0x23 as it
+		 * should be a read enabled pin.
+		 */
+		/*	PIN_P12_7__SPI3_SS0_A	0x0*/
+			PIN_P12_7__GPIO		0x0
 			PIN_P12_6__SPI3_SCLK_A	0x0
-			PIN_P12_4__SPI3_MISO_A	0x0
+			PIN_P12_4__SPI3_MISO_A	0x23
 			PIN_P12_5__SPI3_MOSI_A	0x0
 		>;
 	};

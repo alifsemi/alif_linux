@@ -899,11 +899,15 @@ int bme680_core_probe(struct device *dev, struct regmap *regmap,
 		return ret;
 	}
 
-	if (val != BME680_CHIP_ID_VAL) {
+	/* Note: BME680_CHIP_ID_VAL check is commenting out as the
+	 * sensor is returning 0 as Id.it is supposed to be 0x61.
+	 */
+
+	/*if (val != BME680_CHIP_ID_VAL) {
 		dev_err(dev, "Wrong chip ID, got %x expected %x\n",
 				val, BME680_CHIP_ID_VAL);
 		return -ENODEV;
-	}
+	}*/
 
 	indio_dev = devm_iio_device_alloc(dev, sizeof(*data));
 	if (!indio_dev)

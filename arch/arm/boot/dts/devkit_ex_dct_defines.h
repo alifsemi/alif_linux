@@ -34,7 +34,7 @@
 #define SPI0_STATUS "disabled"
 #define SPI1_STATUS "disabled"
 #define SPI2_STATUS "disabled"
-#define SPI3_STATUS "disabled"
+#define SPI3_STATUS "okay"
 
 //UART defines
 #define UART0_STATUS "disabled"
