@@ -832,6 +832,8 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 	/* Set and enable the CSI clock divider */
 	writel(0x20001, tmp + 0x8);
 
+	writel(0xffffffff, tmp + 0xc);
+
 	/* Set the EXPSLV1 CDC200 clock divider
 	 * Input clock is 400Mhz. Can be divided by min 2 to max 511.
 	 * For Parallel display, pixel clk needs to be between
@@ -850,6 +852,26 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 	/* Master-side D-PHY implementation (tx_rxz=1) */
 	writel(0x100, tmp + 0x30);
 	iounmap(tmp);
+
+#define USB_20MHZ  1 << 22 | 1 << 21
+
+       tmp = ioremap(0x1A602014, 0x4);
+       val = readl(tmp);
+       val |= USB_20MHZ;
+       writel(val, tmp);
+       iounmap(tmp);
+
+       tmp = ioremap(0x1A609008, 0x4);
+        val = readl(tmp);
+        val &= 0x00001333;
+        writel(val, tmp);
+        iounmap(tmp);
+
+       tmp = ioremap(0x4903F0AC, 0x4);
+        val = readl(tmp);
+        val &= ~(1 << 8);
+        writel(val, tmp);
+        iounmap(tmp);
 
 	/* I2S0 */
 	/* Set to 160Mhz clock and divide by 69 (0x45) */
