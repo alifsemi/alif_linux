@@ -1956,8 +1956,8 @@
 	};*/
 	pinctrl_i2c0: i2c0grp {
 		pinmux = <
-			PIN_P3_4__I2C0_SCL_B	0x0
-			PIN_P3_5__I2C0_SDA_B	0x0
+			PIN_P3_4__I2C0_SCL_B	0x23
+			PIN_P3_5__I2C0_SDA_B	0x23
 		>;
 	};
 	pinctrl_i2c1: i2c1grp {
