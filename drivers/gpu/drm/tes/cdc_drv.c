@@ -298,6 +298,9 @@ long cdc_ioctl (struct file *filp, unsigned int cmd, unsigned long arg)
 	if (nr >= 0xe0) {
 		size = _IOC_SIZE(cmd);
 
+		if (size > sizeof(union cdc_ioctl_arg))
+			return -ENOTTY;
+
 		if (cmd & IOC_IN) {
 			if (copy_from_user(stack_data, (void __user *) arg, size) != 0) {
 				return -EFAULT;
@@ -360,8 +363,37 @@ long cdc_ioctl (struct file *filp, unsigned int cmd, unsigned long arg)
 			break;
 		}
 
+		case 0xe4: {
+			struct hack_get_fbdev_fb_info *args =
+				(struct hack_get_fbdev_fb_info *) stack_data;
+
+			struct drm_fb_helper *fb_helper = dev->fb_helper;
+			struct drm_framebuffer *fb;
+			struct drm_gem_cma_object *cma;
+
+			if (!fb_helper)
+				return -EINVAL;
+
+			fb = fb_helper->buffer->fb;
+			cma = drm_fb_cma_get_gem_obj(fb, 0);
+			if (cma) {
+				args->phys_addr	= cma->paddr;
+				args->width	= fb->width;
+				args->height	= fb->height;
+				args->pitch	= fb->pitches[0];
+				args->bpp	= fb->format->cpp[0] * 8;
+			}
+			break;
+		}
+
 		default:
-			printk(KERN_ERR "Unknown IOCTL (nr = %u)!\n", nr);
+			pr_info("Unknown IOCTL (nr = %u)!\n", nr);
+		}
+
+		if (cmd & IOC_OUT) {
+			if (copy_to_user((void __user *) arg,
+					stack_data, size) != 0)
+				return -EFAULT;
 		}
 
 		return 0;

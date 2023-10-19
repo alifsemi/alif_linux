@@ -31,6 +31,24 @@ struct hack_set_alpha {
 	int alpha;
 };
 
+struct hack_get_fbdev_fb_info {
+	u32 phys_addr;
+	int width;
+	int height;
+	int pitch;
+	int bpp;
+};
+
+/*
+ * Add all possible parameters of the ioctls to CDC to the union.
+ */
+union cdc_ioctl_arg {
+	struct hack_set_cb set_cb;
+	struct hack_set_winpos set_winpos;
+	struct hack_set_alpha set_alpha;
+	struct hack_get_fbdev_fb_info fb_info;
+};
+
 #define HACK_IOCTL_BASE                  'h'
 #define HACK_IO(nr)                      _IO(HACK_IOCTL_BASE,nr)
 #define HACK_IOR(nr,type)                _IOR(HACK_IOCTL_BASE,nr,type)
@@ -44,5 +62,6 @@ struct hack_set_alpha {
 #define HACK_IOCTL_SET_WINPOS            HACK_IOW(0xe1, hack_set_winpos)
 #define HACK_IOCTL_SET_ALPHA             HACK_IOW(0xe2, hack_set_alpha)
 #define HACK_IOCTL_WAIT_VSYNC            HACK_IO( 0xe3)
+#define HACK_IOCTL_GET_FBDEV_FB          HACK_IOR(0xe4, hack_get_fbdev_fb_info)
 
 #endif /* CDC_IOCTL_H_ */

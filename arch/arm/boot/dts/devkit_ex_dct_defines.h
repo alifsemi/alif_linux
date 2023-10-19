@@ -107,7 +107,7 @@
 #define I2S3_STATUS "disabled"
 
 //CDC200 Defines
-#define CDC200_STATUS "disabled"
+#define CDC200_STATUS "okay"
 
 //PCM Defines
 #define PCM_STATUS "disabled"

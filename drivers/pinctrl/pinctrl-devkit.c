@@ -785,7 +785,8 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 #if 1
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
 	info->expmst0_base = devm_ioremap_resource(&pdev->dev, res);
-	writel(0x11, info->expmst0_base);
+	/* Enable Peripheral functional clocks and APB interface clocks. */
+	writel(0xC0000000, info->expmst0_base);
 
 	/* Enable UART2, UART4*/
 	val = readl(info->expmst0_base + 0x8);
@@ -851,27 +852,31 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 
 	/* Master-side D-PHY implementation (tx_rxz=1) */
 	writel(0x100, tmp + 0x30);
+
+	/* Enable D-PHY PLL reference clock and TX D-PHY clock. */
+	writel(0x101, tmp + 0x40);
 	iounmap(tmp);
 
 #define USB_20MHZ  1 << 22 | 1 << 21
 
-       tmp = ioremap(0x1A602014, 0x4);
-       val = readl(tmp);
-       val |= USB_20MHZ;
-       writel(val, tmp);
-       iounmap(tmp);
+	tmp = ioremap(0x1A602014, 0x4);
+	val = readl(tmp);
+	/* Enable USB_CLK, 10M_CLK and HFOSC_CLK(38.4MHz) */
+	val |= USB_20MHZ | BIT(23);
+	writel(val, tmp);
+	iounmap(tmp);
 
-       tmp = ioremap(0x1A609008, 0x4);
-        val = readl(tmp);
-        val &= 0x00001333;
-        writel(val, tmp);
-        iounmap(tmp);
+	tmp = ioremap(0x1A609008, 0x4);
+	/* Enable power for D-PHY, D-PLL and USB */
+	writel(0, tmp);
+	iounmap(tmp);
 
-       tmp = ioremap(0x4903F0AC, 0x4);
-        val = readl(tmp);
-        val &= ~(1 << 8);
-        writel(val, tmp);
-        iounmap(tmp);
+	tmp = ioremap(0x4903F0AC, 0x4);
+	val = readl(tmp);
+	/* USB PHY PoR reset mask cleared. */
+	val &= ~(1 << 8);
+	writel(val, tmp);
+	iounmap(tmp);
 
 	/* I2S0 */
 	/* Set to 160Mhz clock and divide by 69 (0x45) */
