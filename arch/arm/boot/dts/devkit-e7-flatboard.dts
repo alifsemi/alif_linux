@@ -1729,6 +1729,16 @@
 		reg = <0x49040000 0x000c0000>;
 		ranges = <>;
 
+		tes_d2d_0: gpu@49040000 {
+			reg = <0x49040000 0x1000>;
+			compatible = "tes,d2d-1.0";
+			status = DAVE_2D_STATUS;
+			interrupt-parent = <&gic>;
+			interrupts = <0 321 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_aclk>;
+			max-clock-frequency = <400000000>;
+		};
+
 		dmac_bus_s: dma-controller@49080000 {
 			reg = <0x49080000 0x1000>;
 			arm,primecell-periphid = <0x00041330>;

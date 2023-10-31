@@ -109,5 +109,8 @@
 //CDC200 Defines
 #define CDC200_STATUS "okay"
 
+//D2D Defines
+#define DAVE_2D_STATUS "okay"
+
 //PCM Defines
 #define PCM_STATUS "disabled"
