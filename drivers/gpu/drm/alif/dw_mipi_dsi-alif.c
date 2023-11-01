@@ -37,87 +37,12 @@ struct dw_mipi_dsi_alif {
 	int lane_max_kbps;
 };
 
-static int dsi_pll_get_clkout_khz(int clkin_khz, int idf, int ndiv, int odf)
-{
-	int divisor = idf * odf;
-
-	/* prevent from division by 0 */
-	if (!divisor)
-		return 0;
-
-	return DIV_ROUND_CLOSEST(clkin_khz * ndiv, divisor);
-}
-
-static int dsi_pll_get_params(struct dw_mipi_dsi_alif *dsi,
-			      int clkin_khz, int clkout_khz,
-			      int *idf, int *ndiv, int *odf)
-{
-/* DSI wrapper registers & bit definitions */
-#define IDF_MIN		1
-#define IDF_MAX		7
-#define NDIV_MIN	10
-#define NDIV_MAX	125
-#define ODF_MIN		1
-#define ODF_MAX		8
-
-	int i, o, n, n_min, n_max;
-	int fvco_min, fvco_max, delta, best_delta; /* all in khz */
-
-	/* Early checks preventing division by 0 & odd results */
-	if (clkin_khz <= 0 || clkout_khz <= 0)
-		return -EINVAL;
-
-	fvco_min = dsi->lane_min_kbps * 2 * ODF_MAX;
-	fvco_max = dsi->lane_max_kbps * 2 * ODF_MIN;
-
-	best_delta = 1000000; /* big started value (1000000khz) */
-
-	for (i = IDF_MIN; i <= IDF_MAX; i++) {
-		/* Compute ndiv range according to Fvco */
-		n_min = ((fvco_min * i) / (2 * clkin_khz)) + 1;
-		n_max = (fvco_max * i) / (2 * clkin_khz);
-
-		/* No need to continue idf loop if we reach ndiv max */
-		if (n_min >= NDIV_MAX)
-			break;
-
-		/* Clamp ndiv to valid values */
-		if (n_min < NDIV_MIN)
-			n_min = NDIV_MIN;
-		if (n_max > NDIV_MAX)
-			n_max = NDIV_MAX;
-
-		for (o = ODF_MIN; o <= ODF_MAX; o *= 2) {
-			n = DIV_ROUND_CLOSEST(i * o * clkout_khz, clkin_khz);
-			/* Check ndiv according to vco range */
-			if (n < n_min || n > n_max)
-				continue;
-			/* Check if new delta is better & saves parameters */
-			delta = dsi_pll_get_clkout_khz(clkin_khz, i, n, o) -
-				clkout_khz;
-			if (delta < 0)
-				delta = -delta;
-			if (delta < best_delta) {
-				*idf = i;
-				*ndiv = n;
-				*odf = o;
-				best_delta = delta;
-			}
-			/* fast return in case of "perfect result" */
-			if (!delta)
-				return 0;
-		}
-	}
-
-	return 0;
-}
-
 int alif_dsi_phy_init(void __iomem *dsi);
 static int dw_mipi_dsi_phy_init(void *priv_data)
 {
 	struct dw_mipi_dsi_alif *dsip = priv_data;
 
-	alif_dsi_phy_init(dsip->base);
+	return alif_dsi_phy_init(dsip->base);
 }
 
 static int
@@ -126,8 +51,8 @@ dw_mipi_dsi_get_lane_mbps(void *priv_data, const struct drm_display_mode *mode,
 			  unsigned int *lane_mbps)
 {
 	struct dw_mipi_dsi_alif *dsi = priv_data;
-	unsigned int idf, ndiv, odf, pll_in_khz, pll_out_khz;
-	int ret, bpp;
+	unsigned int pll_in_khz, pll_out_khz;
+	int bpp;
 
 	dsi->lane_min_kbps = LANE_MIN_KBPS;
 	dsi->lane_max_kbps = LANE_MAX_KBPS;
@@ -152,19 +77,6 @@ dw_mipi_dsi_get_lane_mbps(void *priv_data, const struct drm_display_mode *mode,
 		DRM_WARN("Warning min phy mbps is used\n");
 	}
 
-#if 0
-	/* Compute best pll parameters */
-	idf = 0;
-	ndiv = 0;
-	odf = 0;
-	ret = dsi_pll_get_params(dsi, pll_in_khz, pll_out_khz,
-				 &idf, &ndiv, &odf);
-	if (ret)
-		DRM_WARN("Warning dsi_pll_get_params(): bad params\n");
-
-	/* Get the adjusted pll out value */
-	pll_out_khz = dsi_pll_get_clkout_khz(pll_in_khz, idf, ndiv, odf);
-#endif
 	/* TODO Ideally set the PLL registers here.. */
 
 	*lane_mbps = pll_out_khz / 1000;
