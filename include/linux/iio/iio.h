@@ -569,6 +569,8 @@ struct iio_dev {
 #endif
 };
 
+int iio_device_get_current_mode(struct iio_dev *indio_dev);
+
 const struct iio_chan_spec
 *iio_find_channel_from_si(struct iio_dev *indio_dev, int si);
 /**

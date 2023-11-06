@@ -27,6 +27,7 @@
 #include <linux/async.h>
 #include <linux/pm_runtime.h>
 #include <linux/pinctrl/devinfo.h>
+#include <linux/slab.h>
 
 #include "base.h"
 #include "power/power.h"
@@ -67,6 +68,12 @@ static char async_probe_drv_names[ASYNC_DRV_NAMES_MAX_LEN];
  * Once defer_all_probes is true all drivers probes will be forcibly deferred.
  */
 static bool defer_all_probes;
+
+static void __device_set_deferred_probe_reason(const struct device *dev, char *reason)
+{
+	kfree(dev->p->deferred_probe_reason);
+	dev->p->deferred_probe_reason = reason;
+}
 
 /*
  * deferred_probe_work_func() - Retry probing devices in the active list.
@@ -204,6 +211,24 @@ void device_unblock_probing(void)
 {
 	defer_all_probes = false;
 	driver_deferred_probe_trigger();
+}
+
+/**
+ * device_set_deferred_probe_reason() - Set defer probe reason message for device
+ * @dev: the pointer to the struct device
+ * @vaf: the pointer to va_format structure with message
+ */
+void device_set_deferred_probe_reason(const struct device *dev, struct va_format *vaf)
+{
+	const char *drv = dev_driver_string(dev);
+	char *reason;
+
+	mutex_lock(&deferred_probe_mutex);
+
+	reason = kasprintf(GFP_KERNEL, "%s: %pV", drv, vaf);
+	__device_set_deferred_probe_reason(dev, reason);
+
+	mutex_unlock(&deferred_probe_mutex);
 }
 
 /*
