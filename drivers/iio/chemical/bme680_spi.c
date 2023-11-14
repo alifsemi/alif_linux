@@ -42,6 +42,11 @@ static int bme680_regmap_spi_select_page(
 	 * a read-modify-write on each and every page select
 	 */
 	buf[0] = BME680_REG_STATUS;
+	/*
+	 * The SPI register address (= full register address without bit 7)
+	 * and the read command (bit7 = RW = '1')
+	 */
+	buf[0] |= 0x80;
 	ret = spi_write_then_read(spi, buf, 1, buf + 1, 1);
 	if (ret < 0) {
 		dev_err(&spi->dev, "failed to set page %u\n", page);
