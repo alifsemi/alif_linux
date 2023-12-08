@@ -557,7 +557,9 @@
 			bus-width = <4>;
 			vmmc-supply = <&reg_3p3v>;
 			vqmmc-supply = <&reg_3p3v>;
-			max-frequency = <20000000>;
+			max-frequency = <25000000>;
+			no-mmc;  /* Disabling on B2 flatboard (voltage level traslator issue) */
+			no-sdio; /* Disabling on B2 flatboard (voltage level traslator issue) */
 			status = SDHCI_STATUS;
 		};
 
@@ -2043,12 +2045,13 @@
 	};
 	pinctrl_sdhci: sdhci0grp {
 		pinmux = <
-			PIN_P5_0__SD_D0_A	0x0
-			PIN_P5_1__SD_D1_A	0x0
-			PIN_P5_2__SD_D2_A	0x0
-			PIN_P5_3__SD_D3_A	0x0
-			PIN_P7_0__SD_CMD_A	0x0
-			PIN_P7_1__SD_CLK_A	0x0
+			PIN_P3_3__GPIO		0x23
+			PIN_P5_0__SD_D0_A	0x23
+			PIN_P5_1__SD_D1_A	0x23
+			PIN_P5_2__SD_D2_A	0x23
+			PIN_P5_3__SD_D3_A	0x23
+			PIN_P7_0__SD_CMD_A	0x23
+			PIN_P7_1__SD_CLK_A	0x23
 		>;
 	};
 	pinctrl_pcm0: pcm0grp {

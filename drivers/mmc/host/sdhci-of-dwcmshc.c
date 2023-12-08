@@ -57,7 +57,13 @@ static const struct sdhci_ops sdhci_dwcmshc_ops = {
 
 static const struct sdhci_pltfm_data sdhci_dwcmshc_pdata = {
 	.ops = &sdhci_dwcmshc_ops,
+#define ALIF_B2FLATBOARD_QUIRK	1
+#if ALIF_B2FLATBOARD_QUIRK
+	.quirks = SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN | SDHCI_QUIRK_NO_HISPD_BIT,
+	.quirks2 = SDHCI_QUIRK2_NO_1_8_V | SDHCI_QUIRK2_PRESET_VALUE_BROKEN,
+#else
 	.quirks = SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN,
+#endif
 };
 
 static int dwcmshc_probe(struct platform_device *pdev)
@@ -97,6 +103,12 @@ static int dwcmshc_probe(struct platform_device *pdev)
 	priv->bus_clk = devm_clk_get(&pdev->dev, "bus");
 	if (!IS_ERR(priv->bus_clk))
 		clk_prepare_enable(priv->bus_clk);
+
+#if ALIF_B2FLATBOARD_QUIRK
+	/* Not really a B2 flatboard quirk. But the generic DW driver may not
+	 * be the right place for enabling this. Revisit later. */
+	sdhci_enable_v4_mode(host);
+#endif
 
 	err = mmc_of_parse(host->mmc);
 	if (err)

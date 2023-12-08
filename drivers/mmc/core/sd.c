@@ -854,6 +854,16 @@ int mmc_sd_setup_card(struct mmc_host *host, struct mmc_card *card,
 		 * Fetch SCR from card.
 		 */
 		err = mmc_app_send_scr(card);
+
+#define ALIF_B2FLATBOARD_QUIRK 	1
+#if ALIF_B2FLATBOARD_QUIRK
+		/* Resending. As data is enabled in this command, it is coming
+		 * back with error the first time. But resending the command
+		 * seems to get it going. Suspect the Voltage transaltor on
+		 * B2 flatboard for this problem.
+		 */
+		if (err) err = mmc_app_send_scr(card);
+#endif
 		if (err)
 			return err;
 
@@ -1273,7 +1283,17 @@ int mmc_attach_sd(struct mmc_host *host)
 
 	WARN_ON(!host->claimed);
 
+#if ALIF_B2FLATBOARD_QUIRK
+	/*
+	 * Alif B2 flatboard supports only 3.3V.
+	 * Sending a query (0x0) command results in failure further down. Only
+	 * the HCS bit (bit 30) and 3.2-3.3V bits (bits 20,21) seem to get the
+	 * card into ready status (atleast on the 32GB Sandisk card we tested)
+	 */
+	err = mmc_send_app_op_cond(host, SD_OCR_CCS | (0x3 << 20), &ocr);
+#else
 	err = mmc_send_app_op_cond(host, 0, &ocr);
+#endif
 	if (err)
 		return err;
 
