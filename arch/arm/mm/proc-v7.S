@@ -793,7 +793,9 @@ __v7_ca17mp_proc_info:
 __v7_ca32_proc_info:
 	.long	0x410fd010
 	.long	0xff0ffff0
-	__v7_proc __v7_ca32_proc_info, __v7_setup , cpu_name = cpu_v8_name
+	/* HyperRAM on Alif Soc works only if cache for the area mapped is set to WBWA.
+	 * So setting SMP flags for UP as well */
+	__v7_proc __v7_ca32_proc_info, __v7_setup , mm_mmuflags = PMD_FLAGS_SMP, cpu_name = cpu_v8_name
 	.size	__v7_ca32_proc_info, . - __v7_ca32_proc_info
 
 	/* ARM Ltd. Cortex A73 processor */
