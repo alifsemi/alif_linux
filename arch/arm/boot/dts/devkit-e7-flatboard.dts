@@ -44,7 +44,8 @@
 	memory@02000000 {
 		device_type = "memory";
 		reg = <0x02000000 0x400000>,
-		      <0x08000000 0x27F000>;
+		      <0x08000000 0x27F000>,
+		      <0xA0000000 0x2000000>; /* HyperRAM */
 		/* 4KB: 0x0827F000 - 0x0827FFFF used for MHU services */
 	};
 
