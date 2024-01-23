@@ -393,8 +393,16 @@ ENTRY(secondary_startup)
 	 */
 	adr	r4, __secondary_data
 	ldmia	r4, {r5, r7, r12}		@ address to jump to after
-	sub	lr, r4, r5			@ mmu has been enabled
+						@ mmu has been enabled
+#ifdef CONFIG_XIP_KERNEL
+	ldr     lr, =PAGE_OFFSET
+	ldr     r3, =PLAT_PHYS_OFFSET
+	sub	lr, r3, lr
 	add	r3, r7, lr
+#else
+	sub	lr, r4, r5
+	add	r3, r7, lr
+#endif
 	ldrd	r4, r5, [r3, #0]		@ get secondary_data.pgdir
 ARM_BE8(eor	r4, r4, r5)			@ Swap r5 and r4 in BE:
 ARM_BE8(eor	r5, r4, r5)			@ it can be done in 3 steps

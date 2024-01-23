@@ -18,7 +18,7 @@ static const char *const ensemble_dt_match[] __initconst = {
 	NULL
 };
 
-DT_MACHINE_START(ENSEMBLE_DT, "Alif Ensemble (Flattened Device Tree)")
+DT_MACHINE_START(ENSEMBLE_DT, "Alif Ensemble")
 	/* Maintainer: Harith George <harith.g@alifsemi.com> */
 	.dt_compat      = ensemble_dt_match,
 MACHINE_END
