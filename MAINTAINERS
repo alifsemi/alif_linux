@@ -1423,6 +1423,8 @@ M:	Hemanth Kumar <hemanth@alifsemi.com>
 M:	Harith G George <harith.g@alifsemi.com>
 L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
 S:	Supported
+F:	arch/arm/boot/dts/devkit*
+F:	arch/arm/configs/devkit*
 F:	Documentation/devicetree/bindings/arm/alif/devkit.yaml
 F:	Documentation/devicetree/bindings/crypto/alif,alif-crccode.txt
 F:	Documentation/devicetree/bindings/display/alif,ensemble-dsi.txt
