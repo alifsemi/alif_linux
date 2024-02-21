@@ -51,6 +51,8 @@ patternProperties:
     description: Aeroflex Gaisler AB
   "^al,.*":
     description: Annapurna Labs
+  "^alif,.*":
+    description: Alif Semiconductor
   "^allegro,.*":
     description: Allegro DVT
   "^allo,.*":
@@ -337,6 +339,8 @@ patternProperties:
     description: Firefly
   "^focaltech,.*":
     description: FocalTech Systems Co.,Ltd
+  "^focuslcd,.*":
+    description: Focus LCDs
   "^friendlyarm,.*":
     description: Guangzhou FriendlyARM Computer Tech Co., Ltd
   "^fsl,.*":
@@ -491,6 +495,8 @@ patternProperties:
     description: Kingnovel Technology Co., Ltd.
   "^kionix,.*":
     description: Kionix, Inc.
+  "^knowles,.*":
+    description: Knowles Corporation
   "^kobo,.*":
     description: Rakuten Kobo Inc.
   "^koe,.*":
@@ -939,6 +945,8 @@ patternProperties:
     description: Shenzhen Techstar Electronics Co., Ltd.
   "^terasic,.*":
     description: Terasic Inc.
+  "^tes,.*":
+    description: TES Electronic Solutions
   "^tfc,.*":
     description: Three Five Corp
   "^thine,.*":

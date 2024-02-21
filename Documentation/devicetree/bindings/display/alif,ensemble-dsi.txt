@@ -1,0 +1,75 @@
+Display Serial Interface in Alif Ensemble SoC
+=============================================
+
+DSI Controller:
+Required properties:
+- #address-cells: Should be <1>.
+- #size-cells: Should be <0>.
+- compatible: Should be "alif,ensemble-dsi"
+- reg: Physical base address and length of the registers of controller
+- interrupts: The interrupt signal from the DSI block.
+- clocks: Phandles to device clocks.
+          Must be <&dpi_pixclk>, <&pllref>, and <&cfgclk>
+- clock-names: Must be "pclk", "ref", "cfgclk".
+- ports: A node containing DSI input & output port nodes with endpoint
+  definitions as documented in [3] & [4].
+  - port@0: DSI input port node, connected to the ltdc rgb output port.
+  - port@1: DSI output port node, connected to a panel or a bridge input port.
+- panel or bridge node: A node containing the panel or bridge description as
+  documented in [6].
+  - port: panel or bridge port node, connected to the DSI output port (port@1).
+
+Note: You can find more documentation in the following references
+[1] Documentation/devicetree/bindings/clock/clock-bindings.txt
+[2] Documentation/devicetree/bindings/reset/reset.txt
+[3] Documentation/devicetree/bindings/media/video-interfaces.txt
+[4] Documentation/devicetree/bindings/graph.txt
+[5] Documentation/devicetree/bindings/display/bridge/dw_mipi_dsi.txt
+[6] Documentation/devicetree/bindings/display/mipi-dsi-bus.txt
+
+Example:
+dsi: dsi@0x49032000 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	compatible = "alif,ensemble-dsi";
+	reg = <0x49032000 0x1000>;
+	interrupts = <0 332 IRQ_TYPE_LEVEL_HIGH>;
+	clocks = <&dpi_pixclk>,
+		 <&pllref>,
+		 <&cfgclk>;
+	clock-names = "pclk", "ref", "cfgclk";
+	status = "okay";
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		port@0 {
+			reg = <0>;
+			dsi_in: endpoint {
+				remote-endpoint =
+					<&cdc_out1_rgb>;
+			};
+		};
+		port@1 {
+			reg = <1>;
+			dsi_out: endpoint {
+				remote-endpoint =
+					<&panel_dsi>;
+			};
+		};
+	};
+	paneldsi: panel-dsi@0 {
+		reg = <0>;
+		compatible = "focuslcd,fw405";
+		/* reset-gpios = <&gpio4 6 GPIO_ACTIVE_LOW>; */
+		backlight = <&panel_backlight>;
+		power-supply = <&reg_3p3v>;
+		status = "okay";
+
+		port {
+			panel_dsi: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
+		};
+	};
+};

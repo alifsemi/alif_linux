@@ -1,0 +1,29 @@
+* Knowles SP Series SiSonic MEMS Silicon Microphones
+
+Required properties:
+- compatible: "knowles,sph0645"
+- #sound-dai-cells: should be 0.
+
+Example of the Alif Ensemble 7 SoC:
+
+sph0645: acodec {
+	#sound-dai-cells = <0>;
+	compatible = "knowles,sph0645";
+};
+
+Example of a "simple-audio-card":
+sound-memsmic {
+	compatible = "simple-audio-card";
+	simple-audio-card,name = "mems-mic";
+	simple-audio-card,format = "i2s";
+	simple-audio-card,frame-master = <&cpudai_1>;
+	simple-audio-card,bitclock-master = <&cpudai_1>;
+
+	cpudai_1: simple-audio-card,cpu {
+		sound-dai = <&i2s2>;
+	};
+
+	mcodec: simple-audio-card,codec {
+		sound-dai = <&sph0645>;
+	};
+};

@@ -1,0 +1,16 @@
+Alif Ensemble pinctrl driver
+============================
+
+Required properties:
+- compatible: "alif,pinctrl-devkit"
+- reg: Base address of the PinMux register block and the size of the block.
+       Base address of the Configuration master 0 (CFGMST0) block and
+       the size of the block.
+
+Example:
+--------
+pinmux: pinctrl@1A603000 {
+	compatible = "alif,pinctrl-devkit";
+	reg = <0x1A603000 0x00001000>,
+	      <0x4902F000 0x00001000>;
+};

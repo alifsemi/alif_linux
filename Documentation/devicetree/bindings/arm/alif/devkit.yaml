@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: GPL-2.0
+%YAML 1.2
+---
+$id: http://devicetree.org/schemas/arm/alif/devkit.yaml#
+$schema: http://devicetree.org/meta-schemas/core.yaml#
+
+title: Alif Semiconductor Ensemble Devkits Device Tree Bindings
+
+maintainers:
+  - Hemanth Kumar <hemanth@alifsemi.com>
+
+properties:
+  compatible:
+    oneOf:
+      - enum:
+          - alif,ensemble
+...

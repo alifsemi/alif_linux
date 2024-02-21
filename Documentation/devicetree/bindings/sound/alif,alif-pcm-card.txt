@@ -1,0 +1,11 @@
+Alif Ensemble SoC Sound Card
+
+Required properties:
+- compatible: "alif,alif-pcm-card"
+- clocks: Input clock specifier. Should be <&syst_pclk 0>.
+
+Example:
+pcmcard: pcmcard@4902D800 {
+	compatible = "alif,alif-pcm-card";
+	clocks = <&syst_pclk 0>;
+};

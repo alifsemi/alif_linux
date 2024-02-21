@@ -1,0 +1,25 @@
+Alif Ensemble DAC device driver
+
+Required properties:
+- compatible: Must be "alif,ensemble-dac"
+- reg: Address and length of the device's register set.
+- clock-names: List of input clocks.
+  Required elements: "apb_pclk"
+- clocks: Input clock specifier. Refer to common clock bindings.
+
+
+Examples:
+dac0: dac12_0@49028000 {
+	compatible = "alif,ensemble-dac";
+	reg = <0x49028000 0x10>;
+	clocks = <&syst_pclk 0>;
+	clock-names = "apb_pclk" ;
+	status = DAC120_STATUS;
+};
+dac1: dac12_1@49029000 {
+	compatible = "alif,ensemble-dac";
+	reg = <0x49029000 0x10>;
+	clocks = <&syst_pclk 0>;
+	clock-names = "apb_pclk" ;
+	status = DAC121_STATUS;
+};

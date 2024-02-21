@@ -1,0 +1,15 @@
+* Alif Ensemble CRC
+
+Required properties:
+- compatible: Should be "alif,alif-crccode".
+- reg: The address and length of the peripheral registers space
+- clocks: The input clock of the CRC instance
+- clock-names: should be "ahb_clk".
+
+Example:
+crc: crc@48107000 {
+	compatible = "alif,alif-crccode";
+	reg = <0x48107000 0x1000>;
+	clocks = <&syst_hclk>;
+	clock-names = "ahb_clk";
+};

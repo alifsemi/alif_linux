@@ -23,7 +23,7 @@ Documentation/devicetree/bindings/i3c/i3c.txt for more details):
 I3C device connected on the bus follow the generic description (see
 Documentation/devicetree/bindings/i3c/i3c.txt for more details).
 
-Example:
+Examples:
 
 	i3c-master@2000 {
 		compatible = "snps,dw-i3c-master-1.00a";
@@ -37,5 +37,39 @@ Example:
 			compatible = "atmel,24c01";
 			reg = <0x57 0x0 0x10>;
 			pagesize = <0x8>;
+		};
+	};
+
+	i3c0: i3c@49018000 {
+		compatible = "snps,dw-i3c-master-1.00a";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_i3c0>;
+		reg = <0x49018000 0x1000>;
+		interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&syst_pclk>;
+		#address-cells = <3>;
+		#size-cells = <0>;
+		i2c-scl-hz = <100000>;
+		status = "disabled";
+
+		/* I3C device with an Image sensor */
+		arx3a0@36 {
+			compatible = "onnn,arx3a0";
+			reg = <0x36 0x0 0x4000>;
+			clocks = <&ext_clk>;
+			clock-names = "extclk";
+			reset-gpio =
+			<&port4 5 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
+			vaa-supply = <&reg_2p7v>;
+			vdd-supply = <&reg_1p2v>;
+			vdd_io-supply = <&reg_1p8v>;
+			port@0 {
+				arx3a0_csi2_ep: endpoint@0 {
+					bus-type = <4>;
+					clock-lanes = <0>;
+					data-lanes = <1 2>;
+					remote-endpoint = <&csi2_in>;
+				};
+			};
 		};
 	};

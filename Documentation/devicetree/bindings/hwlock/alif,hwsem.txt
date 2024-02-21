@@ -1,0 +1,25 @@
+Alif Ensemble Hardware Semaphore(HWSEM) Binding
+-----------------------------------------------
+
+Required properties :
+- compatible: should be "alif,hwsem".
+- reg: the register address of hardware semaphore.
+- reg-names: Names for the register areas. Must contain "hwsem_base".
+- interrupts-parent: Phandle for interrupt controller.
+- interrupts: List of Interrupt numbers.
+- clocks: Must contain an entry for each entry in clock-names.
+          Please refer to clock-bindings.txt.
+- clock-names: Should be one of each entry matching the clocks phandles list.
+               Must contain "apb_pclk".
+
+Example of HWSEM provider:
+hwsem0: hwsem0@4902E000 {
+	compatible = "alif,hwsem";
+	reg = <0x4902E000 0x4>;
+	reg-names = "hwsem_base";
+	interrupt-parent = <&gic>;
+	interrupts = <0 30 4>;
+	clocks = <&syst_pclk 0>;
+	clock-names = "apb_pclk" ;
+	status = HWSEM0_STATUS;
+};

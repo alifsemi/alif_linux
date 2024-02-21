@@ -1,0 +1,45 @@
+Synopsys MIPI CSI-2
+-------------------
+
+Required properties:
+- compatible: Must be "snps,dw-csi"
+- #address-cells: Should be <1>.
+- #size-cells: Should be <0>.
+- reg: the register base and size for the device registers
+- interrupts-parent: Phandle for interrupt controller.
+- interrupts: the interrupt for the device
+- phys: phandle to the external D-PHY.
+
+The device node shall contain two 'port' child nodes according to the
+bindings defined in Documentation/devicetree/bindings/media/
+video-interfaces.txt.
+
+Example:
+--------
+
+csi2: csi2@49033000 {
+	compatible = "snps,dw-csi";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	reg = <0x49033000 0x1000>;
+	phys = <&mipi_dphy_rx 1>;
+	/* resets = <&dw_rst 1>; */
+	interrupt-parent = <&gic>;
+	interrupts = <GIC_SPI 333 IRQ_TYPE_LEVEL_HIGH>;
+
+	port@1 {
+		reg = <1>;
+		csi2_in: endpoint {
+			bus-type = <4>;
+			clock-lanes = <0>;
+			data-lanes = <2 1>;
+			remote-endpoint = <&arx3a0_csi2_ep>;
+		};
+	};
+	port@2 {
+		reg = <2>;
+		csi2_out: endpoint {
+			remote-endpoint = <&cpi_csi2_in>;
+		};
+	};
+};

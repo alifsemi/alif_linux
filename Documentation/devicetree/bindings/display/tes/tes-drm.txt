@@ -1,0 +1,21 @@
+TES DRM master device
+=====================
+
+Required properties:
+- compatible: "tes,d2d-1.0"
+- reg: Base address and size of the IP core instance.
+- interrupts-parent: Phandle for interrupt controller.
+- interrupts: List of Interrupt numbers.
+- clocks: Input clock specifier. Refer to common clock bindings.
+- max-clock-frequency: Maximum operating clock frequency.
+                       Must be 400000000.
+Example:
+tes_d2d_0: gpu@49040000 {
+	reg = <0x49040000 0x1000>;
+	compatible = "tes,d2d-1.0";
+	status = DAVE_2D_STATUS;
+	interrupt-parent = <&gic>;
+	interrupts = <0 321 IRQ_TYPE_LEVEL_HIGH>;
+	clocks = <&syst_aclk>;
+	max-clock-frequency = <400000000>;
+};

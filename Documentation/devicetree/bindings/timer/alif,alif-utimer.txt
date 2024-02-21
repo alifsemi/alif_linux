@@ -1,0 +1,23 @@
+Alif Ensemble Utimer
+--------------------
+
+Required properties:
+- compatible should contain:
+	* "alif,alif-utimer"
+- reg : the register address space of the utimer.
+- interrupts-parent: Phandle for interrupt controller.
+- interrupts: List of Interrupt numbers.
+- clocks: Must contain an entry for each entry in clock-names.                   Please refer to clock-bindings.txt.
+- clock-names: Should be one of each entry matching the clocks phandles list.
+               Must contain "axi_clk".
+
+Examples:
+utimer: utimer@48000000 {
+	compatible = "alif,alif-utimer";
+	clocks = <&syst_aclk>;
+	clock-names = "axi_clk" ;
+	reg = <0x48000000 0x100000>;
+	interrupt-parent = <&gic>;
+	interrupts = <GIC_SPI 366 IRQ_TYPE_EDGE_RISING>,
+		...
+};

@@ -1,0 +1,25 @@
+Alif Ensemble PCM audio CODEC
+
+Required properties:
+ - compatible: "alif,alif-pcm"
+ - pinctrl-names: Should contain only one value - "default"
+ - pinctrl-0: Should specify pin control groups used for this controller.
+ - reg: Base address and size of the IP core instance.
+ - interrupts-parent: Phandle for interrupt controller.
+ - interrupts: List of Interrupt numbers.
+ - clock-names: List of input clocks.
+   Required elements: "pclk"
+ - clocks: Input clock specifier. Refer to common clock bindings.
+
+Example:
+pcm: pcm@4902D000 {
+	compatible = "alif,alif-pcm";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcm0>;
+	reg = <0x4902D000 0x800>;
+	clocks = <&syst_pclk 0>;
+	clock-names = "pclk";
+	interrupt-parent = <&gic>;
+	interrupts = <0 134 IRQ_TYPE_LEVEL_HIGH>;
+	status = PCM_STATUS;
+};

@@ -28,6 +28,7 @@ Exception for clocks:
     "ti,keystone-dwc3"
     "rockchip,rk3399-dwc3"
     "xlnx,zynqmp-dwc3"
+    "alif,ensemble-usb3"
 
 Optional properties:
  - usb-phy : array of phandle for the PHY device.  The first element

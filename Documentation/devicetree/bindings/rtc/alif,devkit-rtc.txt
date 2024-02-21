@@ -1,0 +1,22 @@
+* Alif Ensemble Real Time Clock
+
+RTC controller for the Alif Ensemble Time Clock
+
+Required properties:
+- compatible: Should be "alif,devkit-rtc"
+- reg: physical base address of the controller and length of memory mapped
+  region.
+- interrupts: IRQ line for the RTC.
+- clocks: Must contain an entry for each entry in clock-names.
+          Please refer to clock-bindings.txt.
+- clock-names: Should be one of each entry matching the clocks phandles list:
+                  - "timer" (timer clock) Required.
+                  - "pclk" (peripheral clock) Required.
+Example:
+rtc: rtc@42000000 {
+	compatible = "alif,devkit-rtc";
+	reg = <0x42000000 0x100>;
+	interrupts = <GIC_SPI 339  IRQ_TYPE_LEVEL_HIGH>;
+	clocks = <&rtc_clk>, <&syst_pclk>;
+	clock-names = "timer", "pclk";
+};

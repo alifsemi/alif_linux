@@ -1,0 +1,50 @@
+TES Customizable Display Controller (CDC)
+=========================================
+
+Required properties:
+- compatible : Must be "tes,cdc-2.1"
+- reg : should contain 1 register range (address and length).
+- interrupts-parent: Phandle for interrupt controller.
+- interrupts: List of Interrupt numbers.
+- clocks: Input clock specifier. Refer to common clock bindings.
+- max-clock-frequency: Maximum operating clock frequency.
+                       Must be 400000000.
+- ports: A ports node with endpoint definitions as defined in
+  Documentation/devicetree/bindings/media/video-interfaces.txt.
+
+Example:
+cdc200: cdc200@49031000 {
+        compatible = "tes,cdc-2.1";
+        reg = <0x49031000 0x1000>;
+        interrupt-parent = <&gic>;
+        status = CDC200_STATUS;
+        interrupts =    <0 322 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 323 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 324 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 325 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 326 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 327 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 328 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 329 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 330 IRQ_TYPE_LEVEL_HIGH>,
+                        <0 331 IRQ_TYPE_LEVEL_HIGH>;
+        clocks = <&pixclk>;
+        max-clock-frequency = <400000000>;
+
+        ports {
+                #address-cells = <1>;
+                #size-cells = <0>;
+                port@0 {
+                        reg = <0>;
+                        cdc_out_rgb: endpoint {
+                        /* remote-endpoint = <&lvdsenc_in>; */
+                        };
+                };
+                port@1 {
+                        reg = <1>;
+                        cdc_out1_rgb: endpoint {
+                                remote-endpoint = <&dsi_in>;
+                        };
+                };
+        };
+};

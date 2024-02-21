@@ -1,0 +1,26 @@
+Synopsys DSI PHY for Alif Ensemble SoC
+
+The Synopsys MIPI-DSI PHY IP block is e.g. found on Alif Ensemble platforms.
+
+Required properties:
+- compatible: Must be:
+  - "snps,dw-dphy-rx"
+- clocks: Must contain an entry for each entry in clock-names.
+- reg: the register range of the PHY controller
+- bus-width: Number of data lines. Should be <12>.
+- snps,dphy-frequency: the phy core clk frequency, should be: 400000000
+- snps,phy_type: Should be <1>
+- #phy-cells: number of cells in PHY, as defined in
+  Documentation/devicetree/bindings/phy/phy-bindings.txt
+  this must be <1>
+
+Example:
+mipi_dphy_rx:  dphy@49033040 {
+	compatible = "snps,dw-dphy-rx";
+	reg = <0x49033040 0x40>;
+	#phy-cells = <1>;
+	bus-width = <12>;
+	clocks = <&syst_pclk>;
+	snps,dphy-frequency = <400000000>;
+	snps,phy_type = <1>;
+};

@@ -1,0 +1,43 @@
+Alif Ensemble Camera Controller CPI device driver
+=================================================
+
+Required properties:
+- #address-cells: Should be <1>.
+- #size-cells: Should be <0>.
+- pinctrl-names: Should contain only one value - "default"
+- pinctrl-0: Should specify pin control groups used for this controller.
+- compatible: Must be "alif,ensemble-cpi"
+- reg: the register base and size for the device registers
+- interrupts-parent: Phandle for interrupt controller.
+- interrupts: the interrupt for the device.
+- clocks: Phandles to device clocks.
+          Must be <&camera_pixclk>.
+- clock-names: Must be "camera_pixclk".
+- port: child port node, in accordance with the video interface
+        bindings defined in
+        Documentation/devicetree/bindings/media/video-interfaces.txt.
+        The port node must contain at least one endpoint.
+
+Example:
+--------
+cpi:  camera_ctrl@49030000 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_camera>;
+	compatible = "alif,ensemble-cpi";
+	reg = <0x49030000 0x1000>;
+	interrupt-parent = <&gic>;
+	interrupts = <GIC_SPI 334 IRQ_TYPE_LEVEL_HIGH>;
+	clocks = <&camera_pixclk>;
+	clocks-names = "camera_pixclk";
+	status = "ok";
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		cpi_csi2_in: endpoint@0 {
+			reg = <0>;
+			remote-endpoint = <&csi2_out>;
+		};
+	};
+};
