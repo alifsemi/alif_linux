@@ -553,8 +553,9 @@ static int32_t alif_csi_dphy_setup(struct dw_dphy_rx *dphy, uint32_t clock_frequ
 	hsfreqrange = range_gen3[range].hsfregrange;
 	osc_freq_target = range_gen3[range].osc_freq_target;
 
-	printk("##alif_csi_dphy_setup hsfreqrange 0x%x osc_freq_target 0x%x"
+	pr_info("%s hsfreqrange 0x%x osc_freq_target 0x%x "
 		"range %d range_gent3.hsfregrange %d\n",
+		__func__,
 		hsfreqrange, osc_freq_target, range,
 		range_gen3[range].hsfregrange);
 
@@ -590,7 +591,7 @@ static int32_t alif_csi_dphy_setup(struct dw_dphy_rx *dphy, uint32_t clock_frequ
         writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
 
 	reg_data = dw_dphy_read(dphy, R_CSI2_DPHY_TST_CTRL0);
-	reg_data &= ~BIT(0); //TestClr Disable 
+	reg_data &= ~BIT(0); //TestClr Disable
 	dw_dphy_write(dphy, R_CSI2_DPHY_TST_CTRL0, reg_data);
 
 	reg_data = readl(expslv1 + 0x38);
@@ -598,7 +599,7 @@ static int32_t alif_csi_dphy_setup(struct dw_dphy_rx *dphy, uint32_t clock_frequ
         writel(reg_data, expslv1 + 0x38); //rx_dphy_ctrl0
 
 	reg_data = dw_dphy_read(dphy, R_CSI2_DPHY_TST_CTRL0);
-	reg_data &= ~BIT(0); //TestClr Disable 
+	reg_data &= ~BIT(0); //TestClr Disable
 	dw_dphy_write(dphy, R_CSI2_DPHY_TST_CTRL0, reg_data);
 
 	reg_data = readl(expslv1 + 0x38); //rx_dphy_ctrl0
@@ -650,11 +651,15 @@ static int32_t alif_csi_dphy_setup(struct dw_dphy_rx *dphy, uint32_t clock_frequ
 
 	while(dphy_stopstate(dphy) != stopstate_check)
 	{
-		printk("csi_dphy_loop>> ");
+		pr_info("csi_dphy_loop>> ");
 		if(lp_count++ < 100)
 			mdelay(50);
 		else{
-			printk("## CSI DPHY STOP STATE != STOPSTATE CHECK!!!!");
+			dev_err(&dphy->phy->dev,
+				"CSI DPHY STOP STATE != STOPSTATE CHECK! ");
+			dev_err(&dphy->phy->dev,
+				"lane_status - 0x%x",
+				dw_dphy_read(dphy, R_CSI2_DPHY_STOPSTATE));
 			return -1;
 		}
 	}
@@ -672,12 +677,11 @@ static int dw_dphy_configure(struct dw_dphy_rx *dphy)
 //	struct dw_dphy_rx *dphy = hdphy;
 	void __iomem *dsi_base;
 
-	printk("#dw_dphy_configure! \n");
 	dsi_base = ioremap(0x49032000, 0x1000);
 	alif_dsi_phy_init(dsi_base);
-	iounmap(dsi_base);	
+	iounmap(dsi_base);
 
-	printk("alif_csi_dphy_setup ->400000000\n");
+	pr_info("alif_csi_dphy_setup ->400000000\n");
 	alif_csi_dphy_setup(dphy, 400000000);
 
 //	dw_dphy_pwr_down(dphy);
@@ -780,11 +784,11 @@ int dw_dphy_init(struct phy *phy)
 static int dw_dphy_set_phy_state(struct dw_dphy_rx *dphy, u32 on)
 {
 	//u8 hs_freq;
-	if(on){
-		printk("dw_dphy_set_phy_state -> ON\n");
+	if (on) {
+		pr_info("%s -> ON\n", __func__);
 		dw_dphy_configure(dphy);
-	}
-	else printk("dw_dphy_set_phy_state -> OFF\n");
+	} else
+		pr_info("%s -> OFF\n", __func__);
 #if 0
 	dphy->lanes_config = dw_dphy_setup_config(dphy);
 

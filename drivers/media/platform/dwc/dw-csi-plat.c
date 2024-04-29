@@ -73,7 +73,6 @@ const struct mipi_dt csi_dt[] = {
 		.name = "RAW16",
 	},
 };
-#if 0
 static struct mipi_fmt *
 find_dw_mipi_csi_format(struct v4l2_mbus_framefmt *mf)
 {
@@ -85,7 +84,6 @@ find_dw_mipi_csi_format(struct v4l2_mbus_framefmt *mf)
 
 	return NULL;
 }
-#endif
 static int dw_mipi_csi_enum_mbus_code(struct v4l2_subdev *sd,
 				      struct v4l2_subdev_pad_config *cfg,
 				      struct v4l2_subdev_mbus_code_enum *code)
@@ -100,7 +98,6 @@ static int dw_mipi_csi_enum_mbus_code(struct v4l2_subdev *sd,
 	return 0;
 }
 
-#if 0
 static struct mipi_fmt *
 dw_mipi_csi_try_format(struct v4l2_mbus_framefmt *mf)
 {
@@ -114,7 +111,6 @@ dw_mipi_csi_try_format(struct v4l2_mbus_framefmt *mf)
 
 	return fmt;
 }
-#endif
 
 static struct v4l2_mbus_framefmt *
 dw_mipi_csi_get_format(struct dw_csi *dev, struct v4l2_subdev_pad_config *cfg,
@@ -141,7 +137,6 @@ dw_mipi_csi_set_fmt(struct v4l2_subdev *sd,
 		    struct v4l2_subdev_pad_config *cfg,
 		    struct v4l2_subdev_format *fmt)
 {
-#if 0
 	struct dw_csi *dev = sd_to_mipi_csi_dev(sd);
 	struct mipi_fmt *dev_fmt;
 	struct v4l2_mbus_framefmt *mf = dw_mipi_csi_get_format(dev, cfg,
@@ -173,7 +168,6 @@ dw_mipi_csi_set_fmt(struct v4l2_subdev *sd,
 			dev_vdbg(dev->dev, "Using data type %s\n",
 				 csi_dt[i].name);
 		}
-#endif
 	return 0;
 }
 
@@ -204,11 +198,10 @@ dw_mipi_csi_s_power(struct v4l2_subdev *sd, int on)
 	dev_vdbg(dev->dev, "%s: on=%d\n", __func__, on);
 
 	if (on) {
-		//TODO ALIF	dw_mipi_csi_hw_stdby(dev);
-		dw_mipi_csi_start(dev);
+		dw_mipi_csi_hw_stdby(dev);
 	} else {
 		phy_power_off(dev->phy);
-		//dw_mipi_csi_mask_irq_power_off(dev);
+		dw_mipi_csi_mask_irq_power_off(dev);
 		/* reset data type */
 		dev->ipi_dt = 0x0;
 	}
@@ -253,6 +246,8 @@ static int dw_mipi_csi_s_stream(struct v4l2_subdev *sd, int enable)
 {
 	struct dw_csi *csi = sd_to_mipi_csi_dev(sd);
 
+	dw_mipi_csi_set_ipi_color_mode(csi);
+	dw_mipi_csi_start(csi);
 	dw_mipi_csi_start_ipi(csi, enable);
 	return 0;
 }
@@ -458,20 +453,6 @@ static int dw_csi_probe(struct platform_device *pdev)
 
 	v4l2_set_subdevdata(&csi->sd, pdev);
 
-	/* Set the default config options - currently based on the arx3a0
-	 * sensor on A1 development platform */
-	csi->hw.num_lanes = 2;
-	csi->hw.hsa = 0x2;
-	csi->hw.hbp = 0x0;
-	csi->hw.hsd = 0x118;
-	csi->hw.htotal = 0x2 + 0x118 + 0x230 ;
-	csi->hw.vsa = 0x4;
-	csi->hw.vbp = 0x4;
-	csi->hw.vfp = 0x4;
-	csi->hw.vactive = 0x230;
-	csi->hw.ipi_color_mode = 1;
-	csi->hw.ipi_auto_flush = 1;
-
 	platform_set_drvdata(pdev, &csi->sd);
 	dev_set_drvdata(dev, sd);
 
@@ -481,10 +462,9 @@ static int dw_csi_probe(struct platform_device *pdev)
 #if IS_ENABLED(CONFIG_DWC_MIPI_TC_DPHY_GEN3)
 	dw_csi_create_capabilities_sysfs(pdev);
 #endif
-	/* ALIF comment off for now 
 	dw_mipi_csi_get_version(csi);
 	dw_mipi_csi_specific_mappings(csi);
-	dw_mipi_csi_mask_irq_power_off(csi); */
+	dw_mipi_csi_mask_irq_power_off(csi);
 
 	dev_info(dev, "DW MIPI CSI-2 Host registered successfully HW v%u.%u\n",
 		 csi->hw_version_major, csi->hw_version_minor);

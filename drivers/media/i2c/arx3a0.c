@@ -324,6 +324,7 @@ struct arx3a0_dev {
 
 	struct regulator *supplies[ARRAY_SIZE(arx3a0_supply_names)];
 	struct gpio_desc *reset_gpio;
+	struct gpio_desc *power_gpio;
 
 	/* lock to protect all members below */
 	struct mutex lock;
@@ -571,36 +572,36 @@ static int arx3a0_write_mode(struct arx3a0_dev *sensor)
 
 static int arx3a0_set_stream(struct arx3a0_dev *sensor, bool on)
 {
-	//int ret;
+	int ret;
 
 	if (on) {
-#if 0 //TODO
 		ret = pm_runtime_get_sync(&sensor->i2c_client->dev);
 		if (ret < 0) {
 			pm_runtime_put_noidle(&sensor->i2c_client->dev);
 			return ret;
 		}
-		arx3a0_calc_mode(sensor);
-		ret = arx3a0_write_mode(sensor);
-		if (ret)
-			goto err;
 
-		ret = arx3a0_set_gains(sensor);
-		if (ret)
-			goto err;
-
-		/* Exit LP-11 mode on clock and data lanes */
-		ret = arx3a0_write_reg(sensor, ARX3A0_REG_HISPI_CONTROL_STATUS,
-				       0);
-		if (ret)
-			goto err;
-		/* Start streaming */
-		ret = arx3a0_write_reg(sensor, ARX3A0_REG_RESET,
-				       ARX3A0_REG_RESET_DEFAULTS |
-				       ARX3A0_REG_RESET_STREAM);
-		if (ret)
-			goto err;
-#endif
+		// TODO
+//		arx3a0_calc_mode(sensor);
+//		ret = arx3a0_write_mode(sensor);
+//		if (ret)
+//			goto err;
+//
+//		ret = arx3a0_set_gains(sensor);
+//		if (ret)
+//			goto err;
+//
+//		/* Exit LP-11 mode on clock and data lanes */
+//		ret = arx3a0_write_reg(sensor, ARX3A0_REG_HISPI_CONTROL_STATUS,
+//				       0);
+//		if (ret)
+//			goto err;
+//		/* Start streaming */
+//		ret = arx3a0_write_reg(sensor, ARX3A0_REG_RESET,
+//				       ARX3A0_REG_RESET_DEFAULTS |
+//				       ARX3A0_REG_RESET_STREAM);
+//		if (ret)
+//			goto err;
 
 		arx3a0_write_reg8(sensor, ARX3A0_MODE_SELECT_REGISTER, 0x01);
 		return 0;
@@ -610,21 +611,22 @@ static int arx3a0_set_stream(struct arx3a0_dev *sensor, bool on)
 //		return ret;
 
 	} else {
-#if 0 //TODO
-		/* Reset gain, the sensor may produce all white pixels without
-		   this */
-		ret = arx3a0_write_reg(sensor, ARX3A0_REG_GLOBAL_GAIN, 0x2000);
-		if (ret)
-			return ret;
+		/*
+		 * Reset gain, the sensor may produce all white pixels without
+		 * this
+		 */
+//		ret = arx3a0_write_reg(sensor, ARX3A0_REG_GLOBAL_GAIN, 0x2000);
+//		if (ret)
+//			return ret;
+//
+//		/* Stop streaming */
+//		ret = arx3a0_write_reg(sensor, ARX3A0_REG_RESET,
+//				       ARX3A0_REG_RESET_DEFAULTS);
+//		if (ret)
+//			return ret;
+//
+		pm_runtime_put_noidle(&sensor->i2c_client->dev);
 
-		/* Stop streaming */
-		ret = arx3a0_write_reg(sensor, ARX3A0_REG_RESET,
-				       ARX3A0_REG_RESET_DEFAULTS);
-		if (ret)
-			return ret;
-
-		pm_runtime_put(&sensor->i2c_client->dev);
-#endif
 		arx3a0_write_reg8(sensor, ARX3A0_MODE_SELECT_REGISTER, 0x00);
 		return 0;
 	}
@@ -636,7 +638,17 @@ static void arx3a0_adj_fmt(struct v4l2_mbus_framefmt *fmt)
 			   ARX3A0_WIDTH_MAX);
 	fmt->height = clamp(ALIGN(fmt->height, 4), ARX3A0_HEIGHT_MIN,
 			    ARX3A0_HEIGHT_MAX);
-	fmt->code = MEDIA_BUS_FMT_SGRBG8_1X8;
+	/*
+	 * Media bus Format - SBGGR10_1X10 is for color filter arrays in image
+	 * sensors that capture image in Bayer pattern. In bayer pattern, each
+	 * pixel captures only one color component (red, green or blue), and
+	 * neighboring pixels capture different color components.
+	 * The 10_1X10 part represents that each pixel captured by sensor is
+	 * 10-bit wide or bit-depth of each pixel.
+	 * The 1X10 suggests that the data is transmitted 10-bits in a single
+	 * data stream.
+	 */
+	fmt->code = MEDIA_BUS_FMT_SBGGR10_1X10;
 	fmt->field = V4L2_FIELD_NONE;
 	fmt->colorspace = V4L2_COLORSPACE_SRGB;
 	fmt->ycbcr_enc = V4L2_YCBCR_ENC_DEFAULT;
@@ -806,21 +818,20 @@ free_ctrls:
 
 static int arx3a0_power_off(struct device *dev)
 {
-#if 0
 	struct v4l2_subdev *sd = dev_get_drvdata(dev);
 	struct arx3a0_dev *sensor = to_arx3a0_dev(sd);
 	int i;
 
 	clk_disable_unprepare(sensor->extclk);
 
+	/* de-assert RESET signal */
 	if (sensor->reset_gpio)
-		gpiod_set_value(sensor->reset_gpio, 0); /* de-assert RESET signal */
+		gpiod_set_value(sensor->reset_gpio, 1);
 
 	for (i = ARRAY_SIZE(arx3a0_supply_names) - 1; i >= 0; i--) {
 		if (sensor->supplies[i])
 			regulator_disable(sensor->supplies[i]);
 	}
-#endif
 	return 0;
 }
 
@@ -829,8 +840,8 @@ static int arx3a0_power_on(struct device *dev)
 	struct v4l2_subdev *sd = dev_get_drvdata(dev);
 	struct arx3a0_dev *sensor = to_arx3a0_dev(sd);
 	unsigned int cnt;
-	int ret;
 	u16 val;
+	int ret;
 
 	for (cnt = 0; cnt < ARRAY_SIZE(arx3a0_supply_names); cnt++)
 		if (sensor->supplies[cnt]) {
@@ -854,12 +865,31 @@ static int arx3a0_power_on(struct device *dev)
 		gpiod_set_value(sensor->reset_gpio, 1);
 
 	usleep_range(3000, 4000); /* min 45000 clocks */
+	gpiod_set_value(sensor->reset_gpio, 0);
 
-	printk("arx3a0_power_on Initial reset and configuration!!!\n");
+	if (sensor->power_gpio)
+		gpiod_set_value(sensor->power_gpio, 1);
+	usleep_range(1000, 1500); /* min 1 ms */
+
+	if (sensor->reset_gpio)
+		gpiod_set_value(sensor->reset_gpio, 0);
+
+	mdelay(100);
+
+	dev_info(dev, "Power-ON Initial reset and configuration!!!\n");
+	arx3a0_read_reg(sensor, ARX3A0_CHIP_ID_REGISTER, &val);
+	if (val != ARX3A0_CHIP_ID_REGISTER_VALUE) {
+		dev_info(dev, "Unknown Chip-ID - 0x%x", val);
+		goto off;
+	}
+
 	arx3a0_write_reg(sensor, ARX3A0_SOFTWARE_RESET_REGISTER, 0x01);
 	mdelay(1);
-	arx3a0_write_reg(sensor, ARX3A0_MODE_SELECT_REGISTER, 0x00); /*Putting sensor in standby mode*/
 
+	/* Putting sensor in standby mode */
+	arx3a0_write_reg(sensor, ARX3A0_MODE_SELECT_REGISTER, 0x00);
+
+	/* Putting sensor in LP-11 state on Standby mode. */
 	arx3a0_read_reg(sensor, ARX3A0_MIPI_CONFIG_REGISTER, &val);
 	arx3a0_write_reg(sensor, ARX3A0_MIPI_CONFIG_REGISTER,  (1 << 7) | val);
 
@@ -868,25 +898,14 @@ static int arx3a0_power_on(struct device *dev)
 				      initial_regs[cnt].count))
 			goto off;
 
-#if 0
-	ret = arx3a0_write_reg(sensor, ARX3A0_REG_SERIAL_FORMAT,
-			       ARX3A0_REG_SERIAL_FORMAT_MIPI |
-			       sensor->lane_count);
-	if (ret)
-		goto off;
+	/* Start streaming. */
+	arx3a0_write_reg(sensor, ARX3A0_MODE_SELECT_REGISTER, 1);
 
-	/* set MIPI test mode - disabled for now */
-	ret = arx3a0_write_reg(sensor, ARX3A0_REG_HISPI_TEST_MODE,
-			       ((0x40 << sensor->lane_count) - 0x40) |
-			       ARX3A0_REG_HISPI_TEST_MODE_LP11);
-	if (ret)
-		goto off;
+	mdelay(50);
 
-	ret = arx3a0_write_reg(sensor, ARX3A0_REG_ROW_SPEED, 0x110 |
-			       4 / sensor->lane_count);
-	if (ret)
-		goto off;
-#endif
+	/* Suspend any stream. */
+	arx3a0_write_reg(sensor, ARX3A0_MODE_SELECT_REGISTER, 0);
+
 	return 0;
 off:
 	arx3a0_power_off(dev);
@@ -911,24 +930,6 @@ static int arx3a0_s_stream(struct v4l2_subdev *sd, int enable)
 	struct arx3a0_dev *sensor = to_arx3a0_dev(sd);
 	int ret;
 
-//TODO TEST ONLY
-//	if (!(flags & V4L2_SUBDEV_PRE_STREAMON_FL_MANUAL_LP))
-//		return -EACCES;
-
-	ret = pm_runtime_get_sync(&sensor->i2c_client->dev);
-	if (ret < 0) {
-		pm_runtime_put_noidle(&sensor->i2c_client->dev);
-		return ret;
-	}
-
-	/* Start streaming LP-11 */
-/*	ret = arx3a0_write_reg(sensor, ARX3A0_REG_RESET,
-			       ARX3A0_REG_RESET_DEFAULTS |
-			       ARX3A0_REG_RESET_STREAM);
-
-	if (ret)
-		goto err;
-*/
 	mutex_lock(&sensor->lock);
 
 	ret = arx3a0_set_stream(sensor, enable);
@@ -936,7 +937,6 @@ static int arx3a0_s_stream(struct v4l2_subdev *sd, int enable)
 		sensor->streaming = enable;
 
 	mutex_unlock(&sensor->lock);
-//err:
 	pm_runtime_put(&sensor->i2c_client->dev);
 	return ret;
 }
@@ -1051,11 +1051,9 @@ static int arx3a0_probe(struct i2c_client *client)
 	sensor->reset_gpio = devm_gpiod_get_optional(dev, "reset",
 						     GPIOD_OUT_HIGH);
 
-	/* RESET */
-	gpiod_set_value(sensor->reset_gpio, 0);
-	mdelay(100);
-	gpiod_set_value(sensor->reset_gpio, 1);
-
+	/* Request optional power pin. */
+	sensor->power_gpio = devm_gpiod_get_optional(dev, "power",
+						GPIOD_OUT_LOW);
 	v4l2_i2c_subdev_init(&sensor->sd, client, &arx3a0_subdev_ops);
 
 	sensor->sd.flags = V4L2_SUBDEV_FL_HAS_DEVNODE;
@@ -1096,9 +1094,9 @@ static int arx3a0_probe(struct i2c_client *client)
 	ret = arx3a0_power_on(&client->dev);
 	if (ret)
 		goto disable;
+
 	pm_runtime_set_active(&client->dev);
 	pm_runtime_enable(&client->dev);
-	pm_runtime_idle(&client->dev);
 	return 0;
 
 disable:

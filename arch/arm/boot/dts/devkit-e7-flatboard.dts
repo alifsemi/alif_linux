@@ -880,7 +880,7 @@
 			reg = <0x49007000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "disabled";
+			status = "okay";
 
 			/* Port 8 */
 			port8: gpio-port@0 {
@@ -932,7 +932,7 @@
 			reg = <0x49009000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "disabled";
+			status = "okay";
 
 			/* Port 10 */
 			port10: gpio-port@0 {
@@ -1232,7 +1232,26 @@
 			i2c-sda-hold-time-ns = <300>;
 			i2c-sda-falling-time-ns = <300>;
 			i2c-scl-falling-time-ns = <300>;
-			status = "disabled";
+			status = "okay";
+			arx3a0@36 {
+				compatible = "onnn,arx3a0";
+				reg = <0x36 0x0 0x4000>;
+				clocks = <&ext_clk>;
+				clock-names = "extclk";
+				reset-gpio = <&port10 1 GPIO_ACTIVE_LOW>;
+				power-gpio = <&port8 5 GPIO_ACTIVE_HIGH>;
+				vaa-supply = <&reg_2p7v>;
+				vdd-supply = <&reg_1p2v>;
+				vdd_io-supply = <&reg_1p8v>;
+				port@0 {
+					arx3a0_csi2_ep: endpoint@0 {
+						bus-type = <4>;
+						clock-lanes = <0>;
+						data-lanes = <1 2>;
+						remote-endpoint = <&csi2_in>;
+					};
+				};
+			};
 		};
 
 		i2c2@49012000 {
@@ -1268,17 +1287,17 @@
 		};
 
 		/* ====== DW I3C ====== */
-		i3c0: i3c@49018000 {
+		i3c0: i3c@49034000 {
 			compatible = "snps,dw-i3c-master-1.00a";
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_i3c0>;
-			reg = <0x49018000 0x1000>;
+			reg = <0x49034000 0x1000>;
 			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&syst_pclk>;
 			#address-cells = <3>;
 			#size-cells = <0>;
 			i2c-scl-hz = <100000>;
-			status = "disabled";
+			status = "okay";
 
 			//clock-frequency = <100000>;
 			/* I2C device.*/
@@ -1291,24 +1310,6 @@
 				compatible = "bno055";
 				reg = <0x28 0x0 0x100>;
 			};*/
-			arx3a0@36 {
-				compatible = "onnn,arx3a0";
-				reg = <0x36 0x0 0x4000>;
-				clocks = <&ext_clk>;
-				clock-names = "extclk";
-				reset-gpio = <&port4 5 (GPIO_ACTIVE_LOW | GPIO_OPEN_DRAIN)>;
-				vaa-supply = <&reg_2p7v>;
-				vdd-supply = <&reg_1p2v>;
-				vdd_io-supply = <&reg_1p8v>;
-				port@0 {
-					arx3a0_csi2_ep: endpoint@0 {
-						bus-type = <4>;
-						clock-lanes = <0>;
-						data-lanes = <1 2>;
-						remote-endpoint = <&csi2_in>;
-					};
-				};
-			};
 		};
 		/*====== DW I2S ====== */
 		i2s0: i2s0@49014000 {
@@ -1716,6 +1717,8 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0x49033000 0x1000>;
+			/* output-type = 0 (IPI), 1 (IDI), 2 (BOTH) */
+			snps,output-type = <0>;
 			phys = <&mipi_dphy_rx 1>;
 			/*resets = <&dw_rst 1>;*/
 			interrupt-parent = <&gic>;
@@ -2020,9 +2023,21 @@
 		>;
 	};
 	pinctrl_i2c1: i2c1grp {
+		/*
+		 * Enable following features in Pad-config:
+		 *	8bit pad-config value: 0x23
+		 *	bit 0:	1 -> Read enable
+		 *	bit 1:	1 -> Schmitt trigger enable
+		 *	bit 2:	0 -> Slew rate slow
+		 *	bit 3 and 4:
+		 *		00 -> High Impedance
+		 *	bit 5 and 6: Output drive strength
+		 *		01 -> 4mA
+		 *	bit 7:	0 -> Push-pull
+		 */
 		pinmux = <
-			PIN_P7_2__I2C1_SDA_C	0x0
-			PIN_P7_3__I2C1_SCL_C	0x0
+			PIN_P7_2__I2C1_SDA_C	0x23
+			PIN_P7_3__I2C1_SCL_C	0x23
 		>;
 	};
 	pinctrl_i2s3: i2s3grp {
@@ -2033,9 +2048,21 @@
 		>;
 	};
 	pinctrl_i3c0: i3c0grp {
+		/*
+		 * Enable following features in Pad-config:
+		 *	8bit pad-config value: 0x8b
+		 *	bit 0:	1 -> Read enable
+		 *	bit 1:	1 -> Schmitt trigger enable
+		 *	bit 2:	0 -> Slew rate slow
+		 *	bit 3 and 4:
+		 *		01 -> Pull up
+		 *	bit 5 and 6: Output drive strength
+		 *		00 -> 2mA
+		 *	bit 7:	1 -> Open drain
+		 */
 		pinmux = <
-			PIN_P7_6__I3C_SDA_D	0x0
-			PIN_P7_7__I3C_SCL_D	0x0
+			PIN_P7_6__I3C_SDA_D	0x8b
+			PIN_P7_7__I3C_SCL_D	0x8b
 		>;
 	};
 	pinctrl_adc121: adc121grp {
@@ -2129,7 +2156,7 @@
 			PIN_P8_0__CAM_D0_B	0x0
 			PIN_P10_1__CAM_VSYNC_B	0x0
 			PIN_P10_0__CAM_HSYNC_B	0x0
-			PIN_P10_3__CAM_XVCLK_B	0x0
+			PIN_P0_3__CAM_XVCLK_A	0x23
 		>;
 	};
 };

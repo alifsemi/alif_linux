@@ -52,15 +52,20 @@ enum sync_event {
 
 /* DW MIPI CSI-2 register addresses*/
 struct R_CSI2 {
-#if 0
-	u32 VERSION;	 	//0x0
-	u32 N_LANES; 		//0x4
-	u32 CTRL_RESETN; 	//0x8
-	u32 INTERRUPT; 		//0xc
-	u32 DATA_IDS_1;		//0x10
+	u32 VERSION;
+	u32 N_LANES;
+	u32 CSI2_RESETN;
+	u32 INT_ST_MAIN;
+	u32 DATA_IDS_1;
 	u32 DATA_IDS_2;
 	u32 DATA_IDS_VC_1;
 	u32 DATA_IDS_VC_2;
+	u32 PHY_SHUTDOWNZ;
+	u32 DPHY_RSTZ;
+	u32 PHY_RX;
+	u32 PHY_STOPSTATE;
+	u32 PHY_TEST_CTRL0;
+	u32 PHY_TEST_CTRL1;
 	u32 IPI_MODE;
 	u32 IPI_VCID;
 	u32 IPI_DATA_TYPE;
@@ -76,27 +81,28 @@ struct R_CSI2 {
 	u32 IPI_VFP_LINES;
 	u32 IPI_VACTIVE_LINES;
 	u32 VC_EXTENSION;
-	u32 INT_PHY_FATAL;
-	u32 MASK_INT_PHY_FATAL;
-	u32 FORCE_INT_PHY_FATAL;
-	u32 INT_PKT_FATAL;
-	u32 MASK_INT_PKT_FATAL;
-	u32 FORCE_INT_PKT_FATAL;
+	u32 PHY_CAL;
+	u32 INT_ST_PHY_FATAL;
+	u32 INT_MSK_PHY_FATAL;
+	u32 INT_FORCE_PHY_FATAL;
+	u32 INT_ST_PKT_FATAL;
+	u32 INT_MSK_PKT_FATAL;
+	u32 INT_FORCE_PKT_FATAL;
 	u32 INT_FRAME_FATAL;
 	u32 MASK_INT_FRAME_FATAL;
 	u32 FORCE_INT_FRAME_FATAL;
-	u32 INT_PHY;
-	u32 MASK_INT_PHY;
-	u32 FORCE_INT_PHY;
+	u32 INT_ST_PHY;
+	u32 INT_MSK_PHY;
+	u32 INT_FORCE_PHY;
 	u32 INT_PKT;
 	u32 MASK_INT_PKT;
 	u32 FORCE_INT_PKT;
-	u32 INT_LINE;
-	u32 MASK_INT_LINE;
-	u32 FORCE_INT_LINE;
-	u32 INT_IPI;
-	u32 MASK_INT_IPI;
-	u32 FORCE_INT_IPI;
+	u32 INT_ST_LINE;
+	u32 INT_MSK_LINE;
+	u32 INT_FORCE_LINE;
+	u32 INT_ST_IPI_FATAL;
+	u32 INT_MSK_IPI_FATAL;
+	u32 INT_FORCE_IPI_FATAL;
 	u32 ST_BNDRY_FRAME_FATAL;
 	u32 MSK_BNDRY_FRAME_FATAL;
 	u32 FORCE_BNDRY_FRAME_FATAL;
@@ -115,71 +121,9 @@ struct R_CSI2 {
 	u32 ST_ECC_CORRECT;
 	u32 MSK_ECC_CORRECT;
 	u32 FORCE_ECC_CORRECT;
-#endif
-	u32 VERSION;		//0x0	R	Reserved
-	u32 N_LANES;		//0x4	R/W	Lane Configuration Register
-	u32 CSI2_RESETN;		//0x8	R/W	CSI Controller Reset Control Register
-	u32 INT_ST_MAIN;		//0xC	R	Main Interrupt Status Register
-	u32 DATA_IDS_1;		//0x10	R/W	DT Data ID Monitors Configuration Register
-	u32 DATA_IDS_VC_1;		//0x30	R/W	VC Data ID Monitors Configuration Register
-	u32 PHY_SHUTDOWNZ;		//0x40	R/W	PHY Shutdown Control Register
-	u32 DPHY_RSTZ;		//0x44	R/W	PHY Reset Control Register
-	u32 PHY_RX;			//0x48	R	PHY RX Signals Status Register
-	u32 PHY_STOPSTATE;		//0x4C	R	PHY STOPSTATE Signal Status Register
-	u32 PHY_TEST_CTRL0;		//0x50	R/W	PHY Test Control 0 Register
-	u32 PHY_TEST_CTRL1;		//0x54	R/W	PHY Test Control 1 Register
-	u32 IPI_MODE;		//0x80	R/W	IPI Mode Selection Register
-	u32 IPI_VCID;		//0x84	R/W	IPI VC Selection Register
-	u32 IPI_DATA_TYPE;		//0x88	R/W	IPI DT Selection Register
-	u32 IPI_MEM_FLUSH;		//0x8C	R/W	IPI Memory Flush Control Register
-	u32 IPI_HSA_TIME;		//0x90	R/W	IPI HSA Configuration Register
-	u32 IPI_HBP_TIME;		//0x94	R/W	IPI HBP Configuration Register
-	u32 IPI_HSD_TIME;		//0x98	R/W	IPI HSD Configuration Register
-	u32 IPI_HLINE_TIME;		//0x9C	R/W	IPI HLINE Configuration Register
-	u32 IPI_SOFTRSTN;		//0xA0	R/W	IPI Reset Control Register
-	u32 IPI_ADV_FEATURES;	//0xAC	R/W	IPI Advanced Features Configuration Register
-	u32 IPI_VSA_LINES;		//0xB0	R/W	IPI VSA Configuration Register
-	u32 IPI_VBP_LINES;		//0xB4	R/W	IPI VBP Configuration Register
-	u32 IPI_VFP_LINES;		//0xB8	R/W	IPI VFP Configuration Register
-	u32 IPI_VACTIVE_LINES;	//0xBC	R/W	IPI VACTIVE Configuration Register
-	u32 VC_EXTENSION;		//0xC8	R/W	VC Extension Configuration Register
-	u32 PHY_CAL	;		//0xCC	R	PHY CALIBRATION Signal Status Register
-	u32 INT_ST_PHY_FATAL;	//0xE0	R	PHY Packet Discarded Interrupt Status Register
-	u32 INT_MSK_PHY_FATAL;	//0xE4	R/W	PHY Packet Discarded Interrupt Mask Register
-	u32 INT_FORCE_PHY_FATAL;	//0xE8	R/W	PHY Packet Discarded Interrupt Force Register
-	u32 INT_ST_PKT_FATAL;	//0xF0	R	PHY Packet Construction Interrupt Status Register
-	u32 INT_MSK_PKT_FATAL;	//0xF4	R/W	PHY Packet Construction Interrupt Mask Register
-	u32 INT_FORCE_PKT_FATAL;	//0xF8	R/W	PHY Packet Construction Interrupt Force Register
-	u32 INT_ST_PHY;		//0x110	R	PHY Interrupt Status Register
-	u32 INT_MSK_PHY;		//0x114	R/W	PHY Interrupt Mask Register
-	u32 INT_FORCE_PHY;		//0x118	R/W	PHY Interrupt Force Register
-	u32 INT_ST_LINE;		//0x130	R	PHY Line Construction Interrupt Status Register
-	u32 INT_MSK_LINE;		//0x134	R/W	PHY Line Construction Interrupt Mask Register
-	u32 INT_FORCE_LINE;		//0x138	R/W	PHY Line Construction Interrupt Force Register
-	u32 INT_ST_IPI_FATAL;	//0x140	R	IPI Interface Interrupt Status Register
-	u32 INT_MSK_IPI_FATAL;	//0x144	R/W	IPI Interface Interrupt Mask Register
-	u32 INT_FORCE_IPI_FATAL;	//0x148	R/W	IPI Interface Interrupt Force Register
-	u32 INT_ST_BNDRY_FRAME_FATAL;	//0x280	R	Frame Boundary Error Interrupt Status Register
-	u32 INT_MSK_BNDRY_FRAME_FATAL;   //0x284	R	Frame Boundary Error Interrupt Mask Register
-	u32 INT_FORCE_BNDRY_FRAME_FATAL; //0x288	R	Frame Boundary Error Interrupt Force Register
-	u32 INT_ST_SEQ_FRAME_FATAL;	//0x290	R	Frame Sequence Error Interrupt Status Register
-	u32 INT_MSK_SEQ_FRAME_FATAL;	//0x294	R	Frame Sequence Error Interrupt Mask Register
-	u32 INT_FORCE_SEQ_FRAME_FATAL;   //0x298	R	Frame Sequence Error Interrupt Force Register
-	u32 INT_ST_CRC_FRAME_FATAL;	//0x2A0	R	Frame CRC Error Interrupt Status Register
-	u32 INT_MSK_CRC_FRAME_FATAL;	//0x2A4	R	Frame CRC Error Interrupt Mask Register
-	u32 INT_FORCE_CRC_FRAME_FATAL;   //0x2A8	R	Frame CRC Error Interrupt Force Register
-	u32 INT_ST_PLD_CRC_FATAL;	//0x2B0	R	Frame Payload Error Interrupt Status Register
-	u32 INT_MSK_PLD_CRC_FATAL;	//0x2B4	R	Frame Payload Error Interrupt Mask Register
-	u32 INT_FORCE_PLD_CRC_FATAL;	//0x2B8	R	Frame Payload Error Interrupt Force Register
-	u32 INT_ST_DATA_ID;		//0x2C0	R	DT Error Interrupt Status Register
-	u32 INT_MSK_DATA_ID;		//0x2C4	R	DT Error Interrupt Mask Register
-	u32 INT_FORCE_DATA_ID;		//0x2C8	R	DT Error Interrupt Force Register
-	u32 INT_ST_ECC_CORRECT;		//0x2D0	R	ECC Interrupt Status Register
-	u32 INT_MSK_ECC_CORRECT;		//0x2D4	R	ECC Interrupt Mask Register
-	u32 INT_FORCE_ECC_CORRECT;	//0x2D8	R	ECC Interrupt Force Register
-	u32 SCRAMBLING;		//0x300	R/W	Descrambling Control Register
-	u32 SCRAMBLING_SEED1;		//0x304	R/W	Descrambling Seed Configuration Lane 0 Register
-	u32 SCRAMBLING_SEED2;		//0x308	R/W	Descrambling Seed Configuration Lane 1 Register
+	u32 SCRAMBLING;
+	u32 SCRAMBLING_SEED1;
+	u32 SCRAMBLING_SEED2;
 };
 
 /* Interrupt Masks */
@@ -326,6 +270,7 @@ void dw_mipi_csi_reset(struct dw_csi *csi_dev);
 int dw_mipi_csi_mask_irq_power_off(struct dw_csi *csi_dev);
 int dw_mipi_csi_hw_stdby(struct dw_csi *csi_dev);
 void dw_mipi_csi_set_ipi_fmt(struct dw_csi *csi_dev);
+void dw_mipi_csi_set_ipi_color_mode(struct dw_csi *csi_dev);
 void dw_mipi_csi_start(struct dw_csi *csi_dev);
 void dw_mipi_csi_start_ipi(struct dw_csi *csi_dev, int enable);
 int dw_mipi_csi_irq_handler(struct dw_csi *csi_dev);

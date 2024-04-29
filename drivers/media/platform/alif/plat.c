@@ -26,11 +26,48 @@ static int plat_csi_pipeline_s_format(struct plat_csi_media_pipeline *ep,
 	struct plat_csi_pipeline *p = to_plat_csi_pipeline(ep);
 	static const u8 seq[IDX_MAX] = {IDX_SENSOR1, IDX_SENSOR2, IDX_CSI,
 					IDX_CPI, IDX_VDEV};
+	int ret;
+	int i, j;
+	int idx;
 
 	fmt->which = V4L2_SUBDEV_FORMAT_ACTIVE;
-	v4l2_subdev_call(p->subdevs[seq[IDX_CSI]], pad, set_fmt, NULL, fmt);
 
-	return 0;
+	for (i = 0; i < IDX_MAX; i++) {
+		struct media_entity *me;
+		u32 check_flag = 0;
+
+		idx = seq[i];
+
+		if (p->subdevs[idx] == NULL) {
+			pr_debug("No device registered on %d\n", idx);
+			continue;
+		}
+
+		switch (idx) {
+		case IDX_SENSOR1:
+		case IDX_SENSOR2:
+			check_flag = MEDIA_PAD_FL_SOURCE;
+			break;
+		default:
+			check_flag = MEDIA_PAD_FL_SINK;
+		}
+
+		me = &p->subdevs[idx]->entity;
+		for (j = 0; j < me->num_pads; j++) {
+			struct media_pad *spad = &me->pads[j];
+
+			if (spad->flags & check_flag)
+				fmt->pad = j;
+		}
+
+		ret = v4l2_subdev_call(p->subdevs[idx], pad,
+				set_fmt, NULL, fmt);
+		if (ret)
+			pr_info("Failed to set Format for %s, ret - %d\n",
+					p->subdevs[idx]->name, ret);
+	}
+
+	return ret;
 }
 
 static void plat_csi_pipeline_prepare(struct plat_csi_pipeline *p,
@@ -54,7 +91,6 @@ static void plat_csi_pipeline_prepare(struct plat_csi_pipeline *p,
 
 			pad = media_entity_remote_pad(spad);
 			if (pad) {
-
 				sd = media_entity_to_v4l2_subdev(pad->entity);
 				if (sd->grp_id == GRP_ID_CPI) {
 						break;
@@ -170,8 +206,8 @@ static int plat_csi_pipeline_close(struct plat_csi_media_pipeline *ep)
 static int plat_csi_pipeline_s_stream(struct plat_csi_media_pipeline *ep,
 				 bool on)
 {
-	static const u8 seq[IDX_MAX] = {IDX_VDEV, IDX_CPI, IDX_CSI,
-					IDX_SENSOR1, IDX_SENSOR2};
+	static const u8 seq[IDX_MAX] = {IDX_CSI, IDX_SENSOR1, IDX_SENSOR2,
+					IDX_CPI, IDX_VDEV};
 	struct plat_csi_pipeline *p = to_plat_csi_pipeline(ep);
 	int i, ret = 0,	idx;
 

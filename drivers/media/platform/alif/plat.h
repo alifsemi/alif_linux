@@ -24,7 +24,7 @@
 
 #define to_plat_csi_pipeline(_ep) container_of(_ep, struct plat_csi_pipeline, ep)
 
-#define N_BUFFERS 1
+#define N_BUFFERS 4
 
 
 enum plat_csi_subdev_index {
@@ -71,11 +71,6 @@ struct rx_buffer {
 	void *cpu_addr;
 };
 
-struct dmaqueue {
-	struct list_head active;
-	wait_queue_head_t wq;
-};
-
 struct cpi_dev{
 	struct platform_device *pdev;
 	int irq;
@@ -83,19 +78,15 @@ struct cpi_dev{
 	spinlock_t slock;
 	struct plat_csi_video_entity ve;
 	struct v4l2_format format;
-	struct v4l2_pix_format pix_format;
 	const struct plat_csi_fmt *fmt;
-//	unsigned long *alloc_ctx;
 
 	/* Buffer and DMA */
 	struct vb2_queue vb_queue;
-	int idx;
-	int last_idx;
-	struct dmaqueue vidq;
-	struct rx_buffer dma_buf[N_BUFFERS];
-//	struct dma_chan *dma;
-//	struct dma_interleaved_template xt;
-//	struct data_chunk sgl[1];
+
+	int sequence;
+	struct list_head fb_list_head;
+	struct rx_buffer *active;
+
 	struct media_pad vd_pad;
 	struct media_pad subdev_pads[VIDEO_DEV_PADS_NUM];
 	struct plat_csi_sensor_info sensor[PLAT_MAX_SENSORS];
@@ -111,7 +102,6 @@ struct cpi_dev{
 	struct list_head pipelines;
 	int num_sensors;
 	void __iomem *base_addr;
-	void *vframe;
 };
 
 static inline struct cpi_dev *
