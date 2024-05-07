@@ -954,7 +954,6 @@ static int cpi_probe(struct platform_device *pdev)
 	 */
 		static int kkk = 0;
 		kkk++;
-		printk("Probing Alif CPI !!!\n");
 		if (kkk < 3)
 			return -EPROBE_DEFER;
 	}

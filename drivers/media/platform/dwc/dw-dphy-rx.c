@@ -553,12 +553,6 @@ static int32_t alif_csi_dphy_setup(struct dw_dphy_rx *dphy, uint32_t clock_frequ
 	hsfreqrange = range_gen3[range].hsfregrange;
 	osc_freq_target = range_gen3[range].osc_freq_target;
 
-	pr_info("%s hsfreqrange 0x%x osc_freq_target 0x%x "
-		"range %d range_gent3.hsfregrange %d\n",
-		__func__,
-		hsfreqrange, osc_freq_target, range,
-		range_gen3[range].hsfregrange);
-
 	//dw_dphy_init(dphy);
 	dw_dphy_write(dphy, R_CSI2_DPHY_RSTZ, 0);
 	dw_dphy_write(dphy, R_CSI2_DPHY_SHUTDOWNZ, 0);
@@ -651,7 +645,6 @@ static int32_t alif_csi_dphy_setup(struct dw_dphy_rx *dphy, uint32_t clock_frequ
 
 	while(dphy_stopstate(dphy) != stopstate_check)
 	{
-		pr_info("csi_dphy_loop>> ");
 		if(lp_count++ < 100)
 			mdelay(50);
 		else{
@@ -681,7 +674,6 @@ static int dw_dphy_configure(struct dw_dphy_rx *dphy)
 	alif_dsi_phy_init(dsi_base);
 	iounmap(dsi_base);
 
-	pr_info("alif_csi_dphy_setup ->400000000\n");
 	alif_csi_dphy_setup(dphy, 400000000);
 
 //	dw_dphy_pwr_down(dphy);
@@ -785,10 +777,8 @@ static int dw_dphy_set_phy_state(struct dw_dphy_rx *dphy, u32 on)
 {
 	//u8 hs_freq;
 	if (on) {
-		pr_info("%s -> ON\n", __func__);
 		dw_dphy_configure(dphy);
-	} else
-		pr_info("%s -> OFF\n", __func__);
+	}
 #if 0
 	dphy->lanes_config = dw_dphy_setup_config(dphy);
 

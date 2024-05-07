@@ -1232,7 +1232,7 @@
 			i2c-sda-hold-time-ns = <300>;
 			i2c-sda-falling-time-ns = <300>;
 			i2c-scl-falling-time-ns = <300>;
-			status = "okay";
+			status = I2C1_STATUS;
 			arx3a0@36 {
 				compatible = "onnn,arx3a0";
 				reg = <0x36 0x0 0x4000>;
@@ -1297,7 +1297,7 @@
 			#address-cells = <3>;
 			#size-cells = <0>;
 			i2c-scl-hz = <100000>;
-			status = "okay";
+			status = I3C0_STATUS;
 
 			//clock-frequency = <100000>;
 			/* I2C device.*/
@@ -1690,7 +1690,7 @@
 			interrupts = <GIC_SPI 334 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&camera_pixclk>;
 			clocks-names = "camera_pixclk";
-			status = "ok";
+			status = CPI_STATUS;
 			port {
 				#address-cells = <1>;
 				#size-cells = <0>;
@@ -1723,6 +1723,7 @@
 			/*resets = <&dw_rst 1>;*/
 			interrupt-parent = <&gic>;
 			interrupts = <GIC_SPI 333 IRQ_TYPE_LEVEL_HIGH>;
+			status = CSI_STATUS;
 
 			port@1 {
 				reg = <1>;

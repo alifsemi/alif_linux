@@ -98,7 +98,6 @@ uint8_t dsi_dphy_read(void __iomem *base, uint16_t address)
 
 	read_data = dphy_read(base, DPHY_TST_CTRL1);
 	read_data = read_data >> 8;
-	printk("dphy_read: addr 0x%x data 0x%x\n", address, (uint8_t)read_data);
 	return (uint8_t)read_data;
 }
 
@@ -239,7 +238,6 @@ int alif_dsi_phy_init(void __iomem *base)
 	// Wait for clk and data lanes to be in stop state
 	do {
 		mdelay(20);
-		printk("loop->");
 	} while((dphy_read(base, R_DPHY_STATUS) & 0x94) != 0x94);
 	return 0;
 }
