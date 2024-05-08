@@ -1683,7 +1683,7 @@
 			#address-cells = <1>;
 			#size-cells = <0>;
 			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_camera>;
+			pinctrl-0 = <&pinctrl_csi_cam>;
 			compatible = "alif,ensemble-cpi";
 			reg = <0x49030000 0x1000>;
 			interrupt-parent = <&gic>;
@@ -2136,27 +2136,32 @@
 			PIN_P5_6__CDC_VSYNC_A	0x23
 		>;
 	};
+	pinctrl_csi_cam: camera1grp {
+		pinmux = <
+			PIN_P0_3__CAM_XVCLK_A	0x23
+		>;
+	};
 	pinctrl_camera: camera0grp {
 		pinmux = <
-			PIN_P10_2__CAM_PCLK_B	0x0
+			PIN_P2_4__CAM_D0_A	0x0
+			PIN_P8_1__CAM_D1_B	0x0
 			PIN_P8_2__CAM_D2_B	0x0
 			PIN_P8_3__CAM_D3_B	0x0
 			PIN_P8_4__CAM_D4_B	0x0
 			PIN_P8_5__CAM_D5_B	0x0
+			PIN_P8_6__CAM_D6_B	0x0
+			PIN_P8_7__CAM_D7_B	0x0
+			PIN_P9_0__CAM_D8_B	0x0
+			PIN_P9_1__CAM_D9_B	0x0
 			PIN_P9_2__CAM_D10_B	0x0
 			PIN_P9_3__CAM_D11_B	0x0
 			PIN_P9_4__CAM_D12_B	0x0
-			PIN_P9_5__CAM_D13_B	0x0
-			PIN_P9_7__CAM_D15_B	0x0
-			PIN_P9_6__CAM_D14_B	0x0
-			PIN_P9_1__CAM_D9_B	0x0
-			PIN_P9_0__CAM_D8_B	0x0
-			PIN_P8_7__CAM_D7_B	0x0
-			PIN_P8_6__CAM_D6_B	0x0
-			PIN_P8_1__CAM_D1_B	0x0
-			PIN_P8_0__CAM_D0_B	0x0
-			PIN_P10_1__CAM_VSYNC_B	0x0
-			PIN_P10_0__CAM_HSYNC_B	0x0
+			PIN_P4_1__CAM_D13_A	0x0
+			PIN_P4_2__CAM_D14_A	0x0
+			PIN_P4_3__CAM_D15_A	0x0
+			PIN_P0_0__CAM_HSYNC_A	0x0
+			PIN_P0_1__CAM_VSYNC_A	0x0
+			PIN_P0_2__CAM_PCLK_A	0x0
 			PIN_P0_3__CAM_XVCLK_A	0x23
 		>;
 	};
