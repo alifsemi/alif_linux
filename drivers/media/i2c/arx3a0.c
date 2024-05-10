@@ -1095,8 +1095,12 @@ static int arx3a0_probe(struct i2c_client *client)
 	if (ret)
 		goto disable;
 
-	pm_runtime_set_active(&client->dev);
-	pm_runtime_enable(&client->dev);
+	/* TODO: Enable PM */
+	/*
+	 * pm_runtime_set_active(&client->dev);
+	 * pm_runtime_enable(&client->dev);
+	 * pm_runtime_idle(&client->dev);
+	 */
 	return 0;
 
 disable:
@@ -1121,10 +1125,13 @@ static int arx3a0_remove(struct i2c_client *client)
 	media_entity_cleanup(&sensor->sd.entity);
 #endif
 	v4l2_ctrl_handler_free(&sensor->ctrls.handler);
-	pm_runtime_disable(&client->dev);
-	if (!pm_runtime_status_suspended(&client->dev))
-		arx3a0_power_off(&client->dev);
-	pm_runtime_set_suspended(&client->dev);
+	/* TODO: Enable PM */
+	/*
+	 * pm_runtime_disable(&client->dev);
+	 * if (!pm_runtime_status_suspended(&client->dev))
+	 *	arx3a0_power_off(&client->dev);
+	 * pm_runtime_set_suspended(&client->dev);
+	 */
 	mutex_destroy(&sensor->lock);
 	return 0;
 }
@@ -1142,7 +1149,8 @@ MODULE_DEVICE_TABLE(of, arx3a0_dt_ids);
 static struct i2c_driver arx3a0_i2c_driver = {
 	.driver = {
 		.name  = "arx3a0",
-		.pm = &arx3a0_pm_ops,
+		/* TODO: Enable PM */
+		/* .pm = &arx3a0_pm_ops, */
 		.of_match_table = arx3a0_dt_ids,
 	},
 	.probe_new = arx3a0_probe,
