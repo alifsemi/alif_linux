@@ -678,6 +678,7 @@ int plat_csi_probe(struct platform_device *pdev, struct cpi_dev *cpi)
 	v4l2_set_subdev_hostdata(&cpi->subdev, ep);
 
 	cpi->subdev.grp_id = GRP_ID_CPI;
+	cpi->subdev.entity.function = MEDIA_ENT_F_IO_V4L;
 	ret = v4l2_device_register_subdev(&cpi->v4l2_dev, &cpi->subdev);
 
 	if (!ret)

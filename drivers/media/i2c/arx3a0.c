@@ -575,58 +575,9 @@ static int arx3a0_set_stream(struct arx3a0_dev *sensor, bool on)
 	int ret;
 
 	if (on) {
-		ret = pm_runtime_get_sync(&sensor->i2c_client->dev);
-		if (ret < 0) {
-			pm_runtime_put_noidle(&sensor->i2c_client->dev);
-			return ret;
-		}
-
-		// TODO
-//		arx3a0_calc_mode(sensor);
-//		ret = arx3a0_write_mode(sensor);
-//		if (ret)
-//			goto err;
-//
-//		ret = arx3a0_set_gains(sensor);
-//		if (ret)
-//			goto err;
-//
-//		/* Exit LP-11 mode on clock and data lanes */
-//		ret = arx3a0_write_reg(sensor, ARX3A0_REG_HISPI_CONTROL_STATUS,
-//				       0);
-//		if (ret)
-//			goto err;
-//		/* Start streaming */
-//		ret = arx3a0_write_reg(sensor, ARX3A0_REG_RESET,
-//				       ARX3A0_REG_RESET_DEFAULTS |
-//				       ARX3A0_REG_RESET_STREAM);
-//		if (ret)
-//			goto err;
-
 		arx3a0_write_reg8(sensor, ARX3A0_MODE_SELECT_REGISTER, 0x01);
 		return 0;
-
-//err:
-//		pm_runtime_put(&sensor->i2c_client->dev);
-//		return ret;
-
 	} else {
-		/*
-		 * Reset gain, the sensor may produce all white pixels without
-		 * this
-		 */
-//		ret = arx3a0_write_reg(sensor, ARX3A0_REG_GLOBAL_GAIN, 0x2000);
-//		if (ret)
-//			return ret;
-//
-//		/* Stop streaming */
-//		ret = arx3a0_write_reg(sensor, ARX3A0_REG_RESET,
-//				       ARX3A0_REG_RESET_DEFAULTS);
-//		if (ret)
-//			return ret;
-//
-		pm_runtime_put_noidle(&sensor->i2c_client->dev);
-
 		arx3a0_write_reg8(sensor, ARX3A0_MODE_SELECT_REGISTER, 0x00);
 		return 0;
 	}
@@ -724,8 +675,10 @@ static int arx3a0_s_ctrl(struct v4l2_ctrl *ctrl)
 	}
 
 	/* access the sensor only if it's powered up */
-	if (!pm_runtime_get_if_in_use(&sensor->i2c_client->dev))
-		return 0;
+	/*
+	 * if (!pm_runtime_get_if_in_use(&sensor->i2c_client->dev))
+	 *	return 0;
+	 */
 
 	switch (ctrl->id) {
 	case V4L2_CID_HBLANK:
@@ -743,7 +696,7 @@ static int arx3a0_s_ctrl(struct v4l2_ctrl *ctrl)
 		break;
 	}
 
-	pm_runtime_put(&sensor->i2c_client->dev);
+	/* pm_runtime_put(&sensor->i2c_client->dev); */
 	return ret;
 }
 
@@ -937,7 +890,7 @@ static int arx3a0_s_stream(struct v4l2_subdev *sd, int enable)
 		sensor->streaming = enable;
 
 	mutex_unlock(&sensor->lock);
-	pm_runtime_put(&sensor->i2c_client->dev);
+	/* pm_runtime_put(&sensor->i2c_client->dev); */
 	return ret;
 }
 
