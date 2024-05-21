@@ -829,13 +829,6 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 	 * Set to 20 (0x14) to get 20MHz
 	 */
 	writel(0x140001, tmp + 0x0);
-	/*
-	 * HACK - The XVCLK, which is used as input clock to external sensor
-	 * is Fed to sensor after the Probe for the sensor (ARX3A0). Hence,
-	 * pre-enable the XVCLK for the sensor, so that it is available before
-	 * it's probe.
-	 */
-	writel(0x00230006, info->pinmux_base + 0x0c);
 
 	/* Set and enable the CSI clock divider */
 	writel(0x20001, tmp + 0x8);

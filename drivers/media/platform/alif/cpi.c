@@ -68,6 +68,8 @@
 #define FIFO_WR_WMARK_MASK		GENMASK(4, 0)
 #define FIFO_WR_WMARK_SHIFT		8
 
+#define CPI_BUSY_POLL_USEC	10
+#define CPI_BUSY_TIMEOUT_USEC	20000
 static const struct plat_csi_fmt cpi_formats[] = {
 	{
 		.name = "BGR888",
@@ -427,6 +429,7 @@ static inline int cpi_hw_setup_buffer(struct cpi_dev *cpi)
 static void cpi_hw_start_video_capture(struct cpi_dev *cpi)
 {
 	/* Soft reset CPI */
+	writel(0, cpi->base_addr + CPI_CTRL);
 	writel(CTRL_SW_RESET, cpi->base_addr + CPI_CTRL);
 	writel(0, cpi->base_addr + CPI_CTRL);
 
@@ -444,8 +447,8 @@ static int cpi_hw_set_geometry(struct cpi_dev *cpi)
 	u32 val;
 	int i;
 
-	/* Fifo ctrl Read watermark 0xf, Write watermark 0x14 */
-	val = (0x14 << FIFO_WR_WMARK_SHIFT) | (0xf << FIFO_RD_WMARK_SHIFT);
+	/* Fifo ctrl Read watermark 0x8, Write watermark 0x18 */
+	val = (0x18 << FIFO_WR_WMARK_SHIFT) | (0x8 << FIFO_RD_WMARK_SHIFT);
 	writel(val, cpi->base_addr + CPI_FIFO_CTRL);
 
 	/* Configure Frame */
@@ -584,7 +587,7 @@ static void cpi_buffer_queue(struct vb2_buffer *vb)
 	}
 	spin_unlock_irqrestore(&cpi->slock, flags);
 
-	dev_info(&cpi->pdev->dev,
+	dev_dbg(&cpi->pdev->dev,
 		"Queued buffer: dma_addr - 0x%08x cpu_addr - 0x%08x\n",
 		buf->dma_addr,
 		(u32)buf->cpu_addr);
@@ -616,7 +619,7 @@ static int cpi_start_streaming(struct vb2_queue *vq, unsigned int count)
 	cpi_hw_start_video_capture(cpi);
 	spin_unlock_irq(&cpi->slock);
 
-	dev_info(&cpi->pdev->dev, "cpi: Start capture | Video mode!! 0x%x\n",
+	dev_dbg(&cpi->pdev->dev, "cpi: Start capture | Video mode!! 0x%x\n",
 			readl(cpi->base_addr + CPI_CTRL));
 
 	return 0;
@@ -647,10 +650,14 @@ static void cpi_stop_streaming(struct vb2_queue *vq)
 	writel(0, cpi->base_addr + CPI_CTRL);
 	spin_unlock_irq(&cpi->slock);
 
-	/* Wait for Camera controller to stop. */
+	/*
+	 * Wait for Camera controller to stop.
+	 * The CPI_CTRL register will be checked for CTRL_BUSY bit every 10us,
+	 * and maximum wait will be 20000 us (20 ms).
+	 */
 	ret = readl_poll_timeout(cpi->base_addr + CPI_CTRL,
-			val, !(val & CTRL_BUSY), 1000,
-			10);
+			val, !(val & CTRL_BUSY), CPI_BUSY_POLL_USEC,
+			CPI_BUSY_TIMEOUT_USEC);
 	if (ret)
 		dev_err(&cpi->pdev->dev,
 			"Failed to stop the Camera controller.\n");
@@ -912,7 +919,6 @@ static irqreturn_t cpi_isr(int irq, void *dev)
 	int_st = readl(cpi->base_addr + CPI_INTR) &
 		readl(cpi->base_addr + CPI_INTR_ENA);
 	writel(int_st, cpi->base_addr + CPI_INTR);
-	pr_info("in %s -> INTR_STATUS = 0x%x\n", __func__, int_st);
 
 	if (int_st & INTR_HSYNC)
 		dev_dbg(&pdev->dev, "H-Sync Interrupt\n");

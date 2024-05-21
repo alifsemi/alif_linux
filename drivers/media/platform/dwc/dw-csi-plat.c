@@ -246,8 +246,10 @@ static int dw_mipi_csi_s_stream(struct v4l2_subdev *sd, int enable)
 {
 	struct dw_csi *csi = sd_to_mipi_csi_dev(sd);
 
-	dw_mipi_csi_set_ipi_color_mode(csi);
-	dw_mipi_csi_start(csi);
+	if (enable) {
+		dw_mipi_csi_set_ipi_color_mode(csi);
+		dw_mipi_csi_start(csi);
+	}
 	dw_mipi_csi_start_ipi(csi, enable);
 	return 0;
 }

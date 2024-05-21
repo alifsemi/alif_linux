@@ -148,7 +148,6 @@ int dw_mipi_csi_hw_stdby(struct dw_csi *csi_dev)
 		dw_mipi_csi_reset(csi_dev);
 		dw_mipi_csi_write(csi_dev, reg.N_LANES,
 				csi_dev->hw.num_lanes - 1);
-		phy_init(csi_dev->phy);
 
 		/* only for version 1.30 */
 		if (csi_dev->hw_version_minor == 30)

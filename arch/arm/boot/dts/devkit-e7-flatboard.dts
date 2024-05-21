@@ -1238,6 +1238,8 @@
 				reg = <0x36 0x0 0x4000>;
 				clocks = <&ext_clk>;
 				clock-names = "extclk";
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_csi_cam>;
 				reset-gpio = <&port10 1 GPIO_ACTIVE_LOW>;
 				power-gpio = <&port8 5 GPIO_ACTIVE_HIGH>;
 				vaa-supply = <&reg_2p7v>;
@@ -1682,8 +1684,6 @@
 		cpi:  camera_ctrl@49030000 {
 			#address-cells = <1>;
 			#size-cells = <0>;
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_csi_cam>;
 			compatible = "alif,ensemble-cpi";
 			reg = <0x49030000 0x1000>;
 			interrupt-parent = <&gic>;
