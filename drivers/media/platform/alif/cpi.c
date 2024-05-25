@@ -85,7 +85,7 @@ static const struct plat_csi_fmt cpi_formats[] = {
 		.name = "GREY",
 		.fourcc = V4L2_PIX_FMT_GREY,
 		.depth = 8,
-		.mbus_code = MEDIA_BUS_FMT_SGBRG8_1X8,
+		.mbus_code = MEDIA_BUS_FMT_SBGGR8_1X8,
 	}, {
 		.name = "Y10P",
 		.fourcc = V4L2_PIX_FMT_Y10P,
@@ -104,7 +104,7 @@ static const struct plat_csi_fmt cpi_formats[] = {
 		.name = "Y12",
 		.fourcc = V4L2_PIX_FMT_Y12,
 		.depth = 12,
-		.mbus_code = MEDIA_BUS_FMT_SGBRG8_1X8,
+		.mbus_code = MEDIA_BUS_FMT_SBGGR12_1X12,
 	}
 };
 

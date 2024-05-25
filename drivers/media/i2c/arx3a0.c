@@ -79,7 +79,7 @@
 static const struct initial_reg {
 	const __be16 *data; /* data[0] is register address */
 	unsigned int count;
-} initial_regs[] = {
+} initial_regs_raw10[] = {
 
 	/*LOAD= PLL_360Fps_80MHz_80MHz_20MHz*/
 	REGS(be(0x300), be(0x000A)),
@@ -296,6 +296,230 @@ static const struct initial_reg {
 	REGS(be(0x3162), be(0x0317)),
 	REGS(be(0x3164), be(0x0000)),
 	REGS(be(0x0104), be(0x0000)), /* Group_Parameter Hold - Insert register values */
+};
+
+static const struct initial_reg initial_regs_raw8[] = {
+	/* LOAD= OTPM */
+	REGS(be(0x304C), be(0x3000)),
+	REGS(be(0x304A), be(0x0070)),
+
+	/*LOAD= Analog_Setup_Recommended*/
+	REGS(be(0x3ED0), be(0x0748)),
+	REGS(be(0x3ED6), be(0x3136)),
+	REGS(be(0x3EDC), be(0x1020)),
+	REGS(be(0x3EDE), be(0x1D2A)),
+	REGS(be(0x3EE0), be(0x282A)),
+	REGS(be(0x3EE2), be(0x2821)),
+	REGS(be(0x3EC8), be(0x0401)),
+	REGS(be(0x3ED2), be(0x3903)),
+	REGS(be(0x3EC0), be(0x0011)),
+	REGS(be(0x3ECA), be(0x826F)),
+	REGS(be(0x3EBC), be(0xA8AA)),
+	REGS(be(0x3EC4), be(0x1000)),
+	REGS(be(0x3EBA), be(0x0044)),
+
+	/*LOAD= Pixel_Timing_Recommended_10bit*/
+	REGS(be(0x3D00),
+	     /* 3D00 */ be(0x0436), be(0x435A), be(0xFFFF), be(0xFFFF),
+	     /* 3D08 */ be(0x2180), be(0x0005), be(0x108F), be(0x0802),
+	     /* 3D10 */ be(0x5248), be(0x801B), be(0x006F), be(0x8269),
+	     /* 3D18 */ be(0x6A82), be(0x5148), be(0x5A80), be(0x5902),
+	     /* 3D20 */ be(0x8082), be(0x3060), be(0x8567), be(0x5C20),
+	     /* 3D28 */ be(0x4880), be(0x0284), be(0x6084), be(0x5C91),
+	     /* 3D30 */ be(0x5980), be(0x5883), be(0x6462), be(0x8056),
+	     /* 3D38 */ be(0x8162), be(0x8422), be(0x20A2), be(0x2220)),
+	REGS(be(0x3D40),
+	     /* 3D40 */ be(0x804B), be(0x8110), be(0x0943), be(0x9243),
+	     /* 3D48 */ be(0x8050), be(0x9A4B), be(0x8563), be(0x8363),
+	     /* 3D50 */ be(0x8422), be(0x20A2), be(0x61C6), be(0x6F99),
+	     /* 3D58 */ be(0x3009), be(0x1FF6), be(0x20ED), be(0x0874),
+	     /* 3D60 */ be(0x8230), be(0x609B), be(0x3060), be(0x4600),
+	     /* 3D68 */ be(0x3783), be(0x7070), be(0x8040), be(0x4A44),
+	     /* 3D70 */ be(0x8003), be(0x0086), be(0x4588), be(0x46BA),
+	     /* 3D78 */ be(0x0300), be(0xFFD7), be(0x4688), be(0x4588),
+	     /* 3D80 */ be(0x4492), be(0x4A9B), be(0x4070), be(0x8040),
+	     /* 3D88 */ be(0x4AAD), be(0x0070), be(0xAE47), be(0x8547),
+	     /* 3D90 */ be(0xAD78), be(0x6B85), be(0x6A80), be(0x6984),
+	     /* 3D98 */ be(0x6B8A), be(0x6B80), be(0x6980), be(0x6A85),
+	     /* 3DA0 */ be(0x7C93), be(0x846B), be(0x8465), be(0x46FF),
+	     /* 3DA8 */ be(0xAA65), be(0x9C79), be(0x4A00), be(0x2180),
+	     /* 3DB0 */ be(0x44AC), be(0x7070), be(0x2180), be(0x0005),
+	     /* 3DB8 */ be(0x108F), be(0x0802), be(0x5248), be(0x801B),
+	     /* 3DC0 */ be(0x006F), be(0x8269), be(0x6A82), be(0x5148),
+	     /* 3DC8 */ be(0x5A80), be(0x5902), be(0x8082), be(0x3060),
+	     /* 3DD0 */ be(0x8567), be(0x5C20), be(0x4880), be(0x0284),
+	     /* 3DD8 */ be(0x6084), be(0x5C91), be(0x5980), be(0x5883),
+	     /* 3DE0 */ be(0x6462), be(0x8056), be(0x8162), be(0x8422),
+	     /* 3DE8 */ be(0x209C), be(0x2220), be(0x514B), be(0x8110),
+	     /* 3DF0 */ be(0x0943), be(0x9843), be(0x8050), be(0x8B51),
+	     /* 3DF8 */ be(0x8D4B), be(0x9063), be(0x8363), be(0x8422)),
+	REGS(be(0x3E00),
+	     /* 3E00 */ be(0x209C), be(0x61D3), be(0x1FB6), be(0x20ED),
+	     /* 3E08 */ be(0x3809), be(0x524B), be(0x0014), be(0x4580),
+	     /* 3E10 */ be(0x4681), be(0x3060), be(0x9D30), be(0x6083),
+	     /* 3E18 */ be(0x4645), be(0x0017), be(0x8170), be(0x7070),
+	     /* 3E20 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E28 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E30 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E38 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E40 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E48 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E50 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E58 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E60 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E68 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E70 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E78 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E80 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E88 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E90 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3E98 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3EA0 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3EA8 */ be(0x7070), be(0x7070), be(0x7070), be(0x7070),
+	     /* 3EB0 */ be(0x7070), be(0x7070), be(0x7070)),
+
+	/*LOAD= Corrections_Recommended*/
+	REGS(be(0x3ED0), be(0x0745)),
+	REGS(be(0x3ED4), be(0x0016)),
+	REGS(be(0x3EC6), be(0x80F2)),
+	REGS(be(0x3ED8), be(0x55FF)),
+	REGS(be(0x3EE6), be(0x8000)),
+	REGS(be(0x30D2), be(0x0000)),
+	REGS(be(0x31E0), be(0x00F1)),
+	REGS(be(0x31E6), be(0xA35F)),
+	REGS(be(0x3180), be(0x9096)),
+	REGS(be(0x3120), be(0x0001)),
+	REGS(be(0x301E), be(0x002A)),
+
+	/*LOAD= PLL_360Fps_80MHz_80MHz_20MHz*/
+	REGS(be(0x0300), be(0x000A)),
+	REGS(be(0x0302), be(0x0001)),
+	REGS(be(0x0304), be(0x0101)),
+	REGS(be(0x0306), be(0x2828)),
+	REGS(be(0x0308), be(0x000A)),
+	REGS(be(0x030A), be(0x0001)),
+
+	/* MIPI_TIMING_10bit */
+	REGS(be(0x31B0),
+	     be(0x0048),   /* 31B0: frame_preamble */
+	     be(0x0027),   /* 31B2: line_preamble */
+	     be(0x424C),   /* 31B4: */
+	     be(0x3308),   /* 31B6: */
+	     be(0x1C13),   /* 31B8: */
+	     be(0x1450),   /* 31BA: */
+	     be(0x8488)),  /* 31BC: */
+
+	/* Group_Parameter_Hold - hold reg inserts */
+	REGS(be(0x0104), be(0x0001)),
+	REGS(be(0x034C), be(0x0230)),
+	REGS(be(0x034E), be(0x0230)),
+
+	REGS(be(0x3012), be(0x0304)),
+	REGS(be(0x0112), be(0x0808)), /* RAW8 */
+
+	REGS(be(0x0300), be(0x000C)),
+	REGS(be(0x0302), be(0x0001)),
+	REGS(be(0x0304), be(0x0101)),
+	REGS(be(0x0306), be(0x2030)),
+	REGS(be(0x0308), be(0x0008)),
+	REGS(be(0x030A), be(0x0001)),
+	REGS(be(0x0340), be(0xA78E),
+		be(0x02EA),		/* line_length_pck */
+		be(0x0004),		/* X_ADDR_START */
+		be(0x0004),		/* Y_ADDR_START */
+		be(0x0234),		/* X_ADDR_END */
+		be(0x0233),		/* Y_ADDR_END */
+		be(0x0230),		/* X_OUTPUT_SIZE */
+		be(0x0230)),		/* Y_OUTPUT_SIZE */
+	REGS(be(0x0382), be(0x0001)),
+	REGS(be(0x0386), be(0x0001)),
+	REGS(be(0x0400), be(0x0000)),
+	REGS(be(0x0402), be(0x0000)),
+	REGS(be(0x0404), be(0x0010)),
+
+	REGS(be(0x3000), be(0x0353)),
+	REGS(be(0x3002), be(0x0004)),
+	REGS(be(0x3004), be(0x0004)),
+	REGS(be(0x3006), be(0x0233)),
+	REGS(be(0x3008), be(0x0234)),
+	REGS(be(0x300A), be(0xA78E)),
+	REGS(be(0x300C), be(0x02EA)),
+
+	REGS(be(0x3012), be(0x0304)),
+	REGS(be(0x3018), be(0x0000)),
+	REGS(be(0x301A), be(0x001C)),
+	REGS(be(0x301C), be(0x0001)),
+	REGS(be(0x301D), be(0x0000)),
+	REGS(be(0x301E), be(0x002A)),
+	REGS(be(0x3021), be(0x0000)),
+	REGS(be(0x3023), be(0x0000)),
+	REGS(be(0x3026), be(0xFFFF)),
+	REGS(be(0x3028), be(0x0004)),
+	REGS(be(0x3032), be(0x0100)),
+	REGS(be(0x303E), be(0x0000)),
+	REGS(be(0x3040), be(0x0041)),
+	REGS(be(0x3044), be(0x10C0)),
+	REGS(be(0x3046), be(0x0608)),
+	REGS(be(0x3048), be(0x0008)),
+	REGS(be(0x304A), be(0x0070)),
+	REGS(be(0x304C), be(0x3000)),
+	REGS(be(0x305E), be(0x2040)),
+	REGS(be(0x3064), be(0x5840)),
+	REGS(be(0x3068), be(0x0000)),
+	REGS(be(0x306E), be(0x9080)),
+	REGS(be(0x3070), be(0x0000)),
+	REGS(be(0x3072), be(0x0000)),
+	REGS(be(0x3074), be(0x0000)),
+	REGS(be(0x3076), be(0x0000)),
+	REGS(be(0x3078), be(0x0000)),
+	REGS(be(0x307A), be(0x0000)),
+	REGS(be(0x307E), be(0x0020)),
+	REGS(be(0x3088), be(0x0001)),
+	REGS(be(0x30A0), be(0x0001)),
+	REGS(be(0x30A2), be(0x0001)),
+	REGS(be(0x30A4), be(0x0001)),
+	REGS(be(0x30A6), be(0x0001)),
+	REGS(be(0x30AA), be(0x0000)),
+	REGS(be(0x30B0), be(0x0400)),
+	REGS(be(0x30BC), be(0x0000)),
+	REGS(be(0x30BE), be(0x0000)),
+	REGS(be(0x30C0), be(0x2000)),
+	REGS(be(0x30C2), be(0x0000)),
+	REGS(be(0x30E8), be(0x0000)),
+	REGS(be(0x30EA), be(0x0000)),
+	REGS(be(0x30EC), be(0x5AE7)),
+	REGS(be(0x30F8), be(0x0033)),
+	REGS(be(0x30FA), be(0xFC4C)), /* GPIO0, GPIO1 */
+	REGS(be(0x3120), be(0x0001)), /* GAIN dither enable */
+	REGS(be(0x3122), be(0x0007)),
+	REGS(be(0x3124), be(0x01A7)),
+	REGS(be(0x3126), be(0x0000)),
+	REGS(be(0x3128), be(0x01CF)),
+	REGS(be(0x312A), be(0x4567)),
+	REGS(be(0x312C), be(0x89AB)),
+	REGS(be(0x312E), be(0xCDEF)),
+	REGS(be(0x3152), be(0x0010)),
+	REGS(be(0x3154), be(0x3200)),
+	REGS(be(0x3156), be(0xC8F7)),
+	REGS(be(0x3158), be(0x0000)),
+	REGS(be(0x315A), be(0x0000)),
+	REGS(be(0x315C), be(0x0000)),
+	REGS(be(0x315E), be(0x0000)),
+	REGS(be(0x3160), be(0x00EC)),
+	REGS(be(0x3162), be(0x0317)),
+	REGS(be(0x3164), be(0x0000)),
+	REGS(be(0x3166), be(0x0327)),
+	REGS(be(0x3168), be(0x0000)),
+	REGS(be(0x3170), be(0x236E)),
+	REGS(be(0x3172), be(0x0201)),
+	REGS(be(0x3174), be(0x0000)),
+	REGS(be(0x3176), be(0x1000)),
+	REGS(be(0x317A), be(0x416E)),
+	REGS(be(0x31AE), be(0x0202)),
+	REGS(be(0x3730), be(0x0000)),
+	REGS(be(0x3F3C), be(0x0003)),
+	/* Group_Parameter Hold - Release */
+	REGS(be(0x0104), be(0x0000)),
 };
 
 static const char * const arx3a0_supply_names[] = {
@@ -572,8 +796,6 @@ static int arx3a0_write_mode(struct arx3a0_dev *sensor)
 
 static int arx3a0_set_stream(struct arx3a0_dev *sensor, bool on)
 {
-	int ret;
-
 	if (on) {
 		arx3a0_write_reg8(sensor, ARX3A0_MODE_SELECT_REGISTER, 0x01);
 		return 0;
@@ -598,13 +820,42 @@ static void arx3a0_adj_fmt(struct v4l2_mbus_framefmt *fmt)
 	 * 10-bit wide or bit-depth of each pixel.
 	 * The 1X10 suggests that the data is transmitted 10-bits in a single
 	 * data stream.
+	 * Media bus format - SBGGR8_1X8 is also for color filter arrays in
+	 * image sensors that capture image in Bayer pattern.
+	 * The 8_1X8 part signifies that each captured pixel is 8-bit wide, and
+	 * is transmitted as 8-bits per data stream.
 	 */
-	fmt->code = MEDIA_BUS_FMT_SBGGR10_1X10;
+	if (fmt->code != MEDIA_BUS_FMT_SBGGR10_1X10 &&
+	    fmt->code != MEDIA_BUS_FMT_SBGGR8_1X8)
+		fmt->code = MEDIA_BUS_FMT_SBGGR10_1X10;
 	fmt->field = V4L2_FIELD_NONE;
 	fmt->colorspace = V4L2_COLORSPACE_SRGB;
 	fmt->ycbcr_enc = V4L2_YCBCR_ENC_DEFAULT;
 	fmt->quantization = V4L2_QUANTIZATION_FULL_RANGE;
 	fmt->xfer_func = V4L2_XFER_FUNC_DEFAULT;
+}
+
+static int arx3a0_set_initial_regs(struct arx3a0_dev *sensor)
+{
+	unsigned int cnt;
+
+	if (sensor->fmt.code == MEDIA_BUS_FMT_SBGGR10_1X10) {
+		for (cnt = 0; cnt < ARRAY_SIZE(initial_regs_raw10); cnt++)
+			if (arx3a0_write_regs(sensor,
+					initial_regs_raw10[cnt].data,
+					initial_regs_raw10[cnt].count))
+				return -1;
+	} else if (sensor->fmt.code == MEDIA_BUS_FMT_SBGGR8_1X8) {
+		for (cnt = 0; cnt < ARRAY_SIZE(initial_regs_raw8); cnt++)
+			if (arx3a0_write_regs(sensor,
+					initial_regs_raw8[cnt].data,
+					initial_regs_raw8[cnt].count))
+				return -1;
+	} else {
+		return -1;
+	}
+
+	return 0;
 }
 
 static int arx3a0_get_fmt(struct v4l2_subdev *sd,
@@ -645,7 +896,10 @@ static int arx3a0_set_fmt(struct v4l2_subdev *sd,
 		fmt = v4l2_subdev_get_try_format(sd, cfg, 0 /* pad */);
 		*fmt = format->format;
 	} else {
-		sensor->fmt = format->format;
+		if (sensor->fmt.code != format->format.code) {
+			sensor->fmt = format->format;
+			ret = arx3a0_set_initial_regs(sensor);
+		}
 		arx3a0_calc_mode(sensor);
 	}
 
@@ -846,10 +1100,9 @@ static int arx3a0_power_on(struct device *dev)
 	arx3a0_read_reg(sensor, ARX3A0_MIPI_CONFIG_REGISTER, &val);
 	arx3a0_write_reg(sensor, ARX3A0_MIPI_CONFIG_REGISTER,  (1 << 7) | val);
 
-	for (cnt = 0; cnt < ARRAY_SIZE(initial_regs); cnt++)
-		if (arx3a0_write_regs(sensor, initial_regs[cnt].data,
-				      initial_regs[cnt].count))
-			goto off;
+	ret = arx3a0_set_initial_regs(sensor);
+	if (ret)
+		goto off;
 
 	/* Start streaming. */
 	arx3a0_write_reg(sensor, ARX3A0_MODE_SELECT_REGISTER, 1);
