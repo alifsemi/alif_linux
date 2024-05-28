@@ -3,7 +3,7 @@
  * IIO DAC driver for Alif Ensemble DAC
  * Code based on LPC18XX DAC
  *
- * Copyright (C) 2021 Harith George <harith.g@alifsemi.com>
+ * Copyright (C) 2021-2024 Harith George <harith.g@alifsemi.com>
  *
  */
 #include <linux/clk.h>
@@ -16,9 +16,25 @@
 #include <linux/of_device.h>
 #include <linux/platform_device.h>
 
+#define DAC_CTRL_DAC0_CKEN                  (1U  <<  0U)
+#define DAC_CTRL_DAC1_CKEN                  (1U  <<  4U)
+
 /* Ensemble DAC registers and bits */
 #define ENSEMBLE_DAC_REG1		0x000
 #define ENSEMBLE_DAC_IN			0x004
+
+/* DAC  Control register */
+#define DAC_EN                   (1U << 0)   /* Enable DAC */
+#define DAC_RESET_B              (1U << 27)  /* 0=Reset,this will reset the DAC */
+#define DAC_HP_MODE_EN           (1U << 18)  /* To enable the dac output buffer */
+#define DAC_MAX_INPUT            (0xFFFU)    /* Maximum input for the DAC is 4095(DAC 12 bit resolution) */
+#define DAC_IN_BYP_MUX           (1U << 1U)  /* Select the DAC input data source */
+#define DAC_MAX_BYP_VAL_Msk      (0x3FFCU)   /* DAC input data in bypass mode */
+#define DAC_TWOSCOMP_Pos          22U        /* Converts two's complement to unsigned binary data */
+#define DAC_INPUT_BYP_MUX_Pos     1U         /* Set DAC input source in bypass mode */
+#define DAC_BYP_VAL_Pos           2U         /* DAC input data bypass mode   */
+#define DAC_IBIAS_VAL_Pos         23U        /* DAC buffer output current    */
+#define DAC_CAP_VAL_Pos           14U        /* DAC capacitance compensation */
 
 struct ensemble_dac {
 	void __iomem *base;
@@ -48,16 +64,16 @@ static int ensemble_dac_write_raw(struct iio_dev *indio_dev,
 				 int val, int val2, long mask)
 {
 	struct ensemble_dac *dac = iio_priv(indio_dev);
+	unsigned int reg;
 
 	/* Ensemble has a 12 bit DAC */
 	val &= 0xFFF;
+	writel(val, dac->base + ENSEMBLE_DAC_IN);
 
-	/* A0 revision has a HW bug that requires the same value to be
-	 * written thrice for it to reflect on the output.
-	 */
-	writel(val, dac->base + ENSEMBLE_DAC_IN);
-	writel(val, dac->base + ENSEMBLE_DAC_IN);
-	writel(val, dac->base + ENSEMBLE_DAC_IN);
+	reg = readl(dac->base + ENSEMBLE_DAC_REG1);
+	reg |= DAC_EN; /* DAC Enable */
+	writel(reg, dac->base + ENSEMBLE_DAC_REG1);
+
 	return 0;
 }
 
@@ -73,6 +89,7 @@ static int ensemble_dac_probe(struct platform_device *pdev)
 	void __iomem *tmp;
 	struct resource *res;
 	int ret;
+	unsigned int reg;
 
 	indio_dev = devm_iio_device_alloc(&pdev->dev, sizeof(*dac));
 	if (!indio_dev)
@@ -104,16 +121,39 @@ static int ensemble_dac_probe(struct platform_device *pdev)
 		goto exit;
 	}
 
+	tmp = ioremap(0x4902F000, 0x40);
+	reg = readl(tmp + 0x38);
+	reg |= (1 << 0);
+	writel(reg, tmp + 0x38);
+
+	reg = readl(tmp + 0x34);
+	if (res->start == 0x49028000)
+		reg |= DAC_CTRL_DAC0_CKEN;
+	else
+		reg |= DAC_CTRL_DAC1_CKEN;
+
+	writel(reg, tmp + 0x34);
+	iounmap(tmp);
+
 	/* Enable Analog Peripheral */
-	printk("Enable analog peripheral.\n");
-	tmp = ioremap(0x70040000, 0x40);
-	writel(0x388C4230, tmp + 0x1C);
+	tmp = ioremap(0x1A60A000, 0x40);
+	reg = readl(tmp + 0x3C);
+	reg |= ((1 << 22) | (1 << 23));
+	writel(reg, tmp + 0x3C);
 	iounmap(tmp);
+
 	/* Enable DAC reference voltage */
-	printk("Enable DAC reference voltage.\n");
 	tmp = ioremap(0x49023000, 0x10);
-	writel(0x10200000, tmp + 0x4);
+	writel((0x1 << 27) | (0x20 << 21) | (0x1 << 20) |
+		(0x4 << 17) | (0x0 << 16) | (0x1 << 15) |
+		(0x10 << 10) | (0xA << 6) |  (0xA << 1), tmp + 0x4);
 	iounmap(tmp);
+
+	reg = readl(dac->base + ENSEMBLE_DAC_REG1);
+	reg &= ~DAC_EN; /* DAC Disable */
+	writel(reg, dac->base + ENSEMBLE_DAC_REG1);
+	reg |= DAC_RESET_B;
+	writel(reg, dac->base + ENSEMBLE_DAC_REG1);
 
 	ret = iio_device_register(indio_dev);
 	if (ret) {
@@ -121,25 +161,6 @@ static int ensemble_dac_probe(struct platform_device *pdev)
 		goto dis_clk;
 	}
 
-	/*TODO - A0 revision of the SoC has a HW quirk that enable/reset
-	 * (bit 27) for both DAC instances (0x49028000 and 0x49029000) are
-	 * in 0x49028000 register
-         */
-	if(res->start == 0x49028000){
-		printk("DAC setting addr 0x%x value 0x0E31C7FD\n",res->start);
-		writel(0x0E31C7FD, dac->base + ENSEMBLE_DAC_REG1);
-	} else {
-		/* TODO Since the DAC at 0x49029000 can be enabled only by
-		 * reseting bit 27 of 0x49028000, we use this DAC
-		 * with the other DAC also enabled in the dtb.. All this is
-		 * just temporary at the moment. Hopefully this will be
-		 * fixed in HW soon.
-		 */
-		printk("DAC setting addr 0x%x value 0x0631C7FD\n",res->start);
-		writel(0x0631C7FD, dac->base + ENSEMBLE_DAC_REG1);
-	}
-
-	printk("DAC set initial value to 0x0\n");
 	writel(0x0, dac->base + ENSEMBLE_DAC_IN);
 
 	return 0;
