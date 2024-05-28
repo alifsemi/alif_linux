@@ -1760,57 +1760,10 @@
 			max-clock-frequency = <400000000>;
 		};
 
-		dmac_bus_s: dma-controller@49080000 {
-			reg = <0x49080000 0x1000>;
-			arm,primecell-periphid = <0x00041330>;
-		//	compatible = "arm,pl330", "arm,primecell";
-			interrupt-parent = <&gic>;
-			interrupts = 	<0 288 IRQ_TYPE_LEVEL_HIGH>,
-					<0 289 IRQ_TYPE_LEVEL_HIGH>,
-					<0 290 IRQ_TYPE_LEVEL_HIGH>,
-					<0 291 IRQ_TYPE_LEVEL_HIGH>,
-					<0 292 IRQ_TYPE_LEVEL_HIGH>,
-					<0 293 IRQ_TYPE_LEVEL_HIGH>,
-					<0 294 IRQ_TYPE_LEVEL_HIGH>,
-					<0 295 IRQ_TYPE_LEVEL_HIGH>,
-					<0 296 IRQ_TYPE_LEVEL_HIGH>,
-					<0 297 IRQ_TYPE_LEVEL_HIGH>,
-					<0 298 IRQ_TYPE_LEVEL_HIGH>,
-					<0 299 IRQ_TYPE_LEVEL_HIGH>,
-					<0 300 IRQ_TYPE_LEVEL_HIGH>,
-					<0 301 IRQ_TYPE_LEVEL_HIGH>,
-					<0 302 IRQ_TYPE_LEVEL_HIGH>,
-					<0 303 IRQ_TYPE_LEVEL_HIGH>,
-					<0 304 IRQ_TYPE_LEVEL_HIGH>,
-					<0 305 IRQ_TYPE_LEVEL_HIGH>,
-					<0 306 IRQ_TYPE_LEVEL_HIGH>,
-					<0 307 IRQ_TYPE_LEVEL_HIGH>,
-					<0 308 IRQ_TYPE_LEVEL_HIGH>,
-					<0 309 IRQ_TYPE_LEVEL_HIGH>,
-					<0 310 IRQ_TYPE_LEVEL_HIGH>,
-					<0 311 IRQ_TYPE_LEVEL_HIGH>,
-					<0 312 IRQ_TYPE_LEVEL_HIGH>,
-					<0 313 IRQ_TYPE_LEVEL_HIGH>,
-					<0 314 IRQ_TYPE_LEVEL_HIGH>,
-					<0 315 IRQ_TYPE_LEVEL_HIGH>,
-					<0 316 IRQ_TYPE_LEVEL_HIGH>,
-					<0 317 IRQ_TYPE_LEVEL_HIGH>,
-					<0 318 IRQ_TYPE_LEVEL_HIGH>,
-					<0 319 IRQ_TYPE_LEVEL_HIGH>,
-					<0 320 IRQ_TYPE_LEVEL_HIGH>;
-			#dma-cells = <1>;
-			#dma-channels = <8>;
-			#dma-requests = <32>;
-			clocks = <&syst_pclk>;
-			clock-names = "apb_pclk";
-			//resets = <&rst DMA_RESET>, <&rst DMA_OCP_RESET>;
-			//reset-names = "dma", "dma-ocp";
-		};
-
 		dmac_bus_ns: dma-controller@490A0000 {
 			reg = <0x490A0000 0x1000>;
 			arm,primecell-periphid = <0x00041330>;
-		//	compatible = "arm,pl330", "arm,primecell";
+			compatible = "arm,pl330", "arm,primecell";
 			interrupt-parent = <&gic>;
 			interrupts = 	<0 288 IRQ_TYPE_LEVEL_HIGH>,
 					<0 289 IRQ_TYPE_LEVEL_HIGH>,
