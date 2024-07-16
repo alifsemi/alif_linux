@@ -1442,6 +1442,7 @@ F:	Documentation/devicetree/bindings/rtc/alif,devkit-rtc.txt
 F:	Documentation/devicetree/bindings/sound/alif,alif-pcm-card.txt
 F:	Documentation/devicetree/bindings/sound/alif,alif-pcm.txt
 F:	Documentation/devicetree/bindings/sound/knowles,sph0645.txt
+F:	Documentation/devicetree/bindings/sound/invensense,t5848.txt
 F:	Documentation/devicetree/bindings/spi/snps,dw-apb-ssi.yaml
 F:	Documentation/devicetree/bindings/timer/alif,alif-utimer.txt
 

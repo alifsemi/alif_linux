@@ -879,12 +879,20 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 	iounmap(tmp);
 
 	/* I2S0 */
-	/* Set to 160Mhz clock and divide by 69 (0x45) */
-	writel(0x10045, info->expmst0_base + 0x10);
+	/* Set to 76.8Mhz clock and divide by 33 (0x21) */
+	writel(0x101021, info->expmst0_base + 0x10);
+
+	/* I2S1 */
+	/* Set to 76.8Mhz clock and divide by 33 (0x21) */
+	writel(0x101021, info->expmst0_base + 0x14);
 
 	/* I2S2 */
-	/* Set to 160Mhz clock and divide by 69 (0x45) */
-	writel(0x10045, info->expmst0_base + 0x18);
+	/* Set to 76.8Mhz clock and divide by 33 (0x21) */
+	writel(0x101021, info->expmst0_base + 0x18);
+
+	/* I2S3 */
+	/* Set to 76.8Mhz clock and divide by 33 (0x21) */
+	writel(0x101021, info->expmst0_base + 0x1c);
 #endif
 	platform_set_drvdata(pdev, info);
 
