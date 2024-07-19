@@ -1,0 +1,63 @@
+def BRANCH = "devkit-b0-5.4.y"
+
+pipeline {
+    agent any
+    stages {
+        stage('checkout') {
+            steps {
+               script {
+                  sh '''#!/bin/bash -xe
+                     printenv
+                     echo "====> ${CHANGE_BRANCH} ${BRANCH_NAME}"
+                     if [ "${BRANCH_NAME}" = "devkit-b0-5.4.y" ] ; then
+                        BRANCH="devkit-b0-5.4.y"
+                     elif [ "${CHANGE_BRANCH}" != "null" ] ; then
+                        BRANCH="${CHANGE_BRANCH}"
+                     else
+                        BRANCH="devkit-b0-5.4.y"
+                     fi
+                     if [ \"x${BRANCH}\" != \"xdevkit-b0-5.4.y\" ] ; then
+                        for iter in `git log --format="%H" \
+                        origin/"${BRANCH}"...origin/devkit-b0-5.4.y` ; do
+                           if ! git show $iter | grep "^+" | codespell - ; then
+                              echo "Codespell failed on commit $iter"
+                              exit 1
+                           fi
+                           git show --stat $iter > checkpatch_input.txt
+                           git show $iter >> checkpatch_input.txt
+                           if cat checkpatch_input.txt | \
+                           ./scripts/checkpatch.pl \
+                           --ignore=COMMIT_LOG_LONG_LINE,NO_AUTHOR_SIGN_OFF \
+                           --ignore=NEW_TYPEDEFS,BAD_SIGN_OFF \
+                           --ignore=FILE_PATH_CHANGES,LONG_LINE_STRING \
+                           --ignore=LONG_LINE_COMMENT - ; then
+                              echo "INFO:checkpatch.pl succeeded"
+                           else
+                              echo "ERROR:checkpatch.pl failed on commit $iter"
+                              exit 1
+                           fi
+                           source /opt/alif/apss-tiny/0.1/environment-setup-cortexa32hf-neon-poky-linux-musleabi
+                           git checkout ${BRANCH}
+
+                           make distclean
+                           make -j64 devkit_e7_defconfig
+                           make -j64 xipImage
+                           make devkit-e7.dtb
+
+                           make distclean
+                           make -j64 devkit_e7_unicore_defconfig
+                           make -j64 xipImage
+                           make devkit-e7.dtb
+
+                           make distclean
+                           make -j64 devkit_e5_defconfig
+                           make -j64 xipImage
+                           make devkit-e5.dtb
+                        done
+                     fi
+                  '''
+               }
+            }
+        }
+    }
+}
