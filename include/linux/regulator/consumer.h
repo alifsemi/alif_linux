@@ -231,6 +231,8 @@ int __must_check devm_regulator_bulk_get(struct device *dev, int num_consumers,
 					 struct regulator_bulk_data *consumers);
 int __must_check regulator_bulk_enable(int num_consumers,
 				       struct regulator_bulk_data *consumers);
+int devm_regulator_bulk_get_enable(struct device *dev, int num_consumers,
+				   const char * const *id);
 int regulator_bulk_disable(int num_consumers,
 			   struct regulator_bulk_data *consumers);
 int regulator_bulk_force_disable(int num_consumers,
@@ -438,6 +440,13 @@ static inline int devm_regulator_bulk_get(struct device *dev, int num_consumers,
 
 static inline int regulator_bulk_enable(int num_consumers,
 					struct regulator_bulk_data *consumers)
+{
+	return 0;
+}
+
+static inline int devm_regulator_bulk_get_enable(struct device *dev,
+						 int num_consumers,
+						 const char * const *id)
 {
 	return 0;
 }

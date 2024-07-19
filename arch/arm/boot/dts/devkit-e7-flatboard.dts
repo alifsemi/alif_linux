@@ -906,7 +906,7 @@
 			reg = <0x49008000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "disabled";
+			status = "okay";
 
 			/* Port 9 */
 			port9: gpio-port@0 {
@@ -1312,6 +1312,15 @@
 				compatible = "bno055";
 				reg = <0x28 0x0 0x100>;
 			};*/
+			bmi323@69 {
+				compatible = "bosch,bmi323";
+				reg = <0x69 0x0 0x100>;
+				interrupt-parent = <&port9>;
+				interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
+				interrupt-names = "INT1";
+				vdd-supply = <&reg_1p2v>;
+				vdd_io-supply = <&reg_1p8v>;
+			};
 		};
 		/*====== DW I2S ====== */
 		i2s0: i2s0@49014000 {
@@ -2015,8 +2024,8 @@
 		 *	bit 7:	1 -> Open drain
 		 */
 		pinmux = <
-			PIN_P7_6__I3C_SDA_D	0x8b
-			PIN_P7_7__I3C_SCL_D	0x8b
+			PIN_P7_6__I3C_SDA_D	0x2b
+			PIN_P7_7__I3C_SCL_D	0x2b
 		>;
 	};
 	pinctrl_adc121: adc121grp {
