@@ -604,7 +604,17 @@ static int i2c_dw_irq_handler_master(struct dw_i2c_dev *dev)
 	 */
 
 tx_aborted:
-	if ((stat & (DW_IC_INTR_TX_ABRT | DW_IC_INTR_STOP_DET)) || dev->msg_err)
+	/*
+	 * Workaround for continuous data sending using I2C. When sending
+	 * continuous IC command data, I2C gives completion for partial
+	 * writes also, if the data to be sent is very large. This is
+	 * because the STOP condition is being observed even when whole of the
+	 * data to be Transmitted is not sent.
+	 * Hence, sending completion only when STOP has been detected and there
+	 * is no more data in TX buffer to be sent.
+	 */
+	if (((stat & DW_IC_INTR_STOP_DET) && !dev->tx_buf_len) ||
+	    (stat & DW_IC_INTR_TX_ABRT) || dev->msg_err)
 		complete(&dev->cmd_complete);
 	else if (unlikely(dev->flags & ACCESS_INTR_MASK)) {
 		/* Workaround to trigger pending interrupt */
