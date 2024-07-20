@@ -36,25 +36,25 @@ pipeline {
                               echo "ERROR:checkpatch.pl failed on commit $iter"
                               exit 1
                            fi
-                           source /opt/alif/apss-tiny/0.1/environment-setup-cortexa32hf-neon-poky-linux-musleabi
-                           git checkout ${BRANCH}
-
-                           make distclean
-                           make -j64 devkit_e7_defconfig
-                           make -j64 xipImage
-                           make devkit-e7.dtb
-
-                           make distclean
-                           make -j64 devkit_e7_unicore_defconfig
-                           make -j64 xipImage
-                           make devkit-e7.dtb
-
-                           make distclean
-                           make -j64 devkit_e5_defconfig
-                           make -j64 xipImage
-                           make devkit-e5.dtb
                         done
                      fi
+                     source /opt/alif/apss-tiny/0.1/environment-setup-cortexa32hf-neon-poky-linux-musleabi
+                     git checkout ${BRANCH}
+
+                     make distclean
+                     make -j64 devkit_e7_defconfig
+                     make -j64 xipImage
+                     make devkit-e7.dtb
+
+                     make distclean
+                     make -j64 devkit_e7_unicore_defconfig
+                     make -j64 xipImage
+                     make devkit-e7.dtb
+
+                     make distclean
+                     make -j64 devkit_e5_defconfig
+                     make -j64 xipImage
+                     make devkit-e5.dtb
                   '''
                }
             }
