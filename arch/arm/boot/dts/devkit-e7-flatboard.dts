@@ -807,7 +807,7 @@
 			reg = <0x49004000 0x1000>;
 			/*clocks = <&l4_mp_clk>;
 			resets = <&rst GPIO0_RESET>;*/
-			status = "disabled";
+			status = "okay";
 
 			/* Port 5 */
 			port5: gpio-port@0 {
@@ -1258,6 +1258,19 @@
 						remote-endpoint = <&csi2_in>;
 					};
 				};
+			};
+			goodix_ts@5d {
+				compatible = "goodix,gt911";
+				reg = <0x5d>;
+				AVDD28-supply = <&reg_2p7v>;
+				VDDIO-supply = <&reg_1p2v>;
+				interrupt-parent = <&port10>;
+				interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
+				irq-gpios = <&port10 4 IRQ_TYPE_EDGE_FALLING>;
+				reset-gpios = <&port5 0 GPIO_ACTIVE_LOW>;
+				touchscreen-size-x = <480>;
+				touchscreen-size-y = <800>;
+				status = "okay";
 			};
 		};
 
