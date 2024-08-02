@@ -528,8 +528,13 @@ static int goodix_reset(struct goodix_ts_data *ts)
 {
 	int error;
 
+	/* Pull INT line low. */
+	error = gpiod_direction_output(ts->gpiod_int, 0);
+	if (error)
+		return error;
+
 	/* begin select I2C slave addr */
-	error = gpiod_direction_output(ts->gpiod_rst, 0);
+	error = gpiod_direction_output(ts->gpiod_rst, 1);
 	if (error)
 		return error;
 
@@ -542,16 +547,11 @@ static int goodix_reset(struct goodix_ts_data *ts)
 
 	usleep_range(100, 2000);		/* T3: > 100us */
 
-	error = gpiod_direction_output(ts->gpiod_rst, 1);
+	error = gpiod_direction_output(ts->gpiod_rst, 0);
 	if (error)
 		return error;
 
 	usleep_range(6000, 10000);		/* T4: > 5ms */
-
-	/* end select I2C slave addr */
-	error = gpiod_direction_input(ts->gpiod_rst);
-	if (error)
-		return error;
 
 	error = goodix_int_sync(ts);
 	if (error)

@@ -1266,7 +1266,7 @@
 				VDDIO-supply = <&reg_1p2v>;
 				interrupt-parent = <&port10>;
 				interrupts = <4 IRQ_TYPE_EDGE_FALLING>;
-				irq-gpios = <&port10 4 IRQ_TYPE_EDGE_FALLING>;
+				irq-gpios = <&port10 4 0>;
 				reset-gpios = <&port5 0 GPIO_ACTIVE_LOW>;
 				touchscreen-size-x = <480>;
 				touchscreen-size-y = <800>;
