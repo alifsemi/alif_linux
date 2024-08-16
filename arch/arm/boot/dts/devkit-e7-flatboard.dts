@@ -1590,7 +1590,14 @@
 		};
 
 		adc0: adc12_0@49020000 {
-			compatible = "alif,bolt-adc";
+			compatible = "alif,adc-dev";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_adc120>;
+			interrupt-parent = <&gic>;
+			interrupts = <0 140 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 143 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 146 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 149 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x49020000 0x100>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
@@ -1598,20 +1605,47 @@
 		};
 
 		adc1: adc12_1@49021000 {
-			compatible = "alif,bolt-adc";
+			compatible = "alif,adc-dev";
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_adc121>;
+			interrupt-parent = <&gic>;
+			interrupts = <0 141 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 144 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 147 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 150 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x49021000 0x100>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
 			status = ADC121_STATUS;
 		};
+
 		adc2: adc12_2@49022000 {
-			compatible = "alif,bolt-adc";
+			compatible = "alif,adc-dev";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_adc122>;
+			interrupt-parent = <&gic>;
+			interrupts = <0 142 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 145 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 148 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 151 IRQ_TYPE_LEVEL_HIGH>;
 			reg = <0x49022000 0x100>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "apb_pclk" ;
 			status = ADC122_STATUS;
+		};
+		adc24: adc24@49027000 {
+			compatible = "alif,adc-dev";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_adc24>;
+			interrupt-parent = <&gic>;
+			interrupts = <0 152 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 153 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 154 IRQ_TYPE_LEVEL_HIGH>,
+				     <0 155 IRQ_TYPE_LEVEL_HIGH>;
+			reg = <0x49027000 0x100>;
+			clocks = <&syst_pclk 0>;
+			clock-names = "apb_pclk" ;
+			status = ADC24_STATUS;
 		};
 		dac0: dac12_0@49028000 {
 			compatible = "alif,ensemble-dac";
@@ -2058,10 +2092,38 @@
 			PIN_P7_7__I3C_SCL_D	0x2b
 		>;
 	};
+	pinctrl_adc120: adc120grp {
+		pinmux = <
+			PIN_P0_0__ANA_S0        0x23
+			PIN_P0_1__ANA_S1        0x23
+			PIN_P0_2__ANA_S2        0x23
+			PIN_P0_3__ANA_S3        0x23
+			PIN_P0_4__ANA_S4        0x23
+			PIN_P0_5__ANA_S5        0x23
+		>;
+	};
 	pinctrl_adc121: adc121grp {
 		pinmux = <
-			PIN_P0_6__ADC121_IN0	0x0
-			PIN_P0_7__ADC121_IN1	0x0
+			PIN_P0_6__ANA_S6	0x23
+			PIN_P1_2__ANA_S10	0x23
+			PIN_P1_3__ANA_S11	0x23
+		>;
+	};
+	pinctrl_adc122: adc122grp {
+		pinmux = <
+			PIN_P1_4__ANA_S12       0x23
+		>;
+	};
+	pinctrl_adc24: adc24grp {
+		pinmux = <
+			PIN_P0_0__ANA_S0        0x23
+			PIN_P0_1__ANA_S1        0x23
+			PIN_P0_2__ANA_S2        0x23
+			PIN_P0_3__ANA_S3        0x23
+			PIN_P0_4__ANA_S4        0x23
+			PIN_P0_5__ANA_S5        0x23
+			PIN_P0_6__ANA_S6        0x23
+			PIN_P0_7__ANA_S7        0x23
 		>;
 	};
 	pinctrl_spi1: spi1grp {

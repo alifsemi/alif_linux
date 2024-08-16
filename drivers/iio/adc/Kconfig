@@ -1073,6 +1073,17 @@ config VF610_ADC
 	  This driver can also be built as a module. If so, the module will be
 	  called vf610_adc.
 
+config ALIF_ADC
+	tristate "Alif ADC driver"
+	depends on ARCH_ENSEMBLE || COMPILE_TEST
+	depends on OF && HAS_IOMEM
+	help
+	  Say yes here to build support for Alif ADC.
+	  To compile this driver as a module, choose M here.
+
+	  This driver can also be built as a module. If so, the module will be
+	  called alif_adc.
+
 config VIPERBOARD_ADC
 	tristate "Viperboard ADC support"
 	depends on MFD_VIPERBOARD && USB

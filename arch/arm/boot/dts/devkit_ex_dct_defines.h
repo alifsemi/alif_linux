@@ -79,6 +79,7 @@
 #define ADC120_STATUS "disabled"
 #define ADC121_STATUS "disabled"
 #define ADC122_STATUS "disabled"
+#define ADC24_STATUS  "disabled"
 
 //CMP defines
 #define CMP0_STATUS "disabled"
