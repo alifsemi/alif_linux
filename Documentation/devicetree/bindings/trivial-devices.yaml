@@ -46,6 +46,8 @@ properties:
           - adi,adxl345
             # Three-Axis Digital Accelerometer (backward-compatibility value "adi,adxl345" must be listed too)
           - adi,adxl346
+            # ALIF devkit spi controller /dev node for testing.
+          - alif,spi-dev
             # AMS iAQ-Core VOC Sensor
           - ams,iaq-core
             # i2c serial eeprom  (24cxx)
