@@ -599,18 +599,25 @@
 		}; /* SPI0 */
 
                spi1: spi@48104000 {
-                       compatible = "snps,dwc-ssi-1.03a";
-                       #address-cells = <1>;
-                       #size-cells = <0>;
-                       reg = <0x48104000 0x1000>;
-                       num-cs = <1>;
-                       interrupts = <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>;
-                       clocks = <&syst_hclk>;
-                       clock-names = "ahb_clk" ;
-                       reg-io-width = <4>;
-                       spi-tx-bus-width = <1>;
-                       spi-rx-bus-width = <1>;
-                       status = SPI1_STATUS;
+			compatible = "snps,dwc-ssi-1.03a";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_spi1>;
+			reg = <0x48104000 0x1000>;
+			num-cs = <1>;
+			interrupts = <GIC_SPI 127 IRQ_TYPE_LEVEL_HIGH>;
+			clocks = <&syst_hclk>;
+			clock-names = "ahb_clk" ;
+			reg-io-width = <4>;
+			spi-tx-bus-width = <1>;
+			spi-rx-bus-width = <1>;
+			status = SPI1_STATUS;
+			spidev0:spidev@0 {
+				compatible = "alif,spi-dev";
+				reg = <0>;
+				spi-max-frequency= <1000000>;
+			};
                }; /* SPI1 */
 
                spi2: spi@48105000 {
@@ -2050,6 +2057,14 @@
 		pinmux = <
 			PIN_P0_6__ADC121_IN0	0x0
 			PIN_P0_7__ADC121_IN1	0x0
+		>;
+	};
+	pinctrl_spi1: spi1grp {
+		pinmux = <
+			PIN_P6_4__SPI1_SS0_B	0x0
+			PIN_P8_5__SPI1_SCLK_B	0x0
+			PIN_P8_3__SPI1_MISO_B	0x23
+			PIN_P8_4__SPI1_MOSI_B	0x0
 		>;
 	};
 	pinctrl_spi3: spi3grp {
