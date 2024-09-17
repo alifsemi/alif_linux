@@ -225,6 +225,19 @@ struct ensemble_pinctrl {
 #define ENSEMBLE_PINCONF_DRV			BIT(7)
 #define ENSEMBLE_NO_PAD_CTL  			0x00000000
 
+/*DMA event router and clock control per master registers*/
+#define EVNTRTR0_BASE	0x49035000
+#define I2S3_DMA_RX_REQ_ID	27
+#define I2S3_DMA_TX_REQ_ID	31
+#define DMACTRL_I2S3_RX_OFFSET	(4*I2S3_DMA_RX_REQ_ID)
+#define DMACTRL_I2S3_TX_OFFSET	(4*I2S3_DMA_TX_REQ_ID)
+#define DMA_ACK_TYPE1_OFFSET	0x94
+#define DMA_REQ_CTRL_OFFSET	0x80
+#define CLKCTL_PER_MST_BASE	0x4903f000
+#define CLKCTL_DMACTRL_OFFSET		0x70
+#define CLKCTL_DMAIRQ_OFFSET		0x74
+#define CLKCTL_DMAPERIPH_OFFSET		0x78
+
 static inline const struct group_desc *ensemble_pinctrl_find_group_by_name(
 				struct pinctrl_dev *pctldev,
 				const char *name)
@@ -891,8 +904,48 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 	writel(0x101021, info->expmst0_base + 0x18);
 
 	/* I2S3 */
-	/* Set to 76.8Mhz clock and divide by 33 (0x21) */
-	writel(0x101021, info->expmst0_base + 0x1c);
+	/* Set to 76.8Mhz clock and divide by 25 (0x19) */
+	writel(0x101019, info->expmst0_base + 0x1c);
+
+	/*evtrtr and expansion slave settings for DMA0 I2S3*/
+
+	/* Select group 1 and enable DMA channel for I2S3 RX*/
+	tmp = ioremap((EVNTRTR0_BASE + DMACTRL_I2S3_RX_OFFSET), 0x4);
+	writel(0x11, tmp);
+	iounmap(tmp);
+
+	/* Select group 1 and enable DMA channel for I2S3 TX*/
+	tmp = ioremap((EVNTRTR0_BASE + DMACTRL_I2S3_TX_OFFSET), 0x4);
+	writel(0x11, tmp);
+	iounmap(tmp);
+
+	/* Select DMA handshake type for grp1 I2S3 RX and TX*/
+	tmp = ioremap(EVNTRTR0_BASE + DMA_ACK_TYPE1_OFFSET, 0x4);
+	val = readl(tmp);
+	val |= (1 << I2S3_DMA_RX_REQ_ID) | (1 << I2S3_DMA_TX_REQ_ID);
+	writel(val, tmp);
+	iounmap(tmp);
+
+	tmp = ioremap(EVNTRTR0_BASE + DMA_REQ_CTRL_OFFSET, 0x4);
+	writel(0x1111, tmp);
+	iounmap(tmp);
+
+	/* CLKCTL_PER_MST settings for enablng DMA*/
+	tmp = ioremap(CLKCTL_PER_MST_BASE + CLKCTL_DMACTRL_OFFSET, 0x4);
+	val = readl(tmp);
+	val |= (1 << 0);
+	val |= (1 << 16);
+	writel(val, tmp);
+	iounmap(tmp);
+
+	/*Assigning DMA0 to the non secure state*/
+	tmp = ioremap(CLKCTL_PER_MST_BASE + CLKCTL_DMAIRQ_OFFSET, 0x4);
+	writel(0xffffffff, tmp);
+	iounmap(tmp);
+
+	tmp = ioremap(CLKCTL_PER_MST_BASE + CLKCTL_DMAPERIPH_OFFSET, 0x4);
+	writel(0xffffffff, tmp);
+	iounmap(tmp);
 #endif
 	platform_set_drvdata(pdev, info);
 

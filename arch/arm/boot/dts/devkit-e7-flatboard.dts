@@ -1393,10 +1393,15 @@
 			clocks = <&i2s3_clk 0>;
 			clock-names = "i2sclk";
 			#sound-dai-cells = <0>;
-			interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
-			//dmas = <&dma0 5>;
-			//dma-names = "tx";
-			status = "okay";
+			/*
+			 * If you want to disable DMA, uncomment the
+			 * below interrupts property
+			 */
+			//interrupts = <GIC_SPI 133 IRQ_TYPE_LEVEL_HIGH>;
+			dmas =	<&dmac_bus_ns 31 >,
+				<&dmac_bus_ns 27 >;
+			dma-names = "tx", "rx";
+			status = I2S3_STATUS;
 		};
 	};
 
