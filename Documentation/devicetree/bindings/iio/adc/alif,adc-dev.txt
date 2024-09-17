@@ -1,0 +1,39 @@
+Alif ADC12/ADC24 device driver
+
+Required properties:
+- compatible: Must be "alif,adc-dev"
+- reg: Address and length of the device's register set.
+- clock-names: List of input clocks.
+  Required elements: "apb_pclk"
+- clocks: Input clock specifier. Refer to common clock bindings.
+
+
+Examples:
+adc0: adc12_0@49020000 {
+	compatible = "alif,adc-dev";
+	reg = <0x49020000 0x100>;
+	clocks = <&syst_pclk 0>;
+	clock-names = "apb_pclk" ;
+	status = ADC120_STATUS;
+};
+adc1: adc12_1@49021000 {
+	compatible = "alif,adc-dev";
+	reg = <0x49021000 0x100>;
+	clocks = <&syst_pclk 0>;
+	clock-names = "apb_pclk" ;
+	status = ADC121_STATUS;
+};
+adc2: adc12_2@49022000 {
+	compatible = "alif,adc-dev";
+	reg = <0x49022000 0x100>;
+	clocks = <&syst_pclk 0>;
+	clock-names = "apb_pclk" ;
+	status = ADC122_STATUS;
+};
+adc24: adc24@49027000 {
+	compatible = "alif,adc-dev";
+	reg = <0x49027000 0x100>;
+	clocks = <&syst_pclk 0>;
+	clock-names = "apb_pclk" ;
+	status = ADC24_STATUS;
+};
