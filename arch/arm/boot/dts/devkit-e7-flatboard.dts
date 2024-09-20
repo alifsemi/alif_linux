@@ -585,17 +585,24 @@
 
 		spi0: spi@48103000 {
 			compatible = "snps,dwc-ssi-1.03a";
-			#address-cells = <1>;
+			#address-cells = <0>;
 			#size-cells = <0>;
 			reg = <0x48103000 0x1000>;
 			num-cs = <1>;
 			interrupts = <GIC_SPI 126 IRQ_TYPE_LEVEL_HIGH>;
 			clocks = <&syst_hclk>;
 			clock-names = "ahb_clk" ;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_spi0>;
 			reg-io-width = <4>;
 			spi-tx-bus-width = <1>;
 			spi-rx-bus-width = <1>;
 			status = SPI0_STATUS;
+			spi-slave;
+			slave {
+				compatible = "alif,spi-dev";
+				spi-max-frequency= <1000000>;
+			};
 		}; /* SPI0 */
 
                spi1: spi@48104000 {
@@ -613,7 +620,7 @@
 			spi-tx-bus-width = <1>;
 			spi-rx-bus-width = <1>;
 			status = SPI1_STATUS;
-			spidev0:spidev@0 {
+			spidev1:spidev@0 {
 				compatible = "alif,spi-dev";
 				reg = <0>;
 				spi-max-frequency= <1000000>;
@@ -2124,6 +2131,14 @@
 			PIN_P0_5__ANA_S5        0x23
 			PIN_P0_6__ANA_S6        0x23
 			PIN_P0_7__ANA_S7        0x23
+		>;
+	};
+	pinctrl_spi0: spi0grp {
+		pinmux = <
+			PIN_P5_2__SPI0_SS0_B	0x23
+			PIN_P5_3__SPI0_SCLK_B	0x23
+			PIN_P5_0__SPI0_MISO_B	0x23
+			PIN_P5_1__SPI0_MOSI_B	0x23
 		>;
 	};
 	pinctrl_spi1: spi1grp {
