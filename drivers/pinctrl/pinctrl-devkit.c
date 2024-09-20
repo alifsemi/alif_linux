@@ -237,7 +237,7 @@ struct ensemble_pinctrl {
 #define CLKCTL_DMACTRL_OFFSET		0x70
 #define CLKCTL_DMAIRQ_OFFSET		0x74
 #define CLKCTL_DMAPERIPH_OFFSET		0x78
-
+#define SSI_CTRL_OFFSET			0x28
 static inline const struct group_desc *ensemble_pinctrl_find_group_by_name(
 				struct pinctrl_dev *pctldev,
 				const char *name)
@@ -946,6 +946,15 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 	tmp = ioremap(CLKCTL_PER_MST_BASE + CLKCTL_DMAPERIPH_OFFSET, 0x4);
 	writel(0xffffffff, tmp);
 	iounmap(tmp);
+
+	/*
+	 * setting of SS_IN and SS_SEL values in the SSI_CTRL register
+	 * Setting SPI0 as slave and SPI1,SPI2 and SPI3 as master.
+	 * Each bit in the SS_IN and SS_SEL field corresponds to
+	 * each SPI instances respectively.Setting the bit configures
+	 * that instance as master controller.
+	 */
+	writel(0x0E0E, info->expmst0_base + SSI_CTRL_OFFSET);
 #endif
 	platform_set_drvdata(pdev, info);
 

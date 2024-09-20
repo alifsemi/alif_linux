@@ -147,11 +147,6 @@ static int dw_spi_mmio_probe(struct platform_device *pdev)
 	struct dw_spi *dws;
 	int ret;
 	int num_cs;
-	void __iomem *regs = ioremap(EXPMST0_ADDR, 4);
-
-	/* Enable all Four SSI(SPI0-SPI3) instances in Programmable mode */
-	writel(0xF0F, regs);
-	iounmap(regs);
 
 	dwsmmio = devm_kzalloc(&pdev->dev, sizeof(struct dw_spi_mmio),
 			GFP_KERNEL);

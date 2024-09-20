@@ -308,6 +308,11 @@ u32 dw_spi_update_cr0_v1_03a(struct spi_controller *master,
 	 * CTRLR0[ 9] Serial Clock Polarity
 	 */
 	cr0 |= (SPI_MODE_1 << DWC_SSI_CTRLR0_SCPH_OFFSET);
+	if (spi->mode & SPI_CPOL)
+		cr0 |= SPI_CPOL << DWC_SSI_CTRLR0_SCPOL_OFFSET;
+
+	if (spi->mode & SPI_CPHA)
+		cr0 |= SPI_CPHA << DWC_SSI_CTRLR0_SCPH_OFFSET;
 
 	/* CTRLR0[11:10] Transfer Mode */
 	cr0 |= chip->tmode << DWC_SSI_CTRLR0_TMOD_OFFSET;
@@ -315,6 +320,9 @@ u32 dw_spi_update_cr0_v1_03a(struct spi_controller *master,
 	/* CTRLR0[31] Master mode, CTRLR0[14] Slave Select Toggle on and CTRLR0[12] Slave Output Enable */
 	cr0 |= ( 1 << DWC_SSI_CTRLR0_MASTER) | (1 << DWC_SSI_CTRLR0_SSTE_ON) | (0 << DWC_SSI_CTRLR0_SLVOE_OFFSET);
 
+	if (spi_controller_is_slave(master)) {
+		cr0 &= ~(1 << DWC_SSI_CTRLR0_MASTER);
+	}
 	/* Adjust Transfer Mode if necessary */
 	if (chip->cs_control) {
 		chip->tmode = dw_spi_update_tmode(dws);
@@ -383,7 +391,8 @@ static int dw_spi_transfer_one(struct spi_controller *master,
 			return ret;
 		}
 	} else if (!chip->poll_mode) {
-		txlevel = min_t(u16, dws->fifo_len / 2, dws->len / dws->n_bytes);
+		txlevel = min_t(u16, dws->fifo_len / 2,
+				((dws->len / dws->n_bytes)-1));
 		dw_writel(dws, DW_SPI_TXFLTR, txlevel);
 
 		/* Set the interrupt mask */
@@ -494,10 +503,17 @@ int dw_spi_add_host(struct device *dev, struct dw_spi *dws)
 {
 	struct spi_controller *master;
 	int ret;
+	bool is_slave;
 
 	BUG_ON(dws == NULL);
 
-	master = spi_alloc_master(dev, 0);
+	is_slave = of_property_read_bool(dev->of_node, "spi-slave");
+	if (is_slave)
+		master = spi_alloc_slave(dev, 0);
+
+	else
+		master = spi_alloc_master(dev, 0);
+
 	if (!master)
 		return -ENOMEM;
 
@@ -530,6 +546,7 @@ int dw_spi_add_host(struct device *dev, struct dw_spi *dws)
 	master->dev.of_node = dev->of_node;
 	master->dev.fwnode = dev->fwnode;
 	master->flags = SPI_MASTER_GPIO_SS;
+	master->slave = is_slave;
 
 	if (dws->set_cs)
 		master->set_cs = dws->set_cs;
