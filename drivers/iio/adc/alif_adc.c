@@ -377,7 +377,7 @@ ALIF_ADC_CHANNEL(7, IIO_VOLTAGE), };
 
 static const struct iio_chan_spec adc24_channels[] = {
 ALIF_ADC_CHANNEL_DIFF(0, 4, 8),
-ALIF_ADC_CHANNEL_DIFF(0, 5, 9),
+ALIF_ADC_CHANNEL_DIFF(1, 5, 9),
 ALIF_ADC_CHANNEL_DIFF(2, 6, 10),
 ALIF_ADC_CHANNEL_DIFF(3, 7, 11), };
 
