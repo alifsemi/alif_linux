@@ -1414,7 +1414,7 @@
 			compatible = "alif,alif-pcm";
 			pinctrl-names = "default";
 			pinctrl-0 = <&pinctrl_pcm0>;
-			reg = <0x4902D000 0x800>;
+			reg = <0x4902D000 0x1000>;
 			clocks = <&syst_pclk 0>;
 			clock-names = "pclk";
 			interrupt-parent = <&gic>;
@@ -2166,8 +2166,12 @@
 	};
 	pinctrl_pcm0: pcm0grp {
 		pinmux = <
-			PIN_P6_7__PDM_C2_A	0x0
-			PIN_P5_4__PDM_D2_B	0x0
+			PIN_P6_7__PDM_C2_A      0x0
+			PIN_P5_4__PDM_D2_B      0x1
+			PIN_P0_5__PDM_C0_A      0x0
+			PIN_P0_4__PDM_D0_A      0x1
+			PIN_P6_3__PDM_C1_C      0x0
+			PIN_P6_2__PDM_D1_C      0x1
 		>;
 	};
 

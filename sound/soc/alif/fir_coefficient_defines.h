@@ -1,0 +1,211 @@
+/* SPDX-License-Identifier: GPL-2.0-only */
+
+#define PDM_CH0_FIR_COEF_0	0x040
+#define PDM_CH0_FIR_COEF_1	0x044
+#define PDM_CH0_FIR_COEF_2	0x048
+#define PDM_CH0_FIR_COEF_3	0x04c
+#define PDM_CH0_FIR_COEF_4	0x050
+#define PDM_CH0_FIR_COEF_5	0x054
+#define PDM_CH0_FIR_COEF_6	0x058
+#define PDM_CH0_FIR_COEF_7	0x05c
+#define PDM_CH0_FIR_COEF_8	0x060
+#define PDM_CH0_FIR_COEF_9	0x064
+#define PDM_CH0_FIR_COEF_10	0x068
+#define PDM_CH0_FIR_COEF_11	0x06c
+#define PDM_CH0_FIR_COEF_12	0x070
+#define PDM_CH0_FIR_COEF_13	0x074
+#define PDM_CH0_FIR_COEF_14	0x078
+#define PDM_CH0_FIR_COEF_15	0x07c
+#define PDM_CH0_FIR_COEF_16	0x080
+#define PDM_CH0_FIR_COEF_17	0x084
+
+
+#define PDM_CH0_IIR_COEF_SEL	0x0c0
+#define PDM_CH0_PHASE		0x0c4
+#define PDM_CH0_GAIN		0x0c8
+#define PDM_CH0_PKDET_TH	0x0cc
+#define PDM_CH0_PKDET_ITV	0x0d0
+
+
+#define PDM_CH1_FIR_COEF_0	0x140
+#define PDM_CH1_FIR_COEF_1	0x144
+#define PDM_CH1_FIR_COEF_2	0x148
+#define PDM_CH1_FIR_COEF_3	0x14c
+#define PDM_CH1_FIR_COEF_4	0x150
+#define PDM_CH1_FIR_COEF_5	0x154
+#define PDM_CH1_FIR_COEF_6	0x158
+#define PDM_CH1_FIR_COEF_7	0x15c
+#define PDM_CH1_FIR_COEF_8	0x160
+#define PDM_CH1_FIR_COEF_9	0x164
+#define PDM_CH1_FIR_COEF_10	0x168
+#define PDM_CH1_FIR_COEF_11	0x16c
+#define PDM_CH1_FIR_COEF_12	0x170
+#define PDM_CH1_FIR_COEF_13	0x174
+#define PDM_CH1_FIR_COEF_14	0x178
+#define PDM_CH1_FIR_COEF_15	0x17c
+#define PDM_CH1_FIR_COEF_16	0x180
+#define PDM_CH1_FIR_COEF_17	0x184
+
+#define PDM_CH1_IIR_COEF_SEL	0x1c0
+#define PDM_CH1_PHASE		0x1c4
+#define PDM_CH1_GAIN		0x1c8
+#define PDM_CH1_PKDET_TH	0x1cc
+#define PDM_CH1_PKDET_ITV	0x1d0
+
+
+#define PDM_CH2_FIR_COEF_0	0x240
+#define PDM_CH2_FIR_COEF_1	0x244
+#define PDM_CH2_FIR_COEF_2	0x248
+#define PDM_CH2_FIR_COEF_3	0x24c
+#define PDM_CH2_FIR_COEF_4	0x250
+#define PDM_CH2_FIR_COEF_5	0x254
+#define PDM_CH2_FIR_COEF_6	0x258
+#define PDM_CH2_FIR_COEF_7	0x25c
+#define PDM_CH2_FIR_COEF_8	0x260
+#define PDM_CH2_FIR_COEF_9	0x264
+#define PDM_CH2_FIR_COEF_10	0x268
+#define PDM_CH2_FIR_COEF_11	0x26c
+#define PDM_CH2_FIR_COEF_12	0x270
+#define PDM_CH2_FIR_COEF_13	0x274
+#define PDM_CH2_FIR_COEF_14	0x278
+#define PDM_CH2_FIR_COEF_15	0x27c
+#define PDM_CH2_FIR_COEF_16	0x280
+#define PDM_CH2_FIR_COEF_17	0x284
+
+#define PDM_CH2_IIR_COEF_SEL	0x2c0
+#define PDM_CH2_PHASE		0x2c4
+#define PDM_CH2_GAIN		0x2c8
+#define PDM_CH2_PKDET_TH	0x2cc
+#define PDM_CH2_PKDET_ITV	0x2d0
+
+
+
+#define PDM_CH3_FIR_COEF_0	0x340
+#define PDM_CH3_FIR_COEF_1	0x344
+#define PDM_CH3_FIR_COEF_2	0x348
+#define PDM_CH3_FIR_COEF_3	0x34c
+#define PDM_CH3_FIR_COEF_4	0x350
+#define PDM_CH3_FIR_COEF_5	0x354
+#define PDM_CH3_FIR_COEF_6	0x358
+#define PDM_CH3_FIR_COEF_7	0x35c
+#define PDM_CH3_FIR_COEF_8	0x360
+#define PDM_CH3_FIR_COEF_9	0x364
+#define PDM_CH3_FIR_COEF_10	0x368
+#define PDM_CH3_FIR_COEF_11	0x36c
+#define PDM_CH3_FIR_COEF_12	0x370
+#define PDM_CH3_FIR_COEF_13	0x374
+#define PDM_CH3_FIR_COEF_14	0x378
+#define PDM_CH3_FIR_COEF_15	0x37c
+#define PDM_CH3_FIR_COEF_16	0x380
+#define PDM_CH3_FIR_COEF_17	0x384
+
+#define PDM_CH3_IIR_COEF_SEL	0x3c0
+#define PDM_CH3_PHASE		0x3c4
+#define PDM_CH3_GAIN		0x3c8
+#define PDM_CH3_PKDET_TH	0x3cc
+#define PDM_CH3_PKDET_ITV	0x3d0
+
+
+#define PDM_CH4_FIR_COEF_0	0x440
+#define PDM_CH4_FIR_COEF_1	0x444
+#define PDM_CH4_FIR_COEF_2	0x448
+#define PDM_CH4_FIR_COEF_3	0x44c
+#define PDM_CH4_FIR_COEF_4	0x450
+#define PDM_CH4_FIR_COEF_5	0x454
+#define PDM_CH4_FIR_COEF_6	0x458
+#define PDM_CH4_FIR_COEF_7	0x45c
+#define PDM_CH4_FIR_COEF_8	0x460
+#define PDM_CH4_FIR_COEF_9	0x464
+#define PDM_CH4_FIR_COEF_10	0x468
+#define PDM_CH4_FIR_COEF_11	0x46c
+#define PDM_CH4_FIR_COEF_12	0x470
+#define PDM_CH4_FIR_COEF_13	0x474
+#define PDM_CH4_FIR_COEF_14	0x478
+#define PDM_CH4_FIR_COEF_15	0x47c
+#define PDM_CH4_FIR_COEF_16	0x480
+#define PDM_CH4_FIR_COEF_17	0x484
+
+#define PDM_CH4_IIR_COEF_SEL	0x4c0
+#define PDM_CH4_PHASE		0x4c4
+#define PDM_CH4_GAIN		0x4c8
+#define PDM_CH4_PKDET_TH	0x4cc
+#define PDM_CH4_PKDET_ITV	0x4d0
+
+
+#define PDM_CH5_FIR_COEF_0      0x540
+#define PDM_CH5_FIR_COEF_1      0x544
+#define PDM_CH5_FIR_COEF_2      0x548
+#define PDM_CH5_FIR_COEF_3      0x54c
+#define PDM_CH5_FIR_COEF_4      0x550
+#define PDM_CH5_FIR_COEF_5      0x554
+#define PDM_CH5_FIR_COEF_6      0x558
+#define PDM_CH5_FIR_COEF_7      0x55c
+#define PDM_CH5_FIR_COEF_8      0x560
+#define PDM_CH5_FIR_COEF_9      0x564
+#define PDM_CH5_FIR_COEF_10     0x568
+#define PDM_CH5_FIR_COEF_11     0x56c
+#define PDM_CH5_FIR_COEF_12     0x570
+#define PDM_CH5_FIR_COEF_13     0x574
+#define PDM_CH5_FIR_COEF_14     0x578
+#define PDM_CH5_FIR_COEF_15     0x57c
+#define PDM_CH5_FIR_COEF_16     0x580
+#define PDM_CH5_FIR_COEF_17     0x584
+
+#define PDM_CH5_IIR_COEF_SEL    0x5c0
+#define PDM_CH5_PHASE           0x5c4
+#define PDM_CH5_GAIN            0x5c8
+#define PDM_CH5_PKDET_TH        0x5cc
+#define PDM_CH5_PKDET_ITV       0x5d0
+
+
+#define PDM_CH6_FIR_COEF_0      0x640
+#define PDM_CH6_FIR_COEF_1      0x644
+#define PDM_CH6_FIR_COEF_2      0x648
+#define PDM_CH6_FIR_COEF_3      0x64c
+#define PDM_CH6_FIR_COEF_4      0x650
+#define PDM_CH6_FIR_COEF_5      0x654
+#define PDM_CH6_FIR_COEF_6      0x658
+#define PDM_CH6_FIR_COEF_7      0x65c
+#define PDM_CH6_FIR_COEF_8      0x660
+#define PDM_CH6_FIR_COEF_9      0x664
+#define PDM_CH6_FIR_COEF_10     0x668
+#define PDM_CH6_FIR_COEF_11     0x66c
+#define PDM_CH6_FIR_COEF_12     0x670
+#define PDM_CH6_FIR_COEF_13     0x674
+#define PDM_CH6_FIR_COEF_14     0x678
+#define PDM_CH6_FIR_COEF_15     0x67c
+#define PDM_CH6_FIR_COEF_16     0x680
+#define PDM_CH6_FIR_COEF_17     0x684
+
+#define PDM_CH6_IIR_COEF_SEL    0x6c0
+#define PDM_CH6_PHASE           0x6c4
+#define PDM_CH6_GAIN            0x6c8
+#define PDM_CH6_PKDET_TH        0x6cc
+#define PDM_CH6_PKDET_ITV       0x6d0
+
+
+
+#define PDM_CH7_FIR_COEF_0      0x740
+#define PDM_CH7_FIR_COEF_1      0x744
+#define PDM_CH7_FIR_COEF_2      0x748
+#define PDM_CH7_FIR_COEF_3      0x74c
+#define PDM_CH7_FIR_COEF_4      0x750
+#define PDM_CH7_FIR_COEF_5      0x754
+#define PDM_CH7_FIR_COEF_6      0x758
+#define PDM_CH7_FIR_COEF_7      0x75c
+#define PDM_CH7_FIR_COEF_8      0x760
+#define PDM_CH7_FIR_COEF_9      0x764
+#define PDM_CH7_FIR_COEF_10     0x768
+#define PDM_CH7_FIR_COEF_11     0x76c
+#define PDM_CH7_FIR_COEF_12     0x770
+#define PDM_CH7_FIR_COEF_13     0x774
+#define PDM_CH7_FIR_COEF_14     0x778
+#define PDM_CH7_FIR_COEF_15     0x77c
+#define PDM_CH7_FIR_COEF_16     0x780
+#define PDM_CH7_FIR_COEF_17     0x784
+
+#define PDM_CH7_IIR_COEF_SEL    0x7c0
+#define PDM_CH7_PHASE           0x7c4
+#define PDM_CH7_GAIN            0x7c8
+#define PDM_CH7_PKDET_TH        0x7cc
+#define PDM_CH7_PKDET_ITV       0x7d0

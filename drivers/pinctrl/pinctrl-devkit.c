@@ -798,8 +798,8 @@ static int ensemble_pctl_probe(struct platform_device *pdev)
 #if 1
 	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
 	info->expmst0_base = devm_ioremap_resource(&pdev->dev, res);
-	/* Enable Peripheral functional clocks and APB interface clocks. */
-	writel(0xC0000000, info->expmst0_base);
+	/* Enable Peripheral clocks, PDM clk and APB interface clocks. */
+	writel(0xC0000100, info->expmst0_base);
 
 	/* Enable UART2, UART4*/
 	val = readl(info->expmst0_base + 0x8);
