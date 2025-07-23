@@ -40,6 +40,13 @@
 			enable-method = "psci";
 			next-level-cache = <&L2_0>;
 		};
+		cpu@1 {
+			compatible = "arm,armv8";
+			reg = <1>;
+			device_type = "cpu";
+			enable-method = "psci";
+			next-level-cache = <&L2_0>;
+		};
 	};
 
 	psci {
